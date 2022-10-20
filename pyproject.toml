@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "contest-bitnp"
+version = "0.1.0"
+description = "国防知识竞赛"
+authors = [
+    "Y.D.X. <73375426+YDX-2147483647@users.noreply.github.com>",
+    "Phoupraw <Phoupraw@users.noreply.github.com>",
+]
+readme = "README.md"
+packages = [{include = "contest"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^4.1.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
