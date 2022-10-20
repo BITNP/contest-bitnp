@@ -1,0 +1,10 @@
+<h1>{{ question.content }}</h1>
+{% if question.choice_set.all %}
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.content }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>无选项。</p>
+{% endif %}

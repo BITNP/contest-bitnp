@@ -1,0 +1,9 @@
+{% if question_list %}
+    <ul>
+    {% for q in question_list %}
+        <li><a href="{% url 'polls:detail' q.id %}">{{ q.content }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>尚无题目。</p>
+{% endif %}
