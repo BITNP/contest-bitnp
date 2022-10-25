@@ -1,0 +1,9 @@
+<h1>{{ question.content }}</h1>
+
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.content }}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">重新投票？</a>
