@@ -2,5 +2,20 @@ from django.contrib import admin
 
 from .models import Choice, Question
 
-admin.site.register(Question)
-admin.site.register(Choice)
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ("(⊙_⊙)", {"fields": ["content"]}),
+    ]
+
+    inlines = [ChoiceInline]
+
+    search_fields = ["content"]
+
+
+admin.site.register(Question, QuestionAdmin)
