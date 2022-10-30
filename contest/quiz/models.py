@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -36,7 +37,10 @@ class Student(models.Model):
         primary_key=True,
         verbose_name="用户",
     )
-    final_score = models.FloatField("最终得分")
+
+    @admin.display(description="最终得分")
+    def final_score(self) -> float:
+        return max(r.score() for r in self.response_set.all())
 
     # todo: name 应该取自 CAS。
     name = models.CharField("姓名", max_length=50)
@@ -49,13 +53,19 @@ class Student(models.Model):
 
 
 class Response(models.Model):
-    score = models.FloatField("得分")
     submit_at = models.DateTimeField("提交时刻")
-
     student = models.ForeignKey(Student, verbose_name="作答者", on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"{self.student.name} 在 {self.submit_at} 提交的答卷"
+
+    @admin.display(description="得分")
+    def score(self) -> float:
+        return (
+            100
+            * len(self.answer_set.filter(choice__correct=True))
+            / len(self.answer_set.all())
+        )
 
     class Meta:
         verbose_name_plural = verbose_name = "答卷"

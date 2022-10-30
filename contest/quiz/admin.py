@@ -35,11 +35,13 @@ class AnswerInline(admin.TabularInline):
 @admin.register(Response)
 class ResponseAdmin(admin.ModelAdmin):
     fields = ["student", "submit_at", "score"]
+    readonly_fields = ["score"]
     inlines = [AnswerInline]
 
 
 class ResponseInline(admin.TabularInline):
     model = Response
+    readonly_fields = fields = ["submit_at", "score"]
     extra = 0
 
 
@@ -62,8 +64,9 @@ class DraftResponseInline(admin.StackedInline):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     fields = ["user", "name", "final_score"]
+    readonly_fields = ["final_score"]
     search_fields = ["name", "user__username"]
-    list_filter = ["final_score"]
+    # todo: list_filter = ["final_score"]
     list_display = ["name", "final_score"]
 
     inlines = [ResponseInline, DraftResponseInline]
