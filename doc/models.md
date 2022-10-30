@@ -10,6 +10,7 @@ erDiagram
     Response ||--|{ Answer: contains
     Response {
         float score
+        datetime submit_at
     }
     Question ||..|{ Answer: replies
     Choice ||..|{ Answer: selects
