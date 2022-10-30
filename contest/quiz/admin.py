@@ -34,6 +34,7 @@ class AnswerInline(admin.TabularInline):
 
 @admin.register(Response)
 class ResponseAdmin(admin.ModelAdmin):
+    fields = ["student", "submit_at", "score"]
     inlines = [AnswerInline]
 
 
@@ -49,6 +50,7 @@ class DraftAnswerInline(admin.TabularInline):
 
 @admin.register(DraftResponse)
 class DraftResponseAdmin(admin.ModelAdmin):
+    fields = ["student", "deadline"]
     inlines = [DraftAnswerInline]
 
 
@@ -60,8 +62,7 @@ class DraftResponseInline(admin.StackedInline):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     fields = ["user", "name", "final_score"]
-    # todo: 支持搜索 user 的字段
-    search_fields = ["name"]
+    search_fields = ["name", "user__username"]
     list_filter = ["final_score"]
     list_display = ["name", "final_score"]
 
