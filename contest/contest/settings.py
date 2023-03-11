@@ -125,3 +125,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Django auth settings
 AUTH_USER_MODEL = "quiz.User"
+LOGIN_URL = "quiz:login"
+LOGIN_REDIRECT_URL = "quiz:index"

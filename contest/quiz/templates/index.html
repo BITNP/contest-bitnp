@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+    <p>您就是 {{ user }} ？</p>
+{% else %}
+    <p>请先<a href="{% url 'quiz:login' %}">登录</a>。</p>
+{% endif %}
+
+{% endblock %}

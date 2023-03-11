@@ -1,0 +1,20 @@
+{% load static %}<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}国防知识竞赛{% endblock %}</title>
+  </head>
+  <body>
+    <header>
+      {% if user.is_authenticated %}
+        <a href="{% url 'quiz:logout' %}" role="button">登出</a>
+      {% else %}
+        <a href="{% url 'quiz:login' %}" role="button">登录</a>
+      {% endif %}
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
