@@ -3,18 +3,26 @@
 {% block content %}
 <p>截止时刻：{{ draft_response.deadline }}。</p>
 
-<ol>
+<form action="{% url 'quiz:contest_submit' %}" method="post">
+    {% csrf_token %}
+
     {% for a in draft_response.answer_set.all %}
-    <li>
-        <p>题干：{{ a.question }}</p>
-        <p>选项：</p>
-        <ul>
-            {% for choice in a.question.choice_set.all %}
-            <li>{{ choice }}</li>
-            {% endfor %}
-        </ul>
-        <p>您的选择：{{ a.choice }}。</p>
-    </li>
+    <fieldset>
+        <legend>{{ a.question }}</legend>
+        {% for choice in a.question.choice_set.all %}
+        <div>
+            {% if a.choice.id == choice.id %}
+            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}" checked>
+            {% else %}
+            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}">
+            {% endif %}
+            <label for="choice-{{ choice.id }}">{{ choice }}</label>
+        </div>
+        {% endfor %}
+    </fieldset>
     {% endfor %}
-</ol>
+    <div>
+        <button type="submit">提交</button>
+    </div>
+</form>
 {% endblock %}

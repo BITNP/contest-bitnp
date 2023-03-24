@@ -6,11 +6,14 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic.base import TemplateView
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
+from django.views.generic.base import TemplateView
 
-from .models import DraftResponse, Question
+from .models import Answer, Choice, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser
@@ -29,6 +32,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 @login_required
 @user_passes_test(is_student)
+@require_GET
 def contest(request: HttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
@@ -56,3 +60,42 @@ def contest(request: HttpRequest) -> HttpResponse:
             "draft_response": draft_response,
         },
     )
+
+
+@login_required
+@user_passes_test(is_student)
+@require_POST
+def contest_submit(request: HttpRequest) -> HttpResponse:
+    student: Student = request.user.student
+
+    # 1. Validate
+    response = Response(
+        submit_at=timezone.now(),
+        student=student,
+    )
+    answers: list[Answer] = []
+
+    for question_id, choice_id in request.POST.items():
+        # Filter out tokens
+        if not question_id.startswith("question-"):
+            continue
+
+        if not choice_id.startswith("choice-"):
+            # todo: This is an invalid request.
+            continue
+
+        answers.append(
+            Answer(
+                question=Question.objects.get(
+                    pk=int(question_id.removeprefix("question-"))
+                ),
+                choice=Choice.objects.get(pk=int(choice_id.removeprefix("choice-"))),
+                response=response,
+            )
+        )
+
+    # 2. Save
+    response.save()
+    response.answer_set.bulk_create(answers)
+
+    return HttpResponseRedirect(reverse("quiz:index"))
