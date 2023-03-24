@@ -4,6 +4,24 @@
 
 {% if user.is_authenticated %}
     <p>您就是 {{ user }} ？</p>
+    <p><a href="{% url 'quiz:contest' %}">现在参加竞赛？</a></p>
+    <h2>当前成绩</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>提交时刻</th>
+                <th>得分</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in user.student.response_set.all %}
+            <tr>
+                <td>{{ r.submit_at }}</td>
+                <td>{{ r.score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
     <p>请先<a href="{% url 'quiz:login' %}">登录</a>。</p>
 {% endif %}
