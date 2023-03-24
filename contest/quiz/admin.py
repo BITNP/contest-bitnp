@@ -37,6 +37,8 @@ class ResponseAdmin(admin.ModelAdmin):
     fields = ["student", "submit_at", "score"]
     readonly_fields = ["score"]
     inlines = [AnswerInline]
+    list_filter = ["submit_at"]
+    list_display = ["student", "submit_at", "score"]
 
 
 class ResponseInline(admin.TabularInline):
@@ -54,6 +56,8 @@ class DraftAnswerInline(admin.TabularInline):
 class DraftResponseAdmin(admin.ModelAdmin):
     fields = ["student", "deadline"]
     inlines = [DraftAnswerInline]
+    list_display = ["student", "deadline"]
+    list_filter = ["deadline"]
 
 
 class DraftResponseInline(admin.StackedInline):
