@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p>截止时刻：{{ draft_response.deadline }}。</p>
+
+<ol>
+    {% for a in draft_response.answer_set.all %}
+    <li>
+        <p>题干：{{ a.question }}</p>
+        <p>选项：</p>
+        <ul>
+            {% for choice in a.question.choice_set.all %}
+            <li>{{ choice }}</li>
+            {% endfor %}
+        </ul>
+        <p>您的选择：{{ a.choice }}。</p>
+    </li>
+    {% endfor %}
+</ol>
+{% endblock %}

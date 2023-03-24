@@ -85,7 +85,10 @@ class Answer(models.Model):
 
 class DraftResponse(models.Model):
     student = models.OneToOneField(
-        Student, verbose_name="作答者", on_delete=models.CASCADE
+        Student,
+        verbose_name="作答者",
+        on_delete=models.CASCADE,
+        related_name="draft_response",
     )
     deadline = models.DateTimeField("截止时刻")
 
@@ -98,7 +101,10 @@ class DraftResponse(models.Model):
 
 class DraftAnswer(models.Model):
     response = models.ForeignKey(
-        DraftResponse, verbose_name="答卷", on_delete=models.CASCADE
+        DraftResponse,
+        verbose_name="答卷",
+        on_delete=models.CASCADE,
+        related_name="answer_set",
     )
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
     choice = models.ForeignKey(
