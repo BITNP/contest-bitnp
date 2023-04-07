@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}国防知识竞赛{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/bit.png' %}">
+</head>
+<script>
+  let selections = Array(questions.length)
+  function Option_onClick() {
+
+  }
+</script>
+
+<body>
+  <div class="Questions">
+    {% for question in questions %}
+    <div class="QuestionBox">
+      <div class="QuestionIndex">{% question.index %}</div>
+      <div class="QuestionContent">{% question.content %}</div>
+      <div class="Options">
+        {% for option in question.options %}
+        <div class="Option">
+          <input type="radio">
+          <div class="OptionIndex">{% option.index %}</div>
+          <div class="OptionContent">{% option.content %}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="CommitButton">
+    提交
+  </button>
+</body>
+
+</html>
