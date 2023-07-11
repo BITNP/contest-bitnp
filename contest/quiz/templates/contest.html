@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p>截止时刻：{{ draft_response.deadline }}。</p>
+
+<form action="{% url 'quiz:contest_submit' %}" method="post">
+    {% csrf_token %}
+
+    {% for a in draft_response.answer_set.all %}
+    <fieldset>
+        <legend>{{ a.question }}</legend>
+        {% for choice in a.question.choice_set.all %}
+        <div>
+            {% if a.choice.id == choice.id %}
+            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}" checked>
+            {% else %}
+            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}">
+            {% endif %}
+            <label for="choice-{{ choice.id }}">{{ choice }}</label>
+        </div>
+        {% endfor %}
+    </fieldset>
+    {% endfor %}
+    <div>
+        <button type="submit" name="action" value="update">暂存</button>
+        <button type="submit">提交</button>
+    </div>
+</form>
+{% endblock %}

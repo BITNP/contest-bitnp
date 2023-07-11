@@ -61,11 +61,10 @@ class Response(models.Model):
 
     @admin.display(description="得分")
     def score(self) -> float:
-        return (
-            100
-            * len(self.answer_set.filter(choice__correct=True))  # type: ignore
-            / len(self.answer_set.all())  # type: ignore
-        )
+        if (n_answers := len(self.answer_set.all())) == 0:
+            return 0
+        else:
+            return 100 * len(self.answer_set.filter(choice__correct=True)) / n_answers
 
     class Meta:
         verbose_name_plural = verbose_name = "答卷"
@@ -85,7 +84,10 @@ class Answer(models.Model):
 
 class DraftResponse(models.Model):
     student = models.OneToOneField(
-        Student, verbose_name="作答者", on_delete=models.CASCADE
+        Student,
+        verbose_name="作答者",
+        on_delete=models.CASCADE,
+        related_name="draft_response",
     )
     deadline = models.DateTimeField("截止时刻")
 
@@ -98,7 +100,10 @@ class DraftResponse(models.Model):
 
 class DraftAnswer(models.Model):
     response = models.ForeignKey(
-        DraftResponse, verbose_name="答卷", on_delete=models.CASCADE
+        DraftResponse,
+        verbose_name="答卷",
+        on_delete=models.CASCADE,
+        related_name="answer_set",
     )
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
     choice = models.ForeignKey(

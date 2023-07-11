@@ -23,4 +23,18 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-default = true
+priority = "default"
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+]
+line-length = 95
+ignore-init-module-imports = true
+
+[tool.black]
+line-length = 95
