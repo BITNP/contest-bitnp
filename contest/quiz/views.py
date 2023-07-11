@@ -16,13 +16,16 @@ from django.views.generic.base import TemplateView
 from .models import Answer, Choice, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
-    from django.contrib.auth.models import AbstractUser
+    from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
     from django.http import HttpRequest, HttpResponse
 
-    from .models import DraftAnswer, Student
+    from .models import DraftAnswer, Student, User
+
+    class AuthenticatedHttpRequest(HttpRequest):
+        user: User
 
 
-def is_student(user: AbstractUser) -> bool:
+def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student")
 
 
@@ -33,7 +36,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 @login_required
 @user_passes_test(is_student)
 @require_GET
-def contest(request: HttpRequest) -> HttpResponse:
+def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
     if hasattr(student, "draft_response"):
@@ -65,7 +68,7 @@ def contest(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(is_student)
 @require_POST
-def contest_update(request: HttpRequest) -> HttpResponse:
+def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
     # todo: draft_response 可能不存在
@@ -77,7 +80,7 @@ def contest_update(request: HttpRequest) -> HttpResponse:
         if not question_id.startswith("question-"):
             continue
 
-        if not choice_id.startswith("choice-"):
+        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
             # todo: This is an invalid request.
             continue
 
@@ -101,7 +104,7 @@ def contest_update(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(is_student)
 @require_POST
-def contest_submit(request: HttpRequest) -> HttpResponse:
+def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     # 0. 重定向暂存
     # todo: 应当专门请求，现在只是缓兵之计。
     if request.POST.get("action", default="submit") == "update":
@@ -121,7 +124,7 @@ def contest_submit(request: HttpRequest) -> HttpResponse:
         if not question_id.startswith("question-"):
             continue
 
-        if not choice_id.startswith("choice-"):
+        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
             # todo: This is an invalid request.
             continue
 
