@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -17,7 +17,7 @@ from .models import Answer, Choice, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
-    from django.http import HttpRequest, HttpResponse
+    from django.http import HttpRequest
 
     from .models import DraftAnswer, Student, User
 
@@ -92,24 +92,13 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
         answer.choice_id = int(choice_id.removeprefix("choice-"))
         answer.save()
 
-    return render(
-        request,
-        "contest.html",
-        {
-            "draft_response": draft_response,
-        },
-    )
+    return HttpResponse("Updated.")
 
 
 @login_required
 @user_passes_test(is_student)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
-    # 0. 重定向暂存
-    # todo: 应当专门请求，现在只是缓兵之计。
-    if request.POST.get("action", default="submit") == "update":
-        return contest_update(request)
-
     student: Student = request.user.student
 
     # 1. Validate
