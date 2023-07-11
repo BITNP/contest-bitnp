@@ -40,7 +40,7 @@ class Student(models.Model):
 
     @admin.display(description="最终得分")
     def final_score(self) -> float:
-        return max([0] + [r.score() for r in self.response_set.all()])  # type: ignore
+        return max([0] + [r.score() for r in self.response_set.all()])
 
     # todo: name 应该取自 CAS。
     name = models.CharField("姓名", max_length=50)

@@ -43,7 +43,8 @@ class ResponseAdmin(admin.ModelAdmin):
 
 class ResponseInline(admin.TabularInline):
     model = Response
-    readonly_fields = fields = ["submit_at", "score"]
+    fields = ["submit_at", "score"]
+    readonly_fields = ["submit_at", "score"]
     extra = 0
 
 
