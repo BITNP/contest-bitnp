@@ -11,9 +11,12 @@ src_dir := "contest"
 @default:
     just --list
 
+# 调用 Django 的 manage.py
+manage *ARGS:
+   {{ python }} {{ src_dir }}/manage.py {{ ARGS }}
+
 # 启动 Django 服务器
-serve:
-    {{ python }} {{ src_dir }}/manage.py runserver
+serve: (manage "runserver")
 
 # 检查类型
 mypy:
