@@ -61,11 +61,10 @@ class Response(models.Model):
 
     @admin.display(description="得分")
     def score(self) -> float:
-        return (
-            100
-            * len(self.answer_set.filter(choice__correct=True))  # type: ignore
-            / len(self.answer_set.all())  # type: ignore
-        )
+        if (n_answers := len(self.answer_set.all())) == 0:
+            return 0
+        else:
+            return 100 * len(self.answer_set.filter(choice__correct=True)) / n_answers
 
     class Meta:
         verbose_name_plural = verbose_name = "答卷"
