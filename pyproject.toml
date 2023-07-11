@@ -43,6 +43,7 @@ line-length = 95
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/contest/"
 
 [tool.django-stubs]
 django_settings_module = "contest.settings"
