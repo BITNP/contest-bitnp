@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser
     from django.http import HttpRequest, HttpResponse
 
-    from .models import Student
+    from .models import DraftAnswer, Student
 
 
 def is_student(user: AbstractUser) -> bool:
@@ -65,7 +65,48 @@ def contest(request: HttpRequest) -> HttpResponse:
 @login_required
 @user_passes_test(is_student)
 @require_POST
+def contest_update(request: HttpRequest) -> HttpResponse:
+    student: Student = request.user.student
+    draft_response: DraftResponse = student.draft_response
+    # todo: draft_response 可能不存在
+
+    # todo: Check deadline.
+
+    for question_id, choice_id in request.POST.items():
+        # Filter out tokens
+        if not question_id.startswith("question-"):
+            continue
+
+        if not choice_id.startswith("choice-"):
+            # todo: This is an invalid request.
+            continue
+
+        answer: DraftAnswer = draft_response.answer_set.get(
+            question_id=int(question_id.removeprefix("question-"))
+        )
+        # todo: answer_set.get may raise DoesNotExist or MultipleObjectsReturned
+
+        answer.choice_id = int(choice_id.removeprefix("choice-"))
+        answer.save()
+
+    return render(
+        request,
+        "contest.html",
+        {
+            "draft_response": draft_response,
+        },
+    )
+
+
+@login_required
+@user_passes_test(is_student)
+@require_POST
 def contest_submit(request: HttpRequest) -> HttpResponse:
+    # 0. 重定向暂存
+    # todo: 应当专门请求，现在只是缓兵之计。
+    if request.POST.get("action", default="submit") == "update":
+        return contest_update(request)
+
     student: Student = request.user.student
 
     # 1. Validate
