@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
@@ -127,9 +127,7 @@ def contest_submit(request: HttpRequest) -> HttpResponse:
 
         answers.append(
             Answer(
-                question=Question.objects.get(
-                    pk=int(question_id.removeprefix("question-"))
-                ),
+                question=Question.objects.get(pk=int(question_id.removeprefix("question-"))),
                 choice=Choice.objects.get(pk=int(choice_id.removeprefix("choice-"))),
                 response=response,
             )

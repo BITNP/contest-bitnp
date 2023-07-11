@@ -36,4 +36,3 @@ erDiagram
 
     Student ||--o| DraftResponse: working
 ```
-
