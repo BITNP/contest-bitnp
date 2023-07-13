@@ -20,4 +20,4 @@ serve: (manage "runserver")
 
 # 检查类型
 mypy:
-    cd {{ src_dir }} && {{ replace_regex(python, "^\\.", "../.") }} -m mypy . --config-file ../pyproject.toml
+    {{ python }} -m mypy .

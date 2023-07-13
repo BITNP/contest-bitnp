@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+{% load static %}
+<script type='module' src="{% static 'update.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <p>截止时刻：{{ draft_response.deadline }}。</p>
 
@@ -21,9 +26,7 @@
         {% endfor %}
     </fieldset>
     {% endfor %}
-    <div>
-        <button type="submit" name="action" value="update">暂存</button>
-        <button type="submit">提交</button>
-    </div>
+
+    <button type="submit">提交</button>
 </form>
 {% endblock %}
