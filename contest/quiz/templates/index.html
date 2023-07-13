@@ -1,11 +1,138 @@
-{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
 
-{% block content %}
+<head>
 
-{% if user.is_authenticated %}
-    <p>您就是 {{ user }} ？</p>
-{% else %}
-    <p>请先<a href="{% url 'quiz:login' %}">登录</a>。</p>
-{% endif %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-{% endblock %}
+    <title>首页 - 国防知识竞赛</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="javascript:void(0)">首页</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+                Menu
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'quiz:index' %}">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'quiz:logout' %}">登出</a>
+                        {% else %}
+                        <a class="nav-link" href="{% url 'quiz:login' %}">登录</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="masthead" style="background-image: url({% static 'img/home-bg.jpg' %})">
+            <!-- 它语法检查会报错，但是真能跑 -->
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <!-- <span class="subheading">北京理工大学第四届</span> -->
+                        <span class="subheading">北京理工大学 {{config.year}} 年军训</span>
+                        <h1>国防知识竞赛</h1>
+                        <span class="subheading">{{config.year}} 年 {{config.month}} 月</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <h2 class="section-heading">竞赛简介</h2>
+
+                <p style='text-indent:2em;'>
+                    <!--本次竞赛为决赛，-->
+
+                    国防知识竞赛线上赛由系统随机抽取 {{config.cnt}} 道题，限时 {{config.time_limit}} 秒。每人限答 {{config.change}} 次。<span
+                        style="color:#ea3a2a;font-weight: bold;">由于网络原因，请尽量在时间截止前手动交卷，并推荐使用电脑端进行作答。</span>希望同学们掌握好答题时间，并做好充分的答题准备，预祝同学们考个好成绩！
+                </p>
+                <hr />
+                <!-- Pager -->
+                <div class="clearfix">
+                    <a class="btn btn-primary float-right" href="{...}">现在答题 &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+
+                    <div align="center">
+                        <hr style="color:#ccc; width: 61.8%;">
+                        <!--<a href="https://www.bitnp.net/" target="_blank"><img src="https://home.sslcdn.bitnp.net/wp-content/uploads/2017/09/logo_long.png" style="width: 200px; border-radius: 17px;"/></a>-->
+                        <img src="{% static 'img/logo.jpg' %}" style="width: 200px; border-radius: 17px; " />
+                        <p class="copyright text-muted">Copyright © {{config.year}} The National Defense Education Association of
+                            BIT. All Rights Reserved.</p>
+                        <p class="copyright text-muted">Powered by <a href="https://www.bitnp.net/" target="_blank">Net
+                                Pioneer Association</a> of BIT. Designed by Lytning.</p>
+                        <div style="display: none">
+                            <!--	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1278129140'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1278129140%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+-->
+                            <script
+                                type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
+                            <script type="text/javascript"
+                                src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
+                        </div>
+                        <!--
+                    <div style="display: none"><script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script></div>
+-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Layer.js -->
+    <script src="{% static 'layer/layer.js' %}"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="{% static 'js/clean-blog.min.js' %}"></script>
+
+
+</body>
+
+</html>
