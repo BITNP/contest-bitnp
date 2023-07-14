@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic.base import TemplateView
 
-from .models import Answer, Choice, DraftResponse, Question, Response
+from .models import Answer, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
@@ -81,8 +81,9 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
             continue
 
         if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-            # todo: This is an invalid request.
-            continue
+            return HttpResponseBadRequest(
+                f"Invalid choice ID “{choice_id}” for “{question_id}”."
+            )
 
         answer: DraftAnswer = draft_response.answer_set.get(
             question_id=int(question_id.removeprefix("question-"))
@@ -101,26 +102,19 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
-    # 1. Validate
+    # 1. Convert from draft
     response = Response(
         submit_at=timezone.now(),
         student=student,
     )
     answers: list[Answer] = []
 
-    for question_id, choice_id in request.POST.items():
-        # Filter out tokens
-        if not question_id.startswith("question-"):
-            continue
-
-        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-            # todo: This is an invalid request.
-            continue
-
+    for a in student.draft_response.answer_set.all():
+        # todo: a.choice can be empty
         answers.append(
             Answer(
-                question=Question.objects.get(pk=int(question_id.removeprefix("question-"))),
-                choice=Choice.objects.get(pk=int(choice_id.removeprefix("choice-"))),
+                question=a.question,
+                choice=a.choice,
                 response=response,
             )
         )
