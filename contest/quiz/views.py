@@ -6,7 +6,12 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -73,7 +78,11 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     draft_response: DraftResponse = student.draft_response
     # todo: draft_response 可能不存在
 
-    # todo: Check deadline.
+    # Check deadline.
+    if timezone.now() > draft_response.deadline:
+        return HttpResponseForbidden(
+            f"You have missed the deadline: {draft_response.deadline.isoformat()}"
+        )
 
     for question_id, choice_id in request.POST.items():
         # Filter out tokens
