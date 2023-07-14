@@ -110,7 +110,6 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     answers: list[Answer] = []
 
     for a in student.draft_response.answer_set.all():
-        # todo: a.choice can be empty
         answers.append(
             Answer(
                 question=a.question,
