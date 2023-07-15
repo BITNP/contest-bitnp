@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from random import sample
 from typing import TYPE_CHECKING
 
@@ -18,6 +17,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic.base import TemplateView
 
+from .constants import constants
 from .models import Answer, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
@@ -49,13 +49,13 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     else:
         # If there's no draft response, create one
         draft_response = DraftResponse(
-            deadline=timezone.now() + timedelta(minutes=15),
+            deadline=timezone.now() + constants.DEADLINE_DURATION,
             student=student,
         )
         draft_response.save()
 
         # Randomly select some questions
-        questions = sample(list(Question.objects.all()), k=3)
+        questions = sample(list(Question.objects.all()), k=constants.N_QUESTIONS_PER_RESPONSE)
         for q in questions:
             draft_response.answer_set.create(
                 question=q,
