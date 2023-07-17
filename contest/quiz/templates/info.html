@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}个人中心{% endblock %}
+
+{% block pagename %}个人中心{% endblock %}
+
+{% block content%}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <h2 class="section-heading">个人中心</h2>
+
+                {% if user.is_authenticated %}
+                    <p>当前用户：{{user}}</p>
+                    <p>试题满分{{config.score}}分，答题次数上限为{{config.change}}次。</p>
+                    {% if ... %}
+                        {# 答题次数不为0 #}
+                    {% else %}
+                        <p>最高成绩：<B>未答题</B></p>
+                    {% endif %}
+                    <a href="{...}" class="btn btn-primary">前往答题</a>
+
+                {% else %}
+                    <p>请先<a href="{% url 'quiz:login' %}">登录</a>。</p>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
