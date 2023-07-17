@@ -52,6 +52,10 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     if hasattr(student, "draft_response"):
         draft_response: DraftResponse = student.draft_response
     else:
+        # 如果超出答题次数，拒绝
+        if student.response_set.count() >= constants.MAX_TRIES:
+            return HttpResponseForbidden(f"最多尝试{constants.MAX_TRIES}次，您不能再尝试。")
+
         # If there's no draft response, create one
         draft_response = DraftResponse(
             deadline=timezone.now() + constants.DEADLINE_DURATION,

@@ -10,5 +10,8 @@ class ConstantsNamespace:
     N_QUESTIONS_PER_RESPONSE = 3
     """每套题的题数"""
 
+    MAX_TRIES = 100
+    """答题次数上限"""
+
 
 constants = ConstantsNamespace()
