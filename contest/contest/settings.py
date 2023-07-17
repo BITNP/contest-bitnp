@@ -32,6 +32,8 @@ ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "quiz.apps.QuizConfig",
+    "quiz.templatetags",
+    "django.contrib.humanize",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

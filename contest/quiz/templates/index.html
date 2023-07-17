@@ -1,6 +1,9 @@
 {% extends "base.html" %}
+{% load my_humanize %}
+{% load humanize %}
 
 {% block content %}
+国防知识竞赛线上赛由系统随机抽取 {{ constants.N_QUESTIONS_PER_RESPONSE }} 道题，限时{{ constants.DEADLINE_DURATION | natural_delta }}。
 
 {% if user.is_authenticated %}
     <p>您就是 {{ user }} ？</p>
@@ -14,10 +17,10 @@
             </tr>
         </thead>
         <tbody>
-            {% for r in user.student.response_set.all %}
+            {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
             <tr>
-                <td>{{ r.submit_at }}</td>
-                <td>{{ r.score }}</td>
+                <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
+                <td>{{ r.score | as_score }}</td>
             </tr>
             {% endfor %}
         </tbody>

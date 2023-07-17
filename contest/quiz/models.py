@@ -61,9 +61,10 @@ class Response(models.Model):
 
     @admin.display(description="得分")
     def score(self) -> float:
-        if (n_answers := len(self.answer_set.all())) == 0:
+        if (n_answers := self.answer_set.count()) == 0:
             return 0
         else:
+            # 未选择、错误不计分，正确计分
             return 100 * len(self.answer_set.filter(choice__correct=True)) / n_answers
 
     class Meta:
@@ -73,7 +74,9 @@ class Response(models.Model):
 class Answer(models.Model):
     response = models.ForeignKey(Response, verbose_name="答卷", on_delete=models.CASCADE)
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
-    choice = models.ForeignKey(Choice, verbose_name="所选选项", on_delete=models.CASCADE)
+    choice = models.ForeignKey(
+        Choice, verbose_name="所选选项", blank=True, null=True, on_delete=models.CASCADE
+    )
 
     def __str__(self) -> str:
         return f"“{self.question}” → “{self.choice}”"
