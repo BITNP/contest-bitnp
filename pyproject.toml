@@ -12,6 +12,7 @@ packages = [{include = "contest"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 Django = "^4.2"
+humanize = "^4.7.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
