@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+# 非常蠢的写法，之后肯定得改
 config_origin = {
     'year':'2023',      # 年
     'month':'9',        # 月
