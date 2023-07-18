@@ -21,3 +21,9 @@ serve: (manage "runserver")
 # 检查类型
 mypy:
     {{ python }} -m mypy .
+
+# 运行测试
+test: (manage "test" "quiz")
+
+# 检查所有
+check-all: mypy test (manage "check")

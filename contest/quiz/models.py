@@ -1,6 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class User(AbstractUser):
@@ -100,6 +107,20 @@ class DraftResponse(models.Model):
     class Meta:
         verbose_name_plural = verbose_name = "答卷草稿"
 
+    def finalize(self, submit_at: datetime) -> tuple[Response, list[Answer]]:
+        """转换为正式 Response
+
+        并不删除自身或保存新的，从而不更改数据库。
+
+        因为不保存，难以直接建立关系，请手动`bulk_create`。
+        """
+        response = Response(
+            submit_at=submit_at,
+            student=self.student,
+        )
+        answers = [a.finalize(response) for a in self.answer_set.all()]
+        return response, answers
+
 
 class DraftAnswer(models.Model):
     response = models.ForeignKey(
@@ -118,3 +139,14 @@ class DraftAnswer(models.Model):
 
     class Meta:
         verbose_name_plural = verbose_name = "回答草稿"
+
+    def finalize(self, response: Response) -> Answer:
+        """转换为正式 Answer
+
+        并不删除自身或保存新的，从而不更改数据库。
+        """
+        return Answer(
+            question=self.question,
+            choice=self.choice,
+            response=response,
+        )

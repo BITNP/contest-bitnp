@@ -18,7 +18,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic.base import TemplateView
 
 from .constants import constants
-from .models import Answer, Choice, DraftResponse, Question, Response
+from .models import Choice, DraftResponse, Question
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
@@ -129,20 +129,7 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
     # 1. Convert from draft
-    response = Response(
-        submit_at=timezone.now(),
-        student=student,
-    )
-    answers: list[Answer] = []
-
-    for a in student.draft_response.answer_set.all():
-        answers.append(
-            Answer(
-                question=a.question,
-                choice=a.choice,
-                response=response,
-            )
-        )
+    response, answers = student.draft_response.finalize(submit_at=timezone.now())
 
     # 2. Save
     response.save()
