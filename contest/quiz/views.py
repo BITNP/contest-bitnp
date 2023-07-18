@@ -11,14 +11,14 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseRedirect,
 )
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic.base import TemplateView
 
 from .constants import constants
-from .models import Answer, DraftResponse, Question, Response
+from .models import Answer, Choice, DraftResponse, Question, Response
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
@@ -32,6 +32,10 @@ if TYPE_CHECKING:
 
 def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student")
+
+
+def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
+    return hasattr(user, "student") and hasattr(user.student, "draft_response")
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -80,12 +84,11 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
-@user_passes_test(is_student)
+@user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
-    # todo: draft_response 可能不存在
 
     # Check deadline.
     if timezone.now() > draft_response.deadline:
@@ -103,19 +106,24 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
                 f"Invalid choice ID “{choice_id}” for “{question_id}”."
             )
 
-        answer: DraftAnswer = draft_response.answer_set.get(
-            question_id=int(question_id.removeprefix("question-"))
+        answer: DraftAnswer = get_object_or_404(
+            draft_response.answer_set,
+            question_id=int(question_id.removeprefix("question-")),
         )
-        # todo: answer_set.get may raise DoesNotExist or MultipleObjectsReturned
 
-        answer.choice_id = int(choice_id.removeprefix("choice-"))
+        answer.choice = get_object_or_404(
+            Choice.objects,
+            pk=int(choice_id.removeprefix("choice-")),
+            question=answer.question,
+        )
+
         answer.save()
 
     return HttpResponse("Updated.")
 
 
 @login_required
-@user_passes_test(is_student)
+@user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
