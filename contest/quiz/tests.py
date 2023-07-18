@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from .models import (
@@ -41,3 +42,35 @@ class ResponseModelTests(TestCase):
         draft = DraftResponse.objects.create(deadline=timezone.now(), student=self.student)
         final, answers = draft.finalize(submit_at=timezone.now())
         self.assertIsInstance(final, Response)
+
+
+class ContestViewTests(TestCase):
+    def setUp(self):
+        Question.objects.create(content="Angel Attack")
+        Question.objects.create(content="The Beast")
+        Question.objects.create(content="A Transfer")
+
+        self.user = User.objects.create_user(username="Shinji")
+        self.student = Student.objects.create(user=self.user)
+
+    def test_contest_view(self):
+        """访问首页，然后开始作答"""
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:index"))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_empty_response(self):
+        """正常作答，但交白卷"""
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(reverse("quiz:contest_submit"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("quiz:index"))
