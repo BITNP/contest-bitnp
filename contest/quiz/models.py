@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -120,6 +121,10 @@ class DraftResponse(models.Model):
         )
         answers = [a.finalize(response) for a in self.answer_set.all()]
         return response, answers
+
+    def outdated(self) -> bool:
+        """是否到了截止时刻"""
+        return timezone.now() > self.deadline
 
 
 class DraftAnswer(models.Model):

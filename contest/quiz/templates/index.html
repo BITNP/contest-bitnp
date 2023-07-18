@@ -7,6 +7,7 @@
 
 {% if user.is_authenticated %}
     <p>您就是 {{ user }} ？</p>
+    <p>Status: {{ status }}</p>
     <p><a href="{% url 'quiz:contest' %}">现在参加竞赛？</a></p>
     <h2>当前成绩</h2>
     <table>
