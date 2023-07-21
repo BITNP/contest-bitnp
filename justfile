@@ -13,7 +13,7 @@ src_dir := "contest"
 
 # 调用 Django 的 manage.py
 manage *ARGS:
-   {{ python }} {{ src_dir }}/manage.py {{ ARGS }}
+    {{ python }} {{ src_dir }}/manage.py {{ ARGS }}
 
 # 启动 Django 服务器
 serve: (manage "runserver")
