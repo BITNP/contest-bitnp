@@ -11,14 +11,14 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseRedirect,
 )
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic.base import TemplateView
+from django.views.generic import TemplateView
 
 from .constants import constants
-from .models import Answer, DraftResponse, Question, Response
+from .models import Choice, DraftResponse, Question
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
@@ -34,22 +34,44 @@ def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student")
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
-    template_name = "index.html"
+def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
+    return hasattr(user, "student") and hasattr(user.student, "draft_response")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["constants"] = constants
-        return context
+
+@login_required
+@user_passes_test(is_student)
+@require_GET
+def index(request: AuthenticatedHttpRequest) -> HttpResponse:
+    student = request.user.student
+
+    if not hasattr(student, "draft_response"):
+        status = "not taking"
+    elif not student.draft_response.outdated():
+        status = "taking contest"
+    else:
+        status = "deadline passed"
+
+        # 提交之前的草稿
+        response, answers = student.draft_response.finalize(
+            submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
+        )
+
+        response.save()
+        response.answer_set.bulk_create(answers)
+        student.draft_response.delete()
+
+    return render(
+        request,
+        "index.html",
+        {
+            "constants": constants,
+            "status": status,
+        },
+    )
 
 
 class InfoView(LoginRequiredMixin, TemplateView):
     template_name = "info.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["constants"] = constants
-        return context
 
 
 @login_required
@@ -90,15 +112,14 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
-@user_passes_test(is_student)
+@user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
-    # todo: draft_response 可能不存在
 
     # Check deadline.
-    if timezone.now() > draft_response.deadline:
+    if draft_response.outdated():
         return HttpResponseForbidden(
             f"You have missed the deadline: {draft_response.deadline.isoformat()}"
         )
@@ -113,38 +134,30 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
                 f"Invalid choice ID “{choice_id}” for “{question_id}”."
             )
 
-        answer: DraftAnswer = draft_response.answer_set.get(
-            question_id=int(question_id.removeprefix("question-"))
+        answer: DraftAnswer = get_object_or_404(
+            draft_response.answer_set,
+            question_id=int(question_id.removeprefix("question-")),
         )
-        # todo: answer_set.get may raise DoesNotExist or MultipleObjectsReturned
 
-        answer.choice_id = int(choice_id.removeprefix("choice-"))
+        answer.choice = get_object_or_404(
+            Choice.objects,
+            pk=int(choice_id.removeprefix("choice-")),
+            question=answer.question,
+        )
+
         answer.save()
 
     return HttpResponse("Updated.")
 
 
 @login_required
-@user_passes_test(is_student)
+@user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
     # 1. Convert from draft
-    response = Response(
-        submit_at=timezone.now(),
-        student=student,
-    )
-    answers: list[Answer] = []
-
-    for a in student.draft_response.answer_set.all():
-        answers.append(
-            Answer(
-                question=a.question,
-                choice=a.choice,
-                response=response,
-            )
-        )
+    response, answers = student.draft_response.finalize(submit_at=timezone.now())
 
     # 2. Save
     response.save()
