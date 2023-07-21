@@ -13,5 +13,11 @@ class ConstantsNamespace:
     MAX_TRIES = 100
     """答题次数上限"""
 
+    YEAR = 2023
+    MONTH = 9
+
+    # todo: Not used in models
+    SCORE = 100
+
 
 constants = ConstantsNamespace()

@@ -43,6 +43,15 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class InfoView(LoginRequiredMixin, TemplateView):
+    template_name = "info.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["constants"] = constants
+        return context
+
+
 @login_required
 @user_passes_test(is_student)
 @require_GET
@@ -75,6 +84,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         "contest.html",
         {
             "draft_response": draft_response,
+            "constants": constants,
         },
     )
 
