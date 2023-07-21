@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+dependencies:
+  startbootstrap-clean-blog:
+    specifier: ^6.0.9
+    version: 6.0.9(@popperjs/core@2.11.8)
+
 devDependencies:
   '@babel/core':
     specifier: ^7.22.9
@@ -1263,6 +1268,10 @@ packages:
     hasBin: true
     dev: true
 
+  /@popperjs/core@2.11.8:
+    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+    dev: false
+
   /@types/eslint-scope@3.7.4:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
     dependencies:
@@ -1568,6 +1577,14 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
     dev: true
+
+  /bootstrap@5.2.3(@popperjs/core@2.11.8):
+    resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
+    peerDependencies:
+      '@popperjs/core': ^2.11.6
+    dependencies:
+      '@popperjs/core': 2.11.8
+    dev: false
 
   /braces@3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
@@ -2413,6 +2430,14 @@ packages:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /startbootstrap-clean-blog@6.0.9(@popperjs/core@2.11.8):
+    resolution: {integrity: sha512-xbbvk1j++rQjXajEju4TbEs862Fd5nGn/LWQIPIl0ColRSCQwO2uNLQe4u43nB5o4bXEg4IsI9QzfEpNM/kVcQ==}
+    dependencies:
+      bootstrap: 5.2.3(@popperjs/core@2.11.8)
+    transitivePeerDependencies:
+      - '@popperjs/core'
+    dev: false
 
   /style-loader@3.3.3(webpack@5.88.2):
     resolution: {integrity: sha512-53BiGLXAcll9maCYtZi2RCQZKa8NQQai5C4horqKyRmHj9H7QmcUyucrH+4KW/gBQbXM2AsB0axoEcFZPlfPcw==}

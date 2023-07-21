@@ -11,7 +11,7 @@ const stylesHandler = 'style-loader';
 
 const config = {
     entry: {
-        index: './contest/front-end/index.js',
+        theme: './contest/front-end/theme.js',
         update: './contest/front-end/update.js',
     },
     output: {
