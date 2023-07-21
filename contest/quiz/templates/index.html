@@ -6,6 +6,11 @@
 
 {% block pagename %}首页{% endblock %}
 
+{% block scripts %}
+{% load static %}
+<script type='module' src="{% static 'dist/main.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 {% if user.is_authenticated %}
