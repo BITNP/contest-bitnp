@@ -4,6 +4,7 @@ from random import sample
 from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -14,6 +15,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
+from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
@@ -68,6 +70,15 @@ def index(request: AuthenticatedHttpRequest) -> HttpResponse:
     )
 
 
+class InfoView(LoginRequiredMixin, TemplateView):
+    template_name = "info.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["constants"] = constants
+        return context
+
+
 @login_required
 @user_passes_test(is_student)
 @require_GET
@@ -100,6 +111,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         "contest.html",
         {
             "draft_response": draft_response,
+            "constants": constants,
         },
     )
 
