@@ -1,8 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
@@ -20,9 +19,8 @@
     <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
 
     {% block scripts %}{% endblock %}
-</head>
-
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
         <div class="container">
@@ -39,19 +37,19 @@
                         <a class="nav-link" href="{% url 'quiz:index' %}">主页</a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:contest' %}">答题</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:info' %}">个人中心</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:logout' %}">登出</a>
-                    </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="{% url 'quiz:contest' %}">答题</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="{% url 'quiz:info' %}">个人中心</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="{% url 'quiz:logout' %}">登出</a>
+                      </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:login' %}">登录</a>
-                    </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="{% url 'quiz:login' %}">登录</a>
+                      </li>
                     {% endif %}
                 </ul>
             </div>
@@ -77,7 +75,7 @@
     </header>
 
     <main>
-        {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
@@ -117,6 +115,5 @@
     <!-- Custom scripts for this template -->
     <script src="{% static 'js/clean-blog.min.js' %}"></script>
 
-</body>
-
+  </body>
 </html>
