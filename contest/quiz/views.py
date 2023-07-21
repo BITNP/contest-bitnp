@@ -84,6 +84,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         "contest.html",
         {
             "draft_response": draft_response,
+            "constants": constants,
         },
     )
 
