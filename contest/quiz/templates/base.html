@@ -3,9 +3,8 @@
 <html lang="zh-cmn-Hans">
 
 <head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -20,10 +19,10 @@
     <!-- Custom styles for this template -->
     <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
 
+    {% block scripts %}{% endblock %}
 </head>
 
 <body>
-
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
         <div class="container">
@@ -41,10 +40,10 @@
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{ ... }">答题</a>
+                        <a class="nav-link" href="{% url 'quiz:contest' %}">答题</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{ ... }">个人中心</a>
+                        <a class="nav-link" href="{% url 'quiz:info' %}">个人中心</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'quiz:logout' %}">登出</a>
@@ -61,58 +60,63 @@
 
     <!-- Page Header -->
     <header class="masthead" style="background-image: url({% static 'img/home-bg.jpg' %})">
-        <!-- 它语法检查会报错，但是真能跑 -->
+        {# 它语法检查会报错，但是真能跑 #}
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="site-heading">
                         <!-- <span class="subheading">北京理工大学第四届</span> -->
-                        <span class="subheading">北京理工大学 {{config.year}} 年军训</span>
+                        <span class="subheading">北京理工大学 {{ constants.YEAR }} 年军训</span>
                         <h1>国防知识竞赛</h1>
-                        <span class="subheading">{{config.year}} 年 {{config.month}} 月</span>
+                        <span class="subheading">{{ constants.YEAR }} 年 {{ constants.MONTH }} 月</span>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    {% block content%}
-    {% endblock %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
     <!-- Footer -->
     <footer>
-      <div class="container">
-          <div class="row">
-              <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
 
-                  <div align="center">
-                      <hr style="color:#ccc; width: 61.8%;">
-                      <img src="{% static 'img/logo.jpg' %}" style="width: 200px; border-radius: 17px; " />
-                      <p class="copyright text-muted">Copyright © {{config.year}} The National Defense Education Association of
-                          BIT. All Rights Reserved.</p>
-                      <p class="copyright text-muted">Powered by <a href="https://www.bitnp.net/" target="_blank">Net
-                              Pioneer Association</a> of BIT. Designed by Lytning.</p>
-                      <div style="display: none">
-                          <script
-                              type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
-                          <script type="text/javascript"
-                              src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </footer>
+                    <div align="center">
+                        <hr style="color:#ccc; width: 61.8%;">
+                        <img src="{% static 'img/logo.jpg' %}" style="width: 200px; border-radius: 17px; " />
+                        <p class="copyright text-muted">Copyright © {{ constants.YEAR }} The National Defense Education
+                            Association
+                            of
+                            BIT. All Rights Reserved.</p>
+                        <p class="copyright text-muted">Powered by <a href="https://www.bitnp.net/" target="_blank">Net
+                                Pioneer Association</a> of BIT. Designed by Lytning.</p>
+                        <div style="display: none">
+                            <script
+                                type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
+                            <script type="text/javascript"
+                                src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
-  <!-- Layer.js -->
-  <script src="{% static 'layer/layer.js' %}"></script>
+    <!-- Layer.js -->
+    <script src="{% static 'layer/layer.js' %}"></script>
 
-  <!-- Custom scripts for this template -->
-  <script src="{% static 'js/clean-blog.min.js' %}"></script>
+    <!-- Custom scripts for this template -->
+    <script src="{% static 'js/clean-blog.min.js' %}"></script>
 
-  </body>
+</body>
+
+</html>

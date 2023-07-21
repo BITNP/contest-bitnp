@@ -40,7 +40,7 @@ class Student(models.Model):
 
     @admin.display(description="最终得分")
     def final_score(self) -> float:
-        return max([0] + [r.score() for r in self.response_set.all()])  # type: ignore
+        return max([0] + [r.score() for r in self.response_set.all()])
 
     # todo: name 应该取自 CAS。
     name = models.CharField("姓名", max_length=50)
@@ -61,11 +61,11 @@ class Response(models.Model):
 
     @admin.display(description="得分")
     def score(self) -> float:
-        return (
-            100
-            * len(self.answer_set.filter(choice__correct=True))  # type: ignore
-            / len(self.answer_set.all())  # type: ignore
-        )
+        if (n_answers := self.answer_set.count()) == 0:
+            return 0
+        else:
+            # 未选择、错误不计分，正确计分
+            return 100 * len(self.answer_set.filter(choice__correct=True)) / n_answers
 
     class Meta:
         verbose_name_plural = verbose_name = "答卷"
@@ -74,7 +74,9 @@ class Response(models.Model):
 class Answer(models.Model):
     response = models.ForeignKey(Response, verbose_name="答卷", on_delete=models.CASCADE)
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
-    choice = models.ForeignKey(Choice, verbose_name="所选选项", on_delete=models.CASCADE)
+    choice = models.ForeignKey(
+        Choice, verbose_name="所选选项", blank=True, null=True, on_delete=models.CASCADE
+    )
 
     def __str__(self) -> str:
         return f"“{self.question}” → “{self.choice}”"
@@ -85,7 +87,10 @@ class Answer(models.Model):
 
 class DraftResponse(models.Model):
     student = models.OneToOneField(
-        Student, verbose_name="作答者", on_delete=models.CASCADE
+        Student,
+        verbose_name="作答者",
+        on_delete=models.CASCADE,
+        related_name="draft_response",
     )
     deadline = models.DateTimeField("截止时刻")
 
@@ -98,7 +103,10 @@ class DraftResponse(models.Model):
 
 class DraftAnswer(models.Model):
     response = models.ForeignKey(
-        DraftResponse, verbose_name="答卷", on_delete=models.CASCADE
+        DraftResponse,
+        verbose_name="答卷",
+        on_delete=models.CASCADE,
+        related_name="answer_set",
     )
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
     choice = models.ForeignKey(

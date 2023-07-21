@@ -11,10 +11,14 @@ packages = [{include = "contest"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "^4.1.2"
+Django = "^4.2"
+humanize = "^4.7.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
+mypy = "^1.4.1"
+django-stubs = {extras = ["compatible-mypy"], version = "^4.2.3"}
+ipython = "^8.14.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -23,4 +27,25 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-default = true
+priority = "default"
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+]
+line-length = 95
+ignore-init-module-imports = true
+
+[tool.black]
+line-length = 95
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/contest/"
+
+[tool.django-stubs]
+django_settings_module = "contest.settings"

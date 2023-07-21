@@ -13,7 +13,7 @@ erDiagram
         datetime submit_at
     }
     Question ||..|{ Answer: replies
-    Choice ||..|{ Answer: selects
+    Choice o|..|{ Answer: selects
 
     Student ||--o{ Response: done
 
@@ -36,4 +36,3 @@ erDiagram
 
     Student ||--o| DraftResponse: working
 ```
-
