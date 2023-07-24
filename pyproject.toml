@@ -13,6 +13,7 @@ packages = [{include = "contest"}]
 python = "^3.9"
 Django = "^4.2"
 humanize = "^4.7.0"
+django-cas-ng = "^4.3.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"

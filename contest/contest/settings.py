@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_cas_ng",
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_cas_ng.middleware.CASMiddleware",
 ]
 
 ROOT_URLCONF = "contest.urls"
@@ -126,6 +128,17 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Django auth settings
+
 AUTH_USER_MODEL = "quiz.User"
-LOGIN_URL = "quiz:login"
+LOGIN_URL = "cas_ng_login"
 LOGIN_REDIRECT_URL = "quiz:index"
+
+# CAS server
+# https://docs.djangoproject.com/zh-hans/4.2/ref/settings/#authentication-backends
+# https://djangocas.dev/blog/django-cas-ng-example-project/
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "quiz.auth_backends.CASBackend",
+]
+CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
+CAS_VERSION = "2"
