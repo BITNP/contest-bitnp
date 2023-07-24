@@ -130,7 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom Django auth settings
 
 AUTH_USER_MODEL = "quiz.User"
-LOGIN_URL = "cas_ng_login"
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "quiz:index"
 
 # CAS server
@@ -142,3 +142,5 @@ AUTHENTICATION_BACKENDS = [
 ]
 CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
 CAS_VERSION = "2"
+CAS_LOGIN_URL_NAME = LOGIN_URL
+CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
