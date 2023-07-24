@@ -7,6 +7,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from .constants import constants
+
 if TYPE_CHECKING:
     from datetime import datetime
 
@@ -73,7 +75,9 @@ class Response(models.Model):
             return 0
         else:
             # 未选择、错误不计分，正确计分
-            return 100 * len(self.answer_set.filter(choice__correct=True)) / n_answers
+            return (
+                constants.SCORE * len(self.answer_set.filter(choice__correct=True)) / n_answers
+            )
 
     class Meta:
         verbose_name_plural = verbose_name = "答卷"

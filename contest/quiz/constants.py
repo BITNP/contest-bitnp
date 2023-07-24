@@ -16,8 +16,8 @@ class ConstantsNamespace:
     YEAR = 2023
     MONTH = 9
 
-    # todo: Not used in models
     SCORE = 100
+    """一套题的总分"""
 
 
 constants = ConstantsNamespace()
