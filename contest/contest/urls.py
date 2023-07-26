@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django_cas_ng import views as cas_views
 
 urlpatterns = [
     path("quiz/", include("quiz.urls")),
     path("admin/", admin.site.urls),
+    path("accounts/login/", cas_views.LoginView.as_view(), name="login"),
+    path("accounts/logout/", cas_views.LogoutView.as_view(), name="logout"),
 ]
