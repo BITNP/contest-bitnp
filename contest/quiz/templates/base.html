@@ -7,13 +7,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {# todo: Meta #}
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>{% block title %}{% endblock %} - 国防知识竞赛</title>
-
-    {% block scripts %}{% endblock %}
-
+    <meta name="keywords" content="">
+    <title>
+      {% block title %}
+      {% endblock title %}
+    - 国防知识竞赛</title>
+    {% block scripts %}
+    {% endblock scripts %}
     {% tailwind_css %}
   </head>
   <body class="h-full">
@@ -25,7 +28,9 @@
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 {# todo: logo #}
-                <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
+                <img class="h-8 w-8"
+                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                     alt="Your Company">
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
@@ -36,13 +41,18 @@
                     - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
                     - Both: rounded-md px-3 py-2 text-sm font-medium
                   {% endcomment %}
-                  <a href="{% url 'quiz:index' %}" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">主页</a>
+                  <a class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+                     href="{% url 'quiz:index' %}">主页</a>
                   {% if user.is_authenticated %}
-                    <a href="{% url 'quiz:contest' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">答题</a>
-                    <a href="{% url 'quiz:info' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">个人中心</a>
-                    <a href="{% url 'logout' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">登出</a>
+                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                       href="{% url 'quiz:contest' %}">答题</a>
+                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                       href="{% url 'quiz:info' %}">个人中心</a>
+                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                       href="{% url 'logout' %}">登出</a>
                   {% else %}
-                    <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">登录</a>
+                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                       href="{% url 'login' %}">登录</a>
                   {% endif %}
                 </div>
               </div>
@@ -52,14 +62,19 @@
                 <!-- Profile dropdown -->
                 <div class="relative ml-3">
                   <div>
-                    <button type="button" class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                    <button type="button"
+                            class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                            id="user-menu-button"
+                            aria-expanded="false"
+                            aria-haspopup="true">
                       <span class="absolute -inset-1.5"></span>
                       <span class="sr-only">打开用户菜单</span>
                       {# todo: 替换为姓名 #}
-                      <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+                      <img class="h-8 w-8 rounded-full"
+                           src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                           alt="">
                     </button>
                   </div>
-
                   <!-- Dropdown menu, show/hide based on menu state -->
                   {% comment %}
                     todo: 在 JavaScript 中设置动画。
@@ -71,15 +86,31 @@
                       - From: "transform opacity-100 scale-100"
                       - To: "transform opacity-0 scale-95"
                   {% endcomment %}
-                  <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                  <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                       role="menu"
+                       aria-orientation="vertical"
+                       aria-labelledby="user-menu-button"
+                       tabindex="-1">
                     {% comment %}
                       todo: 内容
 
                       Active: "bg-gray-100", Not Active: ""
                     {% endcomment %}
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700"
+                       role="menuitem"
+                       tabindex="-1"
+                       id="user-menu-item-0"
+                       href="#">Your Profile</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700"
+                       role="menuitem"
+                       tabindex="-1"
+                       id="user-menu-item-1"
+                       href="#">Settings</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700"
+                       role="menuitem"
+                       tabindex="-1"
+                       id="user-menu-item-2"
+                       href="#">Sign out</a>
                   </div>
                 </div>
               </div>
@@ -87,22 +118,34 @@
             <div class="-mr-2 flex md:hidden">
               <!-- Mobile menu button -->
               {# todo: Toggle #}
-              <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" aria-controls="mobile-menu" aria-expanded="false">
+              <button type="button"
+                      class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                      aria-controls="mobile-menu"
+                      aria-expanded="false">
                 <span class="absolute -inset-0.5"></span>
                 <span class="sr-only">打开主菜单</span>
                 <!-- Menu open: "hidden", Menu closed: "block" -->
-                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <svg class="block h-6 w-6"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
                 <!-- Menu open: "block", Menu closed: "hidden" -->
-                <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <svg class="hidden h-6 w-6"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-
         <!-- Mobile menu, show/hide based on menu state. -->
         <div class="md:hidden" id="mobile-menu">
           <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
@@ -113,13 +156,18 @@
               - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
               - Both: …
             {% endcomment %}
-            <a href="{% url 'quiz:index' %}" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium">主页</a>
+            <a class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium"
+               href="{% url 'quiz:index' %}">主页</a>
             {% if user.is_authenticated %}
-              <a href="{% url 'quiz:contest' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">答题</a>
-              <a href="{% url 'quiz:info' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">个人中心</a>
-              <a href="{% url 'logout' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">登出</a>
+              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                 href="{% url 'quiz:contest' %}">答题</a>
+              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                 href="{% url 'quiz:info' %}">个人中心</a>
+              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                 href="{% url 'logout' %}">登出</a>
             {% else %}
-              <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">登录</a>
+              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                 href="{% url 'login' %}">登录</a>
             {% endif %}
           </div>
           <div class="border-t border-gray-700 pb-3 pt-4">
@@ -132,53 +180,63 @@
             </div>
             <div class="mt-3 space-y-1 px-2">
               {# todo: 内容 #}
-              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your Profile</a>
-              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
-              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
+              <a class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                 href="#">Your Profile</a>
+              <a class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                 href="#">Settings</a>
+              <a class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                 href="#">Sign out</a>
             </div>
           </div>
         </div>
       </nav>
-
       <header class="bg-white shadow">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">{% block pagename %}{% endblock %}</h1>
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+            {% block pagename %}
+            {% endblock pagename %}
+          </h1>
         </div>
       </header>
-
       <main>
         <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-          {% block content %}{% endblock %}
+          {% block content %}
+          {% endblock content %}
         </div>
       </main>
     </div>
-
     <!-- Footer -->
     {# todo: Refactor with tailwind CSS #}
+    {# djlint:off H013, H021 #}
     <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-md-10 mx-auto">
-
-                    <div align="center">
-                        <hr style="color:#ccc; width: 61.8%;">
-                        <img src="{% static 'img/logo.jpg' %}" style="width: 200px; border-radius: 17px; " />
-                        <p class="copyright text-muted">Copyright © {{ constants.YEAR }} The National Defense Education
-                            Association
-                            of
-                            BIT. All Rights Reserved.</p>
-                        <p class="copyright text-muted">Powered by <a href="https://www.bitnp.net/" target="_blank">Net
-                                Pioneer Association</a> of BIT. Designed by Lytning.</p>
-                        <div style="display: none">
-                            <script
-                                type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
-                            <script type="text/javascript"
-                                src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
-                        </div>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div align="center">
+              <hr style="color:#ccc; width: 61.8%;">
+              <img src="{% static 'img/logo.jpg' %}"
+                   style="width: 200px;
+                          border-radius: 17px" />
+              <p class="copyright text-muted">
+                Copyright © {{ constants.YEAR }} The National Defense Education
+                Association
+                of
+                BIT. All Rights Reserved.
+              </p>
+              <p class="copyright text-muted">
+                Powered by <a href="https://www.bitnp.net/" target="_blank">Net
+                Pioneer Association</a> of BIT. Designed by Lytning.
+              </p>
+              <div style="display: none">
+                <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
+                <script type="text/javascript"
+                        src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </footer>
+    {# djlint:on #}
   </body>
 </html>

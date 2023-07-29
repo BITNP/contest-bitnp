@@ -1,33 +1,42 @@
 {% extends "base.html" %}
-
 {% load static %}
-
-{% block title %}个人中心{% endblock %}
-
-{% block pagename %}个人中心{% endblock %}
-
-{% block content%}
-{% if user.is_authenticated %}
-<div class="prose">
-    <p>当前用户：{{user}}</p>
-    <p>试题满分{{ constants.SCORE }}分，答题次数上限为{{ constants.MAX_TRIES }}次。</p>
-    {% if ... %}
+{% block title %}
+  个人中心
+{% endblock title %}
+{% block pagename %}
+  个人中心
+{% endblock pagename %}
+{% block content %}
+  {% if user.is_authenticated %}
+    <div class="prose">
+      <p>当前用户：{{ user }}</p>
+      <p>试题满分{{ constants.SCORE }}分，答题次数上限为{{ constants.MAX_TRIES }}次。</p>
+      {% if ... %}
         {# todo: 答题次数不为0 #}
-    {% else %}
-        <p>最高成绩：<B>未答题</B></p>
-    {% endif %}
-</div>
-
-<div class="m-4 text-center">
-    <a href="{% url 'quiz:contest' %}" class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
+      {% else %}
+        <p>
+          最高成绩：<b>未答题</b>
+        </p>
+      {% endif %}
+    </div>
+    <div class="m-4 text-center">
+      <a href="{% url 'quiz:contest' %}"
+         class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
         <!-- https://heroicons.com/ arrow-left-on-rectangle -->
-        <svg class="h-6 w-6 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        <svg class="h-6 w-6 inline"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke-width="1.5"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
         </svg>
         前往答题
-    </a>
-</div>
-{% else %}
-    <p>请先<a href="{% url 'login' %}">登录</a>。</p>
-{% endif %}
-{% endblock %}
+      </a>
+    </div>
+  {% else %}
+    <p>
+      请先<a href="{% url 'login' %}">登录</a>。
+    </p>
+  {% endif %}
+{% endblock content %}
