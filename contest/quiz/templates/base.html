@@ -1,84 +1,160 @@
+{# Based on https://tailwindui.com/components/application-ui/application-shells/stacked #}
 {% load static %}
+{% load tailwind_tags %}
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
+<html lang="zh-cmn-Hans" class="h-full bg-gray-100">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <title>{% block title %}{% endblock %} - 国防知识竞赛</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-
-    <!-- Custom fonts for this template -->
-    <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
-
-    <!-- Custom styles for this template -->
-    <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
-
     {% block scripts %}{% endblock %}
+
+    {% tailwind_css %}
   </head>
-  <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand" href="javascript:void(0)">{% block pagename %}{% endblock %}</a>
-            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
-                aria-label="Toggle navigation">
-                Menu
-                <i class="fa fa-bars"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:index' %}">主页</a>
-                    </li>
-                    {% if user.is_authenticated %}
-                      <li class="nav-item">
-                          <a class="nav-link" href="{% url 'quiz:contest' %}">答题</a>
-                      </li>
-                      <li class="nav-item">
-                          <a class="nav-link" href="{% url 'quiz:info' %}">个人中心</a>
-                      </li>
-                      <li class="nav-item">
-                          <a class="nav-link" href="{% url 'logout' %}">登出</a>
-                      </li>
-                    {% else %}
-                      <li class="nav-item">
-                          <a class="nav-link" href="{% url 'login' %}">登录</a>
-                      </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <body class="h-full">
+    <div class="min-h-full">
+      <nav class="bg-gray-800">
+        <!-- Desktop header -->
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                {# todo: logo #}
+                <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
+              </div>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  {% comment %}
+                    todo: 正确设置当前页面
 
-    <!-- Page Header -->
-    <header class="masthead" style="background-image: url({% static 'img/home-bg.jpg' %})">
-        {# 它语法检查会报错，但是真能跑 #}
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 col-md-10 mx-auto">
-                    <div class="site-heading">
-                        <!-- <span class="subheading">北京理工大学第四届</span> -->
-                        <span class="subheading">北京理工大学 {{ constants.YEAR }} 年军训</span>
-                        <h1>国防知识竞赛</h1>
-                        <span class="subheading">{{ constants.YEAR }} 年 {{ constants.MONTH }} 月</span>
-                    </div>
+                    - Current: "bg-gray-900 text-white"
+                    - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    - Both: rounded-md px-3 py-2 text-sm font-medium
+                  {% endcomment %}
+                  <a href="{% url 'quiz:index' %}" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">主页</a>
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'quiz:contest' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">答题</a>
+                    <a href="{% url 'quiz:info' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">个人中心</a>
+                    <a href="{% url 'logout' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">登出</a>
+                  {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">登录</a>
+                  {% endif %}
                 </div>
+              </div>
             </div>
-        </div>
-    </header>
+            <div class="hidden md:block">
+              <div class="ml-4 flex items-center md:ml-6">
+                <!-- Profile dropdown -->
+                <div class="relative ml-3">
+                  <div>
+                    <button type="button" class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                      <span class="absolute -inset-1.5"></span>
+                      <span class="sr-only">打开用户菜单</span>
+                      {# todo: 替换为姓名 #}
+                      <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+                    </button>
+                  </div>
 
-    <main>
-      {% block content %}{% endblock %}
-    </main>
+                  <!-- Dropdown menu, show/hide based on menu state -->
+                  {% comment %}
+                    todo: 在 JavaScript 中设置动画。
+
+                    - Entering: "transition ease-out duration-100"
+                      - From: "transform opacity-0 scale-95"
+                      - To: "transform opacity-100 scale-100"
+                    - Leaving: "transition ease-in duration-75"
+                      - From: "transform opacity-100 scale-100"
+                      - To: "transform opacity-0 scale-95"
+                  {% endcomment %}
+                  <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                    {% comment %}
+                      todo: 内容
+
+                      Active: "bg-gray-100", Not Active: ""
+                    {% endcomment %}
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="-mr-2 flex md:hidden">
+              <!-- Mobile menu button -->
+              {# todo: Toggle #}
+              <button type="button" class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" aria-controls="mobile-menu" aria-expanded="false">
+                <span class="absolute -inset-0.5"></span>
+                <span class="sr-only">打开主菜单</span>
+                <!-- Menu open: "hidden", Menu closed: "block" -->
+                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                <!-- Menu open: "block", Menu closed: "hidden" -->
+                <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden" id="mobile-menu">
+          <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+            {% comment %}
+              todo: 正确设置当前页面
+
+              - Current: "bg-gray-900 text-white"
+              - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
+              - Both: …
+            {% endcomment %}
+            <a href="{% url 'quiz:index' %}" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium">主页</a>
+            {% if user.is_authenticated %}
+              <a href="{% url 'quiz:contest' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">答题</a>
+              <a href="{% url 'quiz:info' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">个人中心</a>
+              <a href="{% url 'logout' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">登出</a>
+            {% else %}
+              <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">登录</a>
+            {% endif %}
+          </div>
+          <div class="border-t border-gray-700 pb-3 pt-4">
+            <div class="flex items-center px-5">
+              <div>
+                {# todo: user data #}
+                <div class="text-base font-medium leading-none text-white">Tom Cook</div>
+                <div class="text-sm font-medium leading-none text-gray-400">tom@example.com</div>
+              </div>
+            </div>
+            <div class="mt-3 space-y-1 px-2">
+              {# todo: 内容 #}
+              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your Profile</a>
+              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
+              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <header class="bg-white shadow">
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">{% block pagename %}{% endblock %}</h1>
+        </div>
+      </header>
+
+      <main>
+        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
 
     <!-- Footer -->
+    {# todo: Refactor with tailwind CSS #}
     <footer>
         <div class="container">
             <div class="row">
@@ -104,16 +180,5 @@
             </div>
         </div>
     </footer>
-
-    <!-- Bootstrap core JavaScript -->
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
-    <!-- Layer.js -->
-    <script src="{% static 'layer/layer.js' %}"></script>
-
-    <!-- Custom scripts for this template -->
-    <script src="{% static 'js/clean-blog.min.js' %}"></script>
-
   </body>
 </html>
