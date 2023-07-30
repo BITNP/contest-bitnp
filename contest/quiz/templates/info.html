@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load my_humanize humanize %}
 {% load static %}
 {% block title %}
   个人中心
@@ -34,6 +35,25 @@
         前往答题
       </a>
     </div>
+    <section class="prose">
+      <h2>当前成绩</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>提交时刻</th>
+            <th>得分</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
+            <tr>
+              <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
+              <td>{{ r.score | as_score }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
   {% else %}
     <p>
       请先<a href="{% url 'login' %}">登录</a>。

@@ -73,4 +73,4 @@ class ContestViewTests(TestCase):
 
         response = self.client.post(reverse("quiz:contest_submit"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("quiz:index"))
+        self.assertEqual(response.url, reverse("quiz:info"))

@@ -190,19 +190,23 @@
           </div>
         </div>
       </nav>
-      <header class="bg-white shadow">
-        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-            {% block pagename %}
-            {% endblock pagename %}
-          </h1>
-        </div>
-      </header>
+      {% block header %}
+        <header class="bg-white shadow">
+          <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+              {% block pagename %}
+              {% endblock pagename %}
+            </h1>
+          </div>
+        </header>
+      {% endblock header %}
       <main>
-        <div class="mx-auto max-w-2xl py-6 sm:px-6 lg:px-8">
-          {% block content %}
-          {% endblock content %}
-        </div>
+        {% block main %}
+          <div class="mx-auto max-w-2xl py-6 sm:px-6 lg:px-8">
+            {% block content %}
+            {% endblock content %}
+          </div>
+        {% endblock main %}
       </main>
     </div>
     <!-- Footer -->
