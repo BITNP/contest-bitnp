@@ -9,8 +9,8 @@
     <form action="{% url 'quiz:contest_submit' %}" method="post">
       {% csrf_token %}
       {% for a in draft_response.answer_set.all %}
-        <fieldset>
-          <legend>{{ a.question }}</legend>
+        <fieldset class="my-4">
+          <legend class="text-lg font-bold">{{ a.question }}</legend>
           {% for choice in a.question.choice_set.all %}
             <div>
               {% if a.choice.id == choice.id %}
@@ -30,7 +30,10 @@
           {% endfor %}
         </fieldset>
       {% endfor %}
-      <button type="submit">提交</button>
+      <div class="text-center">
+        <button type="submit"
+                class="px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">提交</button>
+      </div>
     </form>
   </div>
 {% endblock content %}
