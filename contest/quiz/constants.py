@@ -20,11 +20,9 @@ class ConstantsNamespace:
     """一套题的总分"""
 
     ROUTES = {
-        "quiz:index": {"title": "主页", "scenario": "both"},
-        "quiz:contest": {"title": "答题", "scenario": "logged_in"},
-        "quiz:info": {"title": "个人中心", "scenario": "logged_in"},
-        "logout": {"title": "登出", "scenario": "logged_in"},
-        "login": {"title": "登录", "scenario": "logged_out"},
+        "quiz:index": {"title": "主页", "login_required": False},
+        "quiz:contest": {"title": "答题", "login_required": True},
+        "quiz:info": {"title": "个人中心", "login_required": True},
     }
 
 
