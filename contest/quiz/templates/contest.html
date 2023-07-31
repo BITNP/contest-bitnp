@@ -12,21 +12,13 @@
         <fieldset class="my-4">
           <legend class="text-lg font-bold">{{ a.question }}</legend>
           {% for choice in a.question.choice_set.all %}
-            <div>
-              {% if a.choice.id == choice.id %}
-                <input type="radio"
-                       name="question-{{ a.question.id }}"
-                       value="choice-{{ choice.id }}"
-                       id="choice-{{ choice.id }}"
-                       checked>
-              {% else %}
-                <input type="radio"
-                       name="question-{{ a.question.id }}"
-                       value="choice-{{ choice.id }}"
-                       id="choice-{{ choice.id }}">
-              {% endif %}
-              <label for="choice-{{ choice.id }}">{{ choice }}</label>
-            </div>
+            <label class="block hover:bg-red-100 my-2">
+              <input type="radio"
+                     name="question-{{ a.question.id }}"
+                     value="choice-{{ choice.id }}"
+                     {% if a.choice.id == choice.id %}checked{% endif %}>
+              {{ choice }}
+            </label>
           {% endfor %}
         </fieldset>
       {% endfor %}
