@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 {% load my_humanize humanize %}
 {% load static %}
-{% block title %}
-  个人中心
-{% endblock title %}
-{% block pagename %}
-  个人中心
-{% endblock pagename %}
 {% block content %}
   {% if user.is_authenticated %}
     <div class="prose">

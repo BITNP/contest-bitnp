@@ -1,5 +1,6 @@
 {# Based on https://tailwindui.com/components/application-ui/application-shells/stacked #}
 {% load static %}
+{% load current_page %}
 {% load tailwind_tags %}
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" class="h-full bg-gray-100">
@@ -11,10 +12,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="keywords" content="">
-    <title>
-      {% block title %}
-      {% endblock title %}
-    - 国防知识竞赛</title>
+    <title>{% current_page_title %} - 国防知识竞赛</title>
     {% block scripts %}
     {% endblock scripts %}
     {% tailwind_css %}
@@ -31,26 +29,20 @@
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
-                  {% comment %}
-                    todo: 正确设置当前页面
-
-                    - Current: "bg-gray-900 text-white"
-                    - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    - Both: rounded-md px-3 py-2 text-sm font-medium
-                  {% endcomment %}
-                  <a class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                     href="{% url 'quiz:index' %}">主页</a>
-                  {% if user.is_authenticated %}
-                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                       href="{% url 'quiz:contest' %}">答题</a>
-                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                       href="{% url 'quiz:info' %}">个人中心</a>
-                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                       href="{% url 'logout' %}">登出</a>
-                  {% else %}
-                    <a class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                       href="{% url 'login' %}">登录</a>
-                  {% endif %}
+                  {% for key, page in constants.ROUTES.items %}
+                    {# 若应显示 #}
+                    {% if page.scenario == 'both' or page.scenario == 'logged_in' and user.is_authenticated or page.scenario == 'logged_out' and not user.is_authenticated %}
+                      {% url key as url %}
+                      <a class="{% if url == request.path_info|urlencode %}
+                                  bg-gray-900 text-white
+                                {% else %}
+                                  text-gray-300 hover:bg-gray-700 hover:text-white
+                                {% endif %}
+                                rounded-md px-3 py-2 text-sm font-medium"
+                         {% if url == request.path_info|urlencode %}aria-current="page"{% endif %}
+                         href="{{ url }}">{{ page.title }}</a>
+                    {% endif %}
+                  {% endfor %}
                 </div>
               </div>
             </div>
@@ -146,26 +138,20 @@
         <!-- Mobile menu, show/hide based on menu state. -->
         <div class="md:hidden" id="mobile-menu">
           <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            {% comment %}
-              todo: 正确设置当前页面
-
-              - Current: "bg-gray-900 text-white"
-              - Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
-              - Both: …
-            {% endcomment %}
-            <a class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium"
-               href="{% url 'quiz:index' %}">主页</a>
-            {% if user.is_authenticated %}
-              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-                 href="{% url 'quiz:contest' %}">答题</a>
-              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-                 href="{% url 'quiz:info' %}">个人中心</a>
-              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-                 href="{% url 'logout' %}">登出</a>
-            {% else %}
-              <a class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
-                 href="{% url 'login' %}">登录</a>
-            {% endif %}
+            {% for key, page in constants.ROUTES.items %}
+              {# 若应显示 #}
+              {% if page.scenario == 'both' or page.scenario == 'logged_in' and user.is_authenticated or page.scenario == 'logged_out' and not user.is_authenticated %}
+                {% url key as url %}
+                <a class="{% if url == request.path_info|urlencode %}
+                            bg-gray-900 text-white
+                          {% else %}
+                            text-gray-300 hover:bg-gray-700 hover:text-white
+                          {% endif %}
+                          block rounded-md px-3 py-2 text-base font-medium"
+                   {% if url == request.path_info|urlencode %}aria-current="page"{% endif %}
+                   href="{{ url }}">{{ page.title }}</a>
+              {% endif %}
+            {% endfor %}
           </div>
           <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
@@ -190,10 +176,7 @@
       {% block header %}
         <header class="bg-white shadow">
           <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-              {% block pagename %}
-              {% endblock pagename %}
-            </h1>
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">{% current_page_title %}</h1>
           </div>
         </header>
       {% endblock header %}

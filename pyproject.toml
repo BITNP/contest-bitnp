@@ -55,5 +55,6 @@ django_settings_module = "contest.settings"
 
 [tool.djlint]
 indent = 2
+format_attribute_template_tags = true
 profile = "django"
 ignore = "H006"    # `<img>` tag should have `height` and `width` attributes.
