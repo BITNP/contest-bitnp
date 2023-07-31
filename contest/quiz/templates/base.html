@@ -13,6 +13,7 @@
     <meta name="author" content="">
     <meta name="keywords" content="">
     <title>{% current_page_title %} - 国防知识竞赛</title>
+    <script type='module' src="{% static 'toggle_mobile_menu.js' %}"></script>
     {% block scripts %}
     {% endblock scripts %}
     {% tailwind_css %}
@@ -62,15 +63,15 @@
             </div>
             <!-- Mobile menu button -->
             <div class="-mr-2 flex md:hidden">
-              {# todo: Toggle #}
               <button type="button"
+                      id="toggle-mobile-menu"
                       class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       aria-controls="mobile-menu"
                       aria-expanded="false">
                 <span class="absolute -inset-0.5"></span>
                 <span class="sr-only">打开主菜单</span>
-                <!-- Menu open: "hidden", Menu closed: "block" -->
-                <svg class="block h-6 w-6"
+                <!-- Show if menu is closed -->
+                <svg class="h-6 w-6"
                      fill="none"
                      viewBox="0 0 24 24"
                      stroke-width="1.5"
@@ -78,7 +79,7 @@
                      aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
-                <!-- Menu open: "block", Menu closed: "hidden" -->
+                <!-- Show if menu is open -->
                 <svg class="hidden h-6 w-6"
                      fill="none"
                      viewBox="0 0 24 24"
@@ -92,7 +93,7 @@
           </div>
         </div>
         <!-- Mobile menu, show/hide based on menu state. -->
-        <div class="md:hidden" id="mobile-menu">
+        <div class="md:hidden hidden" id="mobile-menu">
           <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             {% for key, page in constants.ROUTES.items %}
               {# 若应显示 #}
