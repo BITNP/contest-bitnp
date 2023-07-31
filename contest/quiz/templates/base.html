@@ -27,10 +27,7 @@
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                {# todo: logo #}
-                <img class="h-8 w-8"
-                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                     alt="Your Company">
+                <img class="h-8 w-8" src="{% static 'img/bit-icon.svg' %}" alt="北京理工大学">
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
@@ -208,39 +205,18 @@
           </div>
         {% endblock main %}
       </main>
-    </div>
-    <!-- Footer -->
-    {# todo: Refactor with tailwind CSS #}
-    {# djlint:off H013, H021 #}
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 col-md-10 mx-auto">
-            <div align="center">
-              <hr style="color:#ccc; width: 61.8%;">
-              <img src="{% static 'img/logo.jpg' %}"
-                   style="width: 200px;
-                          border-radius: 17px" />
-              <p class="copyright text-muted">
-                Copyright © {{ constants.YEAR }} The National Defense Education
-                Association
-                of
-                BIT. All Rights Reserved.
-              </p>
-              <p class="copyright text-muted">
-                Powered by <a href="https://www.bitnp.net/" target="_blank">Net
-                Pioneer Association</a> of BIT. Designed by Lytning.
-              </p>
-              <div style="display: none">
-                <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1273652750'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1273652750' type='text/javascript'%3E%3C/script%3E"));</script>
-                <script type="text/javascript"
-                        src="https://s19.cnzz.com/z_stat.php?id=1273652750&web_id=1273652750"></script>
-              </div>
-            </div>
-          </div>
+      <!-- Footer -->
+      <footer class="mt-4 pt-2 bg-white shadow-inner">
+        <div class="flex gap-2 justify-center p-2">
+          <img src="{% static 'img/bit-icon.svg' %}" alt="" class="h-8">
+          <img src="{% static 'img/bit-text.svg' %}" alt="北京理工大学" class="h-8">
+          <img src="{% static 'img/defense.png' %}" alt="国防教育协会" class="h-8 ml-4">
         </div>
-      </div>
-    </footer>
-    {# djlint:on #}
+        <p class="text-center text-gray-500">北京理工大学国防教育协会 © {{ constants.YEAR }}</p>
+        <p class="text-center text-gray-500 prose-a:underline">
+          Powered by <a href="https://www.bitnp.net/" target="_blank">Net Pioneer Association</a> of BIT. Designed by Lytning et al.
+        </p>
+      </footer>
+    </div>
   </body>
 </html>
