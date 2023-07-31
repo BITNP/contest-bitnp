@@ -1,5 +1,14 @@
 from dataclasses import dataclass
 from datetime import timedelta
+from typing import NamedTuple
+
+
+class PageMeta(NamedTuple):
+    title: str
+    """标题用于`<title>`、`<h1>`等"""
+
+    login_required: bool
+    """是否仅在登录后显示"""
 
 
 @dataclass(frozen=True)
@@ -20,9 +29,9 @@ class ConstantsNamespace:
     """一套题的总分"""
 
     ROUTES = {
-        "quiz:index": {"title": "主页", "login_required": False},
-        "quiz:contest": {"title": "答题", "login_required": True},
-        "quiz:info": {"title": "个人中心", "login_required": True},
+        "quiz:index": PageMeta(title="主页", login_required=False),
+        "quiz:contest": PageMeta(title="答题", login_required=True),
+        "quiz:info": PageMeta(title="个人中心", login_required=True),
     }
 
 

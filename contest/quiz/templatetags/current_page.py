@@ -21,6 +21,6 @@ def current_page_title(context: dict, default="") -> str:
 
     for key, page in constants.ROUTES.items():
         if request.path_info == reverse(key):
-            return page["title"]
+            return page.title
 
     return default
