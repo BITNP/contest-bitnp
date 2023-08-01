@@ -1,3 +1,6 @@
+/** 时间允差，毫秒 */
+const TIME_MARGIN = 10 * 1e3
+
 /**
  * @param {string} key
  */
@@ -5,12 +8,15 @@ function get_data (key) {
     return JSON.parse(document.getElementById(`data:${key}`).textContent)
 }
 
+const update_url = get_data("update-url")
+const deadline = Date.parse(get_data("deadline"))
+const deadline_duration_seconds = get_data("deadline-duration")
+
 //! 作答
 
 const form = document.querySelector("form")
 const filed_sets = Array.from(form.querySelectorAll('fieldset'))
 const inputs = filed_sets.map(set => Array.from(set.querySelectorAll('input')))
-const update_url = get_data("update-url")
 /** @type {HTMLDivElement} */
 const contest_bar = document.querySelector('div#contest-progress-bar')
 /** @type {HTMLSpanElement} */
@@ -23,31 +29,41 @@ function display_contest_progress () {
     contest_text.textContent = inputs.length - n_completed
 }
 
-display_contest_progress()
-
-form.addEventListener('input', () => {
-    // Send
-    fetch(update_url, {
+async function update_contest_progress () {
+    const response = await fetch(update_url, {
         method: 'POST',
         body: new FormData(form)
-    }).then(response => {
-        if (!response.ok && response.status == 403) {
-            filed_sets.forEach(set => set.disabled = true)
-        }
     })
+    if (!response.ok && response.status == 403) {
+        filed_sets.forEach(set => set.disabled = true)
+    }
+}
 
-    // Display
+function update_contest_progress_periodically () {
+    // 若之前同步时仍有时间，则继续定期同步
+    if (!filed_sets[0].disabled) {
+        setTimeout(update_contest_progress_periodically, TIME_MARGIN / 16)
+    }
+    return update_contest_progress()
+}
+
+// 浏览器可能缓存之前答卷，因此进入页面后立即更新进度条
+display_contest_progress()
+
+// 每次修改时更新
+form.addEventListener('input', () => {
+    update_contest_progress()
     display_contest_progress()
 })
+
+// 将近截止时定期更新
+setTimeout(update_contest_progress_periodically, deadline - Date.now() - TIME_MARGIN)
 
 //! 时间
 
 /** 时间进度 */
 class TimeProgress {
     constructor() {
-        this.deadline = Date.parse(get_data("deadline"))
-        this.deadline_duration_seconds = get_data("deadline-duration")
-
         /** @type {HTMLDivElement} */
         this.bar = document.querySelector('div#time-progress-bar')
         /** @type {HTMLSpanElement} */
@@ -55,11 +71,18 @@ class TimeProgress {
     }
 
     /**
+     * @returns {number} 剩余秒数
+     */
+    get seconds_left () {
+        // timestamps are in milliseconds.
+        return (deadline - Date.now()) / 1e3
+    }
+
+    /**
      * @returns {number} 时间进度，0 代表发卷，1 代表截止
      */
     get progress () {
-        // timestamps are in milliseconds.
-        return 1 + (Date.now() - this.deadline) / 1e3 / this.deadline_duration_seconds
+        return 1 - this.seconds_left / deadline_duration_seconds
     }
 
     /**
@@ -69,12 +92,11 @@ class TimeProgress {
         if (this.progress < 1) {
             this.bar.style.width = `${100 * this.progress}%`
 
-            const seconds_left = (this.deadline - Date.now()) / 1e3
-            if (seconds_left > 100) {
-                this.text.textContent = `${Math.round(seconds_left / 60)}分`
+            if (this.seconds_left > 100) {
+                this.text.textContent = `${Math.round(this.seconds_left / 60)}分`
                 setTimeout(() => { this.update() }, 1000)
             } else {
-                this.text.textContent = `${Math.round(seconds_left)}秒`
+                this.text.textContent = `约${Math.round(this.seconds_left)}秒`
                 setTimeout(() => { this.update() }, 100)
             }
         } else {
