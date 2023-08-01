@@ -12,17 +12,23 @@ src_dir := "contest"
     just --list
 
 # 调用 Django 的 manage.py
+[private]
 manage *ARGS:
     {{ python }} {{ src_dir }}/manage.py {{ ARGS }}
 
 # 启动 Django 服务器
 serve: (manage "runserver")
 
+# 运行 Python 交互解释器，可操作数据库
+shell: (manage "shell")
+
 # 检查类型
+[private]
 mypy:
     {{ python }} -m mypy .
 
 # 运行测试
+[private]
 test: (manage "test" "quiz")
 
 # 检查所有
