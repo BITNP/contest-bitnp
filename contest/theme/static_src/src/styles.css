@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes blinking {
+    0% {
+        background-color: red;
+    }
+    100% {
+        background-color: whitesmoke;
+    }
+}
+.time-progress-severe {
+    animation: blinking 1s infinite
+}
