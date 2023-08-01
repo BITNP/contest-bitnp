@@ -159,5 +159,5 @@ INTERNAL_IPS = [
 ]
 
 # `just manage tailwind install`需要 Node.js
-NPM_BIN_PATH = "npm.cmd"
-# 默认为`npm`，导致 Windows 上即使 npm 在`$PATH`上也无法识别
+NPM_BIN_PATH = "pnpm.CMD"
+# 默认为`npm`，不过在 Windows 上即使 npm 在`$PATH`上也无法识别，应改为`npm.cmd`

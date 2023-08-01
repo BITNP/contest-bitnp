@@ -6,9 +6,9 @@
 
 ### `NPM_BIN_PATH`
 
-构建 Tailwind CSS 需要 Node.js 及 npm。
+构建 Tailwind CSS 需要 Node.js 及 npm 或 [pnpm](https://pnpm.io/)。
 
-此项目设置 npm 为`$PATH`上的`npm.cmd`；若有其它需求，请更改[`settings.py`](../contest/contest/settings.py)中的`NPM_BIN_PATH`。
+仓库中设置会用`$PATH`上的`pnpm.CMD`；若有其它需求，请更改[`settings.py`](../contest/contest/settings.py)中的`NPM_BIN_PATH`。
 
 ### 自动重新构建
 
