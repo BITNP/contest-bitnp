@@ -164,4 +164,4 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     response.answer_set.bulk_create(answers)
     student.draft_response.delete()
 
-    return HttpResponseRedirect(reverse("quiz:index"))
+    return HttpResponseRedirect(reverse("quiz:info"))

@@ -1,32 +1,31 @@
 {% extends "base.html" %}
-
 {% block scripts %}
-{% load static %}
-<script type='module' src="{% static 'update.js' %}"></script>
-{% endblock %}
-
+  {% load static %}
+  <script type='module' src="{% static 'update.js' %}"></script>
+{% endblock scripts %}
 {% block content %}
-<p>截止时刻：{{ draft_response.deadline }}。</p>
-
-<form action="{% url 'quiz:contest_submit' %}" method="post">
-    {% csrf_token %}
-
-    {% for a in draft_response.answer_set.all %}
-    <fieldset>
-        <legend>{{ a.question }}</legend>
-        {% for choice in a.question.choice_set.all %}
-        <div>
-            {% if a.choice.id == choice.id %}
-            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}" checked>
-            {% else %}
-            <input type="radio" name="question-{{ a.question.id }}" value="choice-{{ choice.id }}" id="choice-{{ choice.id }}">
-            {% endif %}
-            <label for="choice-{{ choice.id }}">{{ choice }}</label>
-        </div>
-        {% endfor %}
-    </fieldset>
-    {% endfor %}
-
-    <button type="submit">提交</button>
-</form>
-{% endblock %}
+  <div class="prose">
+    <p>截止时刻：{{ draft_response.deadline }}。</p>
+    <form action="{% url 'quiz:contest_submit' %}" method="post">
+      {% csrf_token %}
+      {% for a in draft_response.answer_set.all %}
+        <fieldset class="my-4">
+          <legend class="text-lg font-bold">{{ a.question }}</legend>
+          {% for choice in a.question.choice_set.all %}
+            <label class="block hover:bg-red-100 my-2">
+              <input type="radio"
+                     name="question-{{ a.question.id }}"
+                     value="choice-{{ choice.id }}"
+                     {% if a.choice.id == choice.id %}checked{% endif %}>
+              {{ choice }}
+            </label>
+          {% endfor %}
+        </fieldset>
+      {% endfor %}
+      <div class="text-center">
+        <button type="submit"
+                class="px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">提交</button>
+      </div>
+    </form>
+  </div>
+{% endblock content %}

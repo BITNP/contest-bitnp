@@ -1,50 +1,64 @@
 {% extends "base.html" %}
 {% load my_humanize %}
-{% load humanize %}
-
-{% block title %}首页{% endblock %}
-
-{% block pagename %}首页{% endblock %}
-
-{% block content %}
-
-{% if user.is_authenticated %}
-    <p>Status: {{ status }}</p>
-    <!-- Main Content -->
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <h2 class="section-heading">竞赛简介</h2>
-                <p style='text-indent:2em;'>
-                    国防知识竞赛线上赛由系统随机抽取{{ constants.N_QUESTIONS_PER_RESPONSE }}道题，限时{{ constants.DEADLINE_DURATION | natural_delta }}。每人限答{{ constants.MAX_TRIES }}次。<span style="color:#ea3a2a;font-weight: bold;">由于网络原因，请尽量在时间截止前手动交卷，并推荐使用电脑端进行作答。</span>希望同学们掌握好答题时间，并做好充分的答题准备，预祝同学们考个好成绩！
-                </p>
-                <hr />
-                <!-- Pager -->
-                <div class="clearfix">
-                    <a class="btn btn-primary float-right" href="{% url 'quiz:contest' %}">现在参加竞赛？</a>
-                </div>
-            </div>
+{% load static %}
+{% block header %}
+{% endblock header %}
+{% block main %}
+  {# Based on https://tailwindui.com/components/marketing/sections/cta-sections #}
+  <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+    <div class="relative isolate overflow-hidden px-6 pt-16 shadow-2xl sm:rounded-3xl sm:px-16 md:pt-24 lg:flex lg:gap-x-20 lg:px-24 lg:pt-0">
+      {# Background gradient #}
+      <svg viewBox="0 0 1024 1024"
+           class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:left-full sm:-ml-80 lg:left-1/2 lg:ml-0 lg:-translate-x-1/2 lg:translate-y-0"
+           aria-hidden="true">
+        <circle cx="512" cy="512" r="512" fill="url(#759c1415-0410-454c-8f7c-9a820de03641)" fill-opacity="0.7" />
+        <defs>
+        <radialGradient id="759c1415-0410-454c-8f7c-9a820de03641">
+        <stop stop-color="#FFDDDD" />
+        <stop offset="1" stop-color="#FF0000" />
+        </radialGradient>
+        </defs>
+      </svg>
+      {# Left/top: Texts #}
+      <div class="mx-auto max-w-md text-center lg:mx-0 lg:flex-auto lg:py-16 lg:text-left">
+        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+          <span class="text-2xl sm:text-3xl">北京理工大学</span>
+          <br>
+          国防知识竞赛
+        </h2>
+        <p class="mt-6 text-lg leading-8 text-gray-500">
+          由系统随机抽取{{ constants.N_QUESTIONS_PER_RESPONSE }}道题，限时{{ constants.DEADLINE_DURATION | natural_delta }}。每人限答{{ constants.MAX_TRIES }}次。
+        </p>
+        <p class="text-lg leading-8 text-red-700 font-bold">由于网络原因，请尽量在时间截止前手动交卷，并推荐使用电脑端进行作答。</p>
+        <p class="text-lg leading-8 text-gray-500">希望同学们掌握好答题时间，并做好充分的答题准备，预祝同学们考个好成绩！</p>
+        <div class="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+          <a href="{% url 'quiz:contest' %}"
+             class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
+            <!-- https://heroicons.com/ arrow-left-on-rectangle -->
+            <svg class="h-6 w-6 inline"
+                 xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            </svg>
+            前往答题
+          </a>
+          <a class="text-sm font-semibold leading-6 hover:text-gray-500"
+             href="{% url 'quiz:info' %}">个人中心 <span aria-hidden="true">→</span></a>
         </div>
+      </div>
+      {# Right/bottom: Image #}
+      <div class="relative mt-16 h-80 lg:mt-8">
+        {# todo: 图片尺寸不匹配#}
+        <img class="absolute left-0 top-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10 placeim"
+             src="{% static 'img/home.jpg' %}"
+             alt="国防"
+             width="1824"
+             height="1080">
+      </div>
     </div>
-    <h2>当前成绩</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>提交时刻</th>
-                <th>得分</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
-            <tr>
-                <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
-                <td>{{ r.score | as_score }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>请先<a href="{% url 'login' %}">登录</a>。</p>
-{% endif %}
-
-{% endblock %}
+  </div>
+  {% if user.is_authenticated %}{# todo: Status #}{% endif %}
+{% endblock main %}

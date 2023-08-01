@@ -1,0 +1,20 @@
+home.jpg:
+  src: PHP 旧项目？
+  remark: 首页图。
+
+defense.png:
+  src: PHP 旧项目。
+  make: 裁边。
+  remark: 国防教育协会徽章、文字、某种宗旨。
+
+bit-icon.svg:
+  url: https://bit.edu.cn/images/gb20190805/logo_01.svg
+  make: 使用 https://www.iloveimg.com/zh-cn/compress-image/compress-svg 压缩。
+  remark: 校徽图案。
+
+bit-text.svg:
+  url: https://bit.edu.cn/images/gb20190805/logo_02.svg
+  make: >-
+    将填充改为黑色，删除阴影图层。
+    再使用 https://www.iloveimg.com/zh-cn/compress-image/compress-svg 压缩。
+  remark: 校名文字，黑字。

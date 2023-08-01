@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_cas_ng",
+    "tailwind",
+    "theme",
+    "django_browser_reload",
 ]
 
 MIDDLEWARE = [
@@ -51,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django_cas_ng.middleware.CASMiddleware",
 ]
 
@@ -145,3 +149,15 @@ CAS_VERSION = "2"
 CAS_LOGIN_URL_NAME = LOGIN_URL
 CAS_LOGOUT_URL_NAME = "logout"  # 会用于 Django 提供的模板，如 admin
 CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
+
+# Tailwind
+# https://django-tailwind.readthedocs.io/en/latest/installation.html
+
+TAILWIND_APP_NAME = "theme"
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+# `just manage tailwind install`需要 Node.js
+NPM_BIN_PATH = "npm.cmd"
+# 默认为`npm`，导致 Windows 上即使 npm 在`$PATH`上也无法识别

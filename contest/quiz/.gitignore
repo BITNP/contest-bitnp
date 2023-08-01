@@ -4,4 +4,6 @@
 /static/layer/
 /static/js/
 /static/css/
-/static/img/
+
+# todo: 换尺寸合适的图
+/static/img/home.jpg

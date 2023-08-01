@@ -14,12 +14,14 @@ python = "^3.9"
 Django = "^4.2"
 humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
+django-tailwind = "^3.6.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 mypy = "^1.4.1"
 django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
 ipython = "^8.14.0"
+django-tailwind = { extras = ["reload"], version = "^3.6.0" }
 
 [build-system]
 requires = ["poetry-core"]
@@ -50,3 +52,9 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/contest/"
 
 [tool.django-stubs]
 django_settings_module = "contest.settings"
+
+[tool.djlint]
+indent = 2
+format_attribute_template_tags = true
+profile = "django"
+ignore = "H006"    # `<img>` tag should have `height` and `width` attributes.

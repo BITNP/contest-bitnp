@@ -31,3 +31,9 @@ check-all: mypy test (manage "check")
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")
     poetry install
+
+# 监视 theme 并随时构建
+watch-theme: (manage "tailwind start")
+
+# 构建 theme
+build-theme: (manage "tailwind build")

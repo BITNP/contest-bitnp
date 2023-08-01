@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/login/", cas_views.LoginView.as_view(), name="login"),
     path("accounts/logout/", cas_views.LogoutView.as_view(), name="logout"),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]
