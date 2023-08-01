@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Justfile: watch-theme",
+            "type": "process",
+            "command": "just",
+            "args": [
+                "watch-theme"
+            ],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "tailwind",
+                "pattern": {
+                    "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s*(.*)$",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                },
+                "background": {
+                    "beginsPattern": "Rebuilding...",
+                    "endsPattern": "Done in \\d+ms.",
+                }
+            },
+            "presentation": {
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+            }
+        },
+        {
+            "label": "Justfile: serve",
+            "type": "process",
+            "command": "just",
+            "args": [
+                "serve"
+            ],
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "django",
+                "fileLocation": "autoDetect",
+                "pattern": {
+                    "regexp": "^(.*) \\((.*)\\)$",
+                    "kind": "file",
+                    "file": 2,
+                    "message": 1
+                },
+                "background": {
+                    "beginsPattern": " changed, reloading.",
+                    "endsPattern": "Starting development server at ",
+                }
+            },
+            "presentation": {
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+            }
+        },
+    ]
+}
