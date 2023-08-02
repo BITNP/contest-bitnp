@@ -1,18 +1,20 @@
 {
   "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=production --node-env=production",
-    "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production",
-    "watch": "webpack --watch"
+    "build": "npm run build:clean && npm run build:js",
+    "build:clean": "rimraf ../static/js/dist",
+    "build:js": "rollup --config rollup.config.prod.mjs",
+    "watch": "rollup --config rollup.config.dev.mjs --watch --no-watch.clearScreen"
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
-    "babel-loader": "^9.1.3",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.27.0"
   },
   "dependencies": {
     "sweetalert2": "^11.7.20"
