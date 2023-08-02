@@ -1,5 +1,13 @@
 # 模型
 
+## 答题流程
+
+1. 发卷：创建`DraftResponse`，计算并存储`deadline`。
+2. 作答：更新`DraftResponse`，更新前用`deadline`验证。
+3. 提交：将`DraftResponse`定稿（`finalize`）为`Response`。
+
+## 关系
+
 ```mermaid
 erDiagram
     Student {

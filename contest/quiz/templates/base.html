@@ -128,14 +128,14 @@
           </div>
         </header>
       {% endblock header %}
-      <main>
-        {% block main %}
+      {% block main %}
+        <main>
           <div class="mx-auto max-w-2xl py-6 sm:px-6 lg:px-8">
             {% block content %}
             {% endblock content %}
           </div>
-        {% endblock main %}
-      </main>
+        </main>
+      {% endblock main %}
       <!-- Footer -->
       <footer class="mt-4 pt-2 bg-white shadow-inner">
         <div class="flex gap-2 justify-center p-2">

@@ -1,31 +1,65 @@
 {% extends "base.html" %}
+{% load my_humanize %}
 {% block scripts %}
   {% load static %}
-  <script type='module' src="{% static 'update.js' %}"></script>
+  <script type='module' src="{% static 'contest.js' %}"></script>
+  {# 数据 #}
+  {% url 'quiz:contest_update' as update_url %}
+  {{ update_url | json_script:"data:update-url" }}
+  {{ draft_response.deadline | json_script:"data:deadline" }}
+  {{ constants.DEADLINE_DURATION.seconds | json_script:"data:deadline-duration" }}
 {% endblock scripts %}
-{% block content %}
-  <div class="prose">
-    <p>截止时刻：{{ draft_response.deadline }}。</p>
-    <form action="{% url 'quiz:contest_submit' %}" method="post">
-      {% csrf_token %}
-      {% for a in draft_response.answer_set.all %}
-        <fieldset class="my-4">
-          <legend class="text-lg font-bold">{{ a.question }}</legend>
-          {% for choice in a.question.choice_set.all %}
-            <label class="block hover:bg-red-100 my-2">
-              <input type="radio"
-                     name="question-{{ a.question.id }}"
-                     value="choice-{{ choice.id }}"
-                     {% if a.choice.id == choice.id %}checked{% endif %}>
-              {{ choice }}
-            </label>
-          {% endfor %}
-        </fieldset>
-      {% endfor %}
-      <div class="text-center">
-        <button type="submit"
-                class="px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">提交</button>
+{% block main %}
+  <main>
+    {# 进度 #}
+    <aside class="sticky top-0 md:top-4 mt-4 md:w-80 md:float-right p-2 bg-white shadow">
+      <div class="grid grid-cols-[auto_1fr] items-center">
+        <div>
+          时间：还剩<span id="time-progress-text">{{ constants.DEADLINE_DURATION | natural_delta }}</span>
+        </div>
+        <div class="ml-4 h-2 flex flex-auto rounded-full bg-white"
+             aria-hidden="true">
+          <div id="time-progress-bar"
+               class="h-2 w-0 flex-none rounded-l-full rounded-r-[1px] bg-indigo-600"></div>
+          <div class="-my-[0.3125rem] ml-0.5 h-[1.125rem] w-1 rounded-full bg-indigo-600"></div>
+        </div>
+        <div>
+          作答：还剩<span id="contest-progress-text">{{ constants.N_QUESTIONS_PER_RESPONSE }}</span>题
+        </div>
+        <div class="ml-4 h-2 flex flex-auto rounded-full bg-white"
+             aria-hidden="true">
+          <div id="contest-progress-bar"
+               class="h-2 w-0 flex-none rounded-l-full rounded-r-[1px] bg-green-600"></div>
+          <div class="-my-[0.3125rem] ml-0.5 h-[1.125rem] w-1 rounded-full bg-green-600"></div>
+        </div>
       </div>
-    </form>
-  </div>
-{% endblock content %}
+    </aside>
+    {# 题目 #}
+    <article class="mx-auto max-w-2xl py-6 px-2 sm:px-6 lg:px-8">
+      <div class="prose">
+        <form action="{% url 'quiz:contest_submit' %}" method="post">
+          {% csrf_token %}
+          {% for a in draft_response.answer_set.all %}
+            <fieldset class="my-4 disabled:text-gray-400"
+                      {% if draft_response.outdated %}disabled{% endif %}>
+              <legend class="text-lg font-bold">{{ a.question }}</legend>
+              {% for choice in a.question.choice_set.all %}
+                <label class="block hover:bg-red-100 my-2">
+                  <input type="radio"
+                         name="question-{{ a.question.id }}"
+                         value="choice-{{ choice.id }}"
+                         {% if a.choice.id == choice.id %}checked{% endif %}>
+                  {{ choice }}
+                </label>
+              {% endfor %}
+            </fieldset>
+          {% endfor %}
+          <div class="text-center">
+            <button type="submit"
+                    class="px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">提交</button>
+          </div>
+        </form>
+      </div>
+    </article>
+  </main>
+{% endblock main %}
