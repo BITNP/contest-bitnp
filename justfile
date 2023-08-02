@@ -36,7 +36,7 @@ check-all: mypy test (manage "check")
 
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")
-    poetry install
+    poetry install --no-root
     pnpm --dir {{ src_dir }}/theme/static_src/ install
     pnpm --dir {{ src_dir }}/js/static_src/ install
 
