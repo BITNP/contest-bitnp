@@ -1,12 +1,7 @@
+import { get_data } from "./util"
+
 /** 时间允差，毫秒 */
 const TIME_MARGIN = 10 * 1e3
-
-/**
- * @param {string} key
- */
-function get_data (key) {
-    return JSON.parse(document.getElementById(`data:${key}`).textContent)
-}
 
 const update_url = get_data("update-url")
 const deadline = Date.parse(get_data("deadline"))

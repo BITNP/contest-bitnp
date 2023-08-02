@@ -36,10 +36,20 @@ check-all: mypy test (manage "check")
 
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")
-    poetry install
+    poetry install --no-root
+    pnpm --dir {{ src_dir }}/theme/static_src/ install
+    pnpm --dir {{ src_dir }}/js/static_src/ install
 
 # 监视 theme 并随时构建
 watch-theme: (manage "tailwind start")
 
 # 构建 theme
 build-theme: (manage "tailwind build")
+
+# 监视 js 并随时构建
+watch-js:
+    pnpm --dir {{ src_dir }}/js/static_src/ run watch
+
+# 构建 js
+build-js:
+    pnpm --dir {{ src_dir }}/js/static_src/ run build

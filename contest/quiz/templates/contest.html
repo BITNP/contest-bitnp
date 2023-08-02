@@ -2,7 +2,7 @@
 {% load my_humanize %}
 {% block scripts %}
   {% load static %}
-  <script type='module' src="{% static 'contest.js' %}"></script>
+  <script type='module' src="{% static 'js/dist/contest.js' %}"></script>
   {# 数据 #}
   {% url 'quiz:contest_update' as update_url %}
   {{ update_url | json_script:"data:update-url" }}
