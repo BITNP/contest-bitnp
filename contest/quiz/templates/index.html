@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load my_humanize %}
 {% load static %}
+{% block scripts %}
+  <script type='module' src="{% static 'js/dist/index.js' %}"></script>
+  {{ status | json_script:"data:status" }}
+{% endblock scripts %}
 {% block header %}
 {% endblock header %}
 {% block main %}
@@ -44,7 +48,11 @@
                    stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
               </svg>
-              前往答题
+              {% if status == "taking contest" %}
+                继续上次答题
+              {% else %}
+                前往答题
+              {% endif %}
             </a>
             <a class="text-sm font-semibold leading-6 hover:text-gray-500"
                href="{% url 'quiz:info' %}">个人中心 <span aria-hidden="true">→</span></a>
@@ -61,6 +69,5 @@
         </div>
       </div>
     </div>
-    {% if user.is_authenticated %}{# todo: Status #}{% endif %}
   </main>
 {% endblock main %}

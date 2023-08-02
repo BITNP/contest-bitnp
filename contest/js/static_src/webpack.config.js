@@ -6,6 +6,7 @@ const isProduction = process.env.NODE_ENV == "production"
 
 const config = {
   entry: {
+    index: './src/index.js',
     contest: './src/contest.js',
     toggle_mobile_menu: './src/toggle_mobile_menu.js',
   },
