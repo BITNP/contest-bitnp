@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django_cas_ng",
     "tailwind",
     "theme",
+    "js",
     "django_browser_reload",
 ]
 

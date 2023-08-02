@@ -43,3 +43,11 @@ watch-theme: (manage "tailwind start")
 
 # 构建 theme
 build-theme: (manage "tailwind build")
+
+# 监视 js 并随时构建
+watch-js:
+    pnpm --dir {{ src_dir }}/js/static_src/ run watch
+
+# 构建 js
+build-js:
+    pnpm --dir {{ src_dir }}/js/static_src/ run build
