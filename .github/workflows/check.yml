@@ -1,0 +1,52 @@
+name: Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+        - "**/*.md"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # Setup python tools
+    - name: Install poetry
+      run: pipx install poetry
+    - name: Configure poetry for in-project venv
+      run: |
+        poetry config virtualenvs.in-project true
+        echo 'PYTHON = "./.venv/bin/python"' > .env
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: poetry
+
+    # Setup other tools
+    - name: Setup just
+      uses: taiki-e/install-action@v2
+      with:
+          tool: just
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: pnpm
+        cache-dependency-path: |
+          contest/*/static_src/pnpm-lock.yaml
+
+    # Install and update
+    - run: just update
+
+    # Build and check
+    - run: just build-theme
+    - run: just build-js
+    - run: just check-all
