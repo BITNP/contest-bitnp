@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import wraps
 from random import sample
 from typing import TYPE_CHECKING
 
@@ -21,56 +20,13 @@ from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
+from .util import is_student, is_student_taking_contest, student_only
 
 if TYPE_CHECKING:
-    from typing import Callable
-
-    from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
     from django.http import HttpRequest
 
-    from .models import DraftAnswer, Student, User
-
-    class AuthenticatedHttpRequest(HttpRequest):
-        user: User
-
-
-def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student")
-
-
-def student_only(
-    view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
-) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
-    """If not student, render `not_student.html`
-
-    # Example
-
-    ```
-    @login_required
-    @student_only
-    def my_view(request: AuthenticatedHttpRequest) -> HttpResponse:
-        ...
-    ```
-    """
-
-    @wraps(view_func)
-    def wrapper(request):
-        if is_student(request.user):
-            return view_func(request)
-        else:
-            return render(
-                request,
-                "not_student.html",
-                {
-                    "constants": constants,
-                },
-            )
-
-    return wrapper
-
-
-def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student") and hasattr(user.student, "draft_response")
+    from .models import DraftAnswer, Student
+    from .util import AuthenticatedHttpRequest
 
 
 @require_GET
