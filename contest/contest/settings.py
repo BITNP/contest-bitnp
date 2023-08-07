@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from shutil import which
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,5 +161,6 @@ INTERNAL_IPS = [
 ]
 
 # `just manage tailwind install`需要 Node.js
-NPM_BIN_PATH = "pnpm.CMD"
-# 默认为`npm`，不过在 Windows 上即使 npm 在`$PATH`上也无法识别，应改为`npm.cmd`
+NPM_BIN_PATH = which("pnpm")
+# Windows 有`$PATHEXT`问题，而`subprocess.run()`应尽量保证是完成路径。
+# https://github.com/timonweb/django-tailwind/pull/181
