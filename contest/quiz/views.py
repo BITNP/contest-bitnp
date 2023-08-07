@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import wraps
 from random import sample
 from typing import TYPE_CHECKING
 
@@ -14,6 +15,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
@@ -21,6 +23,8 @@ from .constants import constants
 from .models import Choice, DraftResponse, Question
 
 if TYPE_CHECKING:
+    from typing import Callable
+
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
     from django.http import HttpRequest
 
@@ -32,6 +36,37 @@ if TYPE_CHECKING:
 
 def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student")
+
+
+def student_only(
+    view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
+) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
+    """If not student, render `not_student.html`
+
+    # Example
+
+    ```
+    @login_required
+    @student_only
+    def my_view(request: AuthenticatedHttpRequest) -> HttpResponse:
+        ...
+    ```
+    """
+
+    @wraps(view_func)
+    def wrapper(request):
+        if is_student(request.user):
+            return view_func(request)
+        else:
+            return render(
+                request,
+                "not_student.html",
+                {
+                    "constants": constants,
+                },
+            )
+
+    return wrapper
 
 
 def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
@@ -71,12 +106,13 @@ def index(request: HttpRequest) -> HttpResponse:
     )
 
 
+@method_decorator(student_only, name="dispatch")
 class InfoView(LoginRequiredMixin, TemplateView):
     template_name = "info.html"
 
 
 @login_required
-@user_passes_test(is_student)
+@student_only
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
@@ -113,6 +149,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
@@ -152,6 +189,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
