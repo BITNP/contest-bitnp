@@ -38,6 +38,36 @@ def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student") and hasattr(user.student, "draft_response")
 
 
+def continue_or_finalize(draft: DraftResponse) -> bool:
+    """自动提交
+
+    若草稿已超期，则定稿，否则什么也不做。
+
+    :return: 是否如此操作（定稿）了
+
+    定稿只会修改数据库，而 python 实例仍存在。
+    可用其它 model 的`refresh_from_db`刷新缓存的关系。
+
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
+    """
+
+    if draft.outdated():
+        # 提交之前的草稿
+        response, answers = draft.finalize(
+            submit_at=draft.deadline + constants.DEADLINE_DURATION
+        )
+
+        response.save()
+        response.answer_set.bulk_create(answers)
+
+        draft.delete()
+
+        return True
+
+    return False
+
+
 @require_GET
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_student(request.user):
@@ -45,19 +75,12 @@ def index(request: HttpRequest) -> HttpResponse:
 
         if not hasattr(student, "draft_response"):
             status = "not taking"
-        elif not student.draft_response.outdated():
-            status = "taking contest"
         else:
-            status = "deadline passed"
-
-            # 提交之前的草稿
-            response, answers = student.draft_response.finalize(
-                submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
-            )
-
-            response.save()
-            response.answer_set.bulk_create(answers)
-            student.draft_response.delete()
+            finalized = continue_or_finalize(student.draft_response)
+            if finalized:
+                status = "deadline passed"
+            else:
+                status = "taking contest"
     else:
         status = ""
 
