@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import wraps
+from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 from django.http import (
@@ -52,6 +53,7 @@ def student_only(
                 {
                     "constants": constants,
                 },
+                status=HTTPStatus.FORBIDDEN,
             )
 
     return wrapper
