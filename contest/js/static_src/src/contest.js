@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2'
+
 import { get_data } from "./util"
 
 /** 时间允差，毫秒 */
@@ -30,7 +32,22 @@ async function update_contest_progress () {
         body: new FormData(form)
     })
     if (!response.ok && response.status == 403) {
+        // 锁定表单
         filed_sets.forEach(set => set.disabled = true)
+
+        // 提示提交
+        const result = await Swal.fire({
+            title: '此次作答已超时',
+            html: '<p>无法再更改答卷，但您还可以查看自己的答卷。</p><p>（截止前作答部分已尽量保存）</p>',
+            icon: 'warning',
+            confirmButtonText: '现在提交',
+            showCancelButton: true,
+            cancelButtonText: '再看看答卷',
+            showCloseButton: true,
+        })
+        if (result.isConfirmed) {
+            form.submit()
+        }
     }
 }
 
