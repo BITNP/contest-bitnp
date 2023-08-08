@@ -51,7 +51,11 @@
               {% if status == "taking contest" %}
                 继续上次答题
               {% else %}
-                前往答题
+                {% if user.is_authenticated %}
+                  前往答题
+                {% else %}
+                  登录并前往答题
+                {% endif %}
               {% endif %}
             </a>
             <a class="text-sm font-semibold leading-6 hover:text-gray-500"

@@ -38,27 +38,28 @@ def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
     return hasattr(user, "student") and hasattr(user.student, "draft_response")
 
 
-@login_required
-@user_passes_test(is_student)
 @require_GET
-def index(request: AuthenticatedHttpRequest) -> HttpResponse:
-    student = request.user.student
+def index(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated and is_student(request.user):
+        student = request.user.student
 
-    if not hasattr(student, "draft_response"):
-        status = "not taking"
-    elif not student.draft_response.outdated():
-        status = "taking contest"
+        if not hasattr(student, "draft_response"):
+            status = "not taking"
+        elif not student.draft_response.outdated():
+            status = "taking contest"
+        else:
+            status = "deadline passed"
+
+            # 提交之前的草稿
+            response, answers = student.draft_response.finalize(
+                submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
+            )
+
+            response.save()
+            response.answer_set.bulk_create(answers)
+            student.draft_response.delete()
     else:
-        status = "deadline passed"
-
-        # 提交之前的草稿
-        response, answers = student.draft_response.finalize(
-            submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
-        )
-
-        response.save()
-        response.answer_set.bulk_create(answers)
-        student.draft_response.delete()
+        status = ""
 
     return render(
         request,

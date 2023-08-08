@@ -54,12 +54,12 @@ class ContestViewTests(TestCase):
         self.student = Student.objects.create(user=self.user)
 
     def test_contest_view(self):
-        """访问首页，然后开始作答"""
-
-        self.client.force_login(self.user)
+        """访问首页，登录，然后开始作答"""
 
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, 200)
+
+        self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, 200)
