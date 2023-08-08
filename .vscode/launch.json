@@ -14,6 +14,7 @@
             ],
             "cwd": "${workspaceFolder}/contest/",
             "console": "integratedTerminal",
+            "django": true,
             "justMyCode": true
         }
     ]
