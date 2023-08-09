@@ -14,30 +14,21 @@ from django.http import (
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
+from .util import is_student, is_student_taking_contest, student_only
 
 if TYPE_CHECKING:
     from typing import Any, Literal
 
-    from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
-    from django.http import HttpRequest
+    from django.contrib.auth.models import AnonymousUser
 
     from .models import DraftAnswer, Student, User
-
-    class AuthenticatedHttpRequest(HttpRequest):
-        user: User
-
-
-def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student")
-
-
-def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student") and hasattr(user.student, "draft_response")
+    from .util import AuthenticatedHttpRequest
 
 
 def continue_or_finalize(draft: DraftResponse) -> bool:
@@ -105,12 +96,13 @@ class IndexView(TemplateView):
         return context
 
 
+@method_decorator(student_only, name="dispatch")
 class InfoView(LoginRequiredMixin, IndexView):
     template_name = "info.html"
 
 
 @login_required
-@user_passes_test(is_student)
+@student_only
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
@@ -127,10 +119,14 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
             deadline=timezone.now() + constants.DEADLINE_DURATION,
             student=student,
         )
-        draft_response.save()
 
         # Randomly select some questions
         questions = sample(list(Question.objects.all()), k=constants.N_QUESTIONS_PER_RESPONSE)
+        # 题目不够时，会抛出异常
+        # 因此必须先选题再保存，不然可能保存空的 DraftResponse
+
+        # 保存
+        draft_response.save()
         for q in questions:
             draft_response.answer_set.create(
                 question=q,
@@ -147,6 +143,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
@@ -186,6 +183,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
