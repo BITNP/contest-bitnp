@@ -56,9 +56,7 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
 
     if draft.outdated():
         # 提交之前的草稿
-        response, answers = draft.finalize(
-            submit_at=draft.deadline + constants.DEADLINE_DURATION
-        )
+        response, answers = draft.finalize(submit_at=draft.deadline)
 
         response.save()
         response.answer_set.bulk_create(answers)
