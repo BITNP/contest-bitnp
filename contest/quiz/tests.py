@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -57,23 +59,37 @@ class ContestViewTests(TestCase):
         """访问首页，登录，然后开始作答"""
 
         response = self.client.get(reverse("quiz:index"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_empty_response(self):
         """正常作答，但交白卷"""
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
         response = self.client.post(reverse("quiz:contest_submit"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("quiz:info"))
+
+    def test_non_student_user(self):
+        """如果登录了但不是学生，应当禁止访问"""
+        user = User.objects.create_user(username="Keel")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("quiz:index"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+        response = self.client.get(reverse("quiz:info"))
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
 
 class EmptyDataTests(TestCase):

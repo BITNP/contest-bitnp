@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <p class="prose">
+    {% if user.is_authenticated %}
+      只有学生能访问这里，请先<a href="{% url 'logout' %}">登出</a>，再用学生账户登录。
+    {% else %}
+      请先<a href="{% url 'login' %}">登录</a>。
+    {% endif %}
+  </p>
+{% endblock content %}
