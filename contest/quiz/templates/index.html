@@ -2,7 +2,7 @@
 {% load my_humanize %}
 {% load static %}
 {% block scripts %}
-  <script type='module' src="{% static 'js/dist/index.js' %}"></script>
+  <script type='module' src="{% static 'js/dist/status.js' %}"></script>
   {{ status | json_script:"data:status" }}
 {% endblock scripts %}
 {% block header %}

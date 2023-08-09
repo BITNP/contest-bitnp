@@ -1,52 +1,50 @@
 {% extends "base.html" %}
 {% load my_humanize humanize %}
 {% load static %}
+{% block scripts %}
+  <script type='module' src="{% static 'js/dist/status.js' %}"></script>
+  {{ status | json_script:"data:status" }}
+{% endblock scripts %}
 {% block content %}
-  {% if user.is_authenticated %}
-    <div class="prose">
-      <h2>成绩</h2>
-      <p class="text-center font-bold mb-2">
-        <span class="text-6xl">{{ user.student.final_score | as_score }}</span><span class="text-4xl">分</span>
-      </p>
-      <p>满分{{ constants.SCORE }}分，取最高分（限答{{ constants.MAX_TRIES }}次）。</p>
-    </div>
-    <div class="m-4 text-center">
-      <a href="{% url 'quiz:contest' %}"
-         class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
-        <!-- https://heroicons.com/ arrow-left-on-rectangle -->
-        <svg class="h-6 w-6 inline"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke-width="1.5"
-             stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-        </svg>
-        前往答题
-      </a>
-    </div>
-    <section class="prose">
-      <h2>答题记录</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>提交时刻</th>
-            <th>单次成绩</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
-            <tr>
-              <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
-              <td>{{ r.score | as_score }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-  {% else %}
-    <p>
-      请先<a href="{% url 'login' %}">登录</a>。
+  <div class="prose">
+    <h2>成绩</h2>
+    <p class="text-center font-bold mb-2">
+      <span class="text-6xl">{{ user.student.final_score | as_score }}</span><span class="text-4xl">分</span>
     </p>
-  {% endif %}
+    <p>满分{{ constants.SCORE }}分，取最高分（限答{{ constants.MAX_TRIES }}次）。</p>
+  </div>
+  <div class="m-4 text-center">
+    <a href="{% url 'quiz:contest' %}"
+       class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
+      <!-- https://heroicons.com/ arrow-left-on-rectangle -->
+      <svg class="h-6 w-6 inline"
+           xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="1.5"
+           stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+      </svg>
+      前往答题
+    </a>
+  </div>
+  <section class="prose">
+    <h2>答题记录</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>提交时刻</th>
+          <th>单次成绩</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
+          <tr>
+            <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
+            <td>{{ r.score | as_score }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
 {% endblock content %}

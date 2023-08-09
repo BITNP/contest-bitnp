@@ -14,69 +14,95 @@ from django.http import (
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
+from .util import is_student, is_student_taking_contest, student_only
 
 if TYPE_CHECKING:
-    from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
-    from django.http import HttpRequest
+    from typing import Any, Literal
+
+    from django.contrib.auth.models import AnonymousUser
 
     from .models import DraftAnswer, Student, User
-
-    class AuthenticatedHttpRequest(HttpRequest):
-        user: User
+    from .util import AuthenticatedHttpRequest
 
 
-def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student")
+def continue_or_finalize(draft: DraftResponse) -> bool:
+    """自动提交
+
+    若草稿已超期，则定稿，否则什么也不做。
+
+    :return: 是否如此操作（定稿）了
+
+    定稿只会修改数据库，而 python 实例仍存在。
+    可用其它 model 的`refresh_from_db`刷新缓存的关系。
+
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
+    """
+
+    if draft.outdated():
+        # 提交之前的草稿
+        response, answers = draft.finalize(submit_at=draft.deadline)
+
+        response.save()
+        response.answer_set.bulk_create(answers)
+
+        draft.delete()
+
+        return True
+
+    return False
 
 
-def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
-    return hasattr(user, "student") and hasattr(user.student, "draft_response")
+def manage_status(
+    user: User | AnonymousUser,
+) -> (
+    Literal["not taking"]
+    | Literal["deadline passed"]
+    | Literal["taking contest"]
+    | Literal[""]
+):
+    """检查状态及自动提交"""
 
-
-@require_GET
-def index(request: HttpRequest) -> HttpResponse:
-    if request.user.is_authenticated and is_student(request.user):
-        student = request.user.student
+    if user.is_authenticated and is_student(user):
+        student = user.student
 
         if not hasattr(student, "draft_response"):
-            status = "not taking"
-        elif not student.draft_response.outdated():
-            status = "taking contest"
+            return "not taking"
         else:
-            status = "deadline passed"
-
-            # 提交之前的草稿
-            response, answers = student.draft_response.finalize(
-                submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
-            )
-
-            response.save()
-            response.answer_set.bulk_create(answers)
-            student.draft_response.delete()
+            finalized = continue_or_finalize(student.draft_response)
+            if finalized:
+                return "deadline passed"
+            else:
+                return "taking contest"
     else:
-        status = ""
-
-    return render(
-        request,
-        "index.html",
-        {
-            "constants": constants,
-            "status": status,
-        },
-    )
+        return ""
 
 
-class InfoView(LoginRequiredMixin, TemplateView):
+class IndexView(TemplateView):
+    template_name = "index.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["status"] = manage_status(self.request.user)
+        context["constants"] = constants
+
+        return context
+
+
+@method_decorator(student_only, name="dispatch")
+class InfoView(LoginRequiredMixin, IndexView):
     template_name = "info.html"
 
 
 @login_required
-@user_passes_test(is_student)
+@student_only
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
@@ -93,10 +119,14 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
             deadline=timezone.now() + constants.DEADLINE_DURATION,
             student=student,
         )
-        draft_response.save()
 
         # Randomly select some questions
         questions = sample(list(Question.objects.all()), k=constants.N_QUESTIONS_PER_RESPONSE)
+        # 题目不够时，会抛出异常
+        # 因此必须先选题再保存，不然可能保存空的 DraftResponse
+
+        # 保存
+        draft_response.save()
         for q in questions:
             draft_response.answer_set.create(
                 question=q,
@@ -113,6 +143,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
@@ -152,6 +183,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 
 @login_required
+@student_only
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
