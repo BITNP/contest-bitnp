@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load my_humanize humanize %}
 {% load static %}
+{% block scripts %}
+  <script type='module' src="{% static 'js/dist/status.js' %}"></script>
+  {{ status | json_script:"data:status" }}
+{% endblock scripts %}
 {% block content %}
   <div class="prose">
     <h2>成绩</h2>

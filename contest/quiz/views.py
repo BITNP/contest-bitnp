@@ -23,47 +23,81 @@ from .models import Choice, DraftResponse, Question
 from .util import is_student, is_student_taking_contest, student_only
 
 if TYPE_CHECKING:
-    from django.http import HttpRequest
+    from typing import Any, Literal
 
-    from .models import DraftAnswer, Student
+    from django.contrib.auth.models import AnonymousUser
+
+    from .models import DraftAnswer, Student, User
     from .util import AuthenticatedHttpRequest
 
 
-@require_GET
-def index(request: HttpRequest) -> HttpResponse:
-    if request.user.is_authenticated and is_student(request.user):
-        student = request.user.student
+def continue_or_finalize(draft: DraftResponse) -> bool:
+    """自动提交
+
+    若草稿已超期，则定稿，否则什么也不做。
+
+    :return: 是否如此操作（定稿）了
+
+    定稿只会修改数据库，而 python 实例仍存在。
+    可用其它 model 的`refresh_from_db`刷新缓存的关系。
+
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
+    https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
+    """
+
+    if draft.outdated():
+        # 提交之前的草稿
+        response, answers = draft.finalize(submit_at=draft.deadline)
+
+        response.save()
+        response.answer_set.bulk_create(answers)
+
+        draft.delete()
+
+        return True
+
+    return False
+
+
+def manage_status(
+    user: User | AnonymousUser,
+) -> (
+    Literal["not taking"]
+    | Literal["deadline passed"]
+    | Literal["taking contest"]
+    | Literal[""]
+):
+    """检查状态及自动提交"""
+
+    if user.is_authenticated and is_student(user):
+        student = user.student
 
         if not hasattr(student, "draft_response"):
-            status = "not taking"
-        elif not student.draft_response.outdated():
-            status = "taking contest"
+            return "not taking"
         else:
-            status = "deadline passed"
-
-            # 提交之前的草稿
-            response, answers = student.draft_response.finalize(
-                submit_at=student.draft_response.deadline + constants.DEADLINE_DURATION
-            )
-
-            response.save()
-            response.answer_set.bulk_create(answers)
-            student.draft_response.delete()
+            finalized = continue_or_finalize(student.draft_response)
+            if finalized:
+                return "deadline passed"
+            else:
+                return "taking contest"
     else:
-        status = ""
+        return ""
 
-    return render(
-        request,
-        "index.html",
-        {
-            "constants": constants,
-            "status": status,
-        },
-    )
+
+class IndexView(TemplateView):
+    template_name = "index.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["status"] = manage_status(self.request.user)
+        context["constants"] = constants
+
+        return context
 
 
 @method_decorator(student_only, name="dispatch")
-class InfoView(LoginRequiredMixin, TemplateView):
+class InfoView(LoginRequiredMixin, IndexView):
     template_name = "info.html"
 
 
