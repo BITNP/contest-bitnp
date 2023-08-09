@@ -23,6 +23,13 @@ django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
 ipython = "^8.14.0"
 django-tailwind = { extras = ["reload"], version = "^3.6.0" }
 
+[tool.poetry.group.coverage]
+optional = true
+
+[tool.poetry.group.coverage.dependencies]
+coverage = { extras = ["toml"], version = "^7.2.7" }
+django-coverage-plugin = "^3.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -58,3 +65,23 @@ indent = 2
 format_attribute_template_tags = true
 profile = "django"
 ignore = "H006"    # `<img>` tag should have `height` and `width` attributes.
+
+[tool.coverage.run]
+command_line = "contest/manage.py test quiz"
+source = ["contest/"]
+omit = [
+    "**/migrations/**",
+    "**/node_modules/**",
+    "contest/manage.py",
+    "contest/contest/asgi.py",
+    "contest/contest/wsgi.py",
+]
+plugins = [
+    "django_coverage_plugin"
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "def __str__",
+]
