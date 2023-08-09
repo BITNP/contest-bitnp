@@ -21,6 +21,8 @@ from .constants import constants
 from .models import Choice, DraftResponse, Question
 
 if TYPE_CHECKING:
+    from typing import Any, Literal
+
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
     from django.http import HttpRequest
 
@@ -68,33 +70,44 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
     return False
 
 
-@require_GET
-def index(request: HttpRequest) -> HttpResponse:
-    if request.user.is_authenticated and is_student(request.user):
-        student = request.user.student
+def manage_status(
+    user: User | AnonymousUser,
+) -> (
+    Literal["not taking"]
+    | Literal["deadline passed"]
+    | Literal["taking contest"]
+    | Literal[""]
+):
+    """检查状态及自动提交"""
+
+    if user.is_authenticated and is_student(user):
+        student = user.student
 
         if not hasattr(student, "draft_response"):
-            status = "not taking"
+            return "not taking"
         else:
             finalized = continue_or_finalize(student.draft_response)
             if finalized:
-                status = "deadline passed"
+                return "deadline passed"
             else:
-                status = "taking contest"
+                return "taking contest"
     else:
-        status = ""
-
-    return render(
-        request,
-        "index.html",
-        {
-            "constants": constants,
-            "status": status,
-        },
-    )
+        return ""
 
 
-class InfoView(LoginRequiredMixin, TemplateView):
+class IndexView(TemplateView):
+    template_name = "index.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["status"] = manage_status(self.request.user)
+        context["constants"] = constants
+
+        return context
+
+
+class InfoView(LoginRequiredMixin, IndexView):
     template_name = "info.html"
 
 
