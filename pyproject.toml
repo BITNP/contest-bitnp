@@ -23,6 +23,9 @@ django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
 ipython = "^8.14.0"
 django-tailwind = { extras = ["reload"], version = "^3.6.0" }
 
+[tool.poetry.group.coverage]
+optional = true
+
 [tool.poetry.group.coverage.dependencies]
 coverage = { extras = ["toml"], version = "^7.2.7" }
 django-coverage-plugin = "^3.1.0"
