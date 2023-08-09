@@ -90,3 +90,19 @@ class ContestViewTests(TestCase):
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+
+class EmptyDataTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="Asuka")
+        self.student = Student.objects.create(user=self.user)
+
+    def test_contest_without_any_question(self):
+        """空题库时尝试答题"""
+
+        self.client.force_login(self.user)
+
+        with self.assertRaisesMessage(ValueError, "Sample larger than population"):
+            self.client.get(reverse("quiz:contest"))
+
+        self.assertFalse(hasattr(self.user.student, "draft_response"))

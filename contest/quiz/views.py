@@ -85,10 +85,14 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
             deadline=timezone.now() + constants.DEADLINE_DURATION,
             student=student,
         )
-        draft_response.save()
 
         # Randomly select some questions
         questions = sample(list(Question.objects.all()), k=constants.N_QUESTIONS_PER_RESPONSE)
+        # 题目不够时，会抛出异常
+        # 因此必须先选题再保存，不然可能保存空的 DraftResponse
+
+        # 保存
+        draft_response.save()
         for q in questions:
             draft_response.answer_set.create(
                 question=q,
