@@ -50,15 +50,46 @@ class ResponseModelTests(TestCase):
 
 class ContestViewTests(TestCase):
     def setUp(self):
-        Question.objects.create(content="Angel Attack")
-        Question.objects.create(content="The Beast")
-        Question.objects.create(content="A Transfer")
+        contents_map = {
+            "Angel Attack": [
+                "Emergency in Tokai",
+                "Angel Attack",
+                "N2 Mine ~ Enroute",
+                "The Car Train ~ Tokyo-3",
+            ],
+            "The Beast": [
+                "The Welcoming Party",
+                "Pen2 ~ Laundry of Life",
+                "The Beast: Part A",
+                "The Beast: Part B",
+                '''Eva's True State ~ "Good Night"''',
+            ],
+            "A Transfer": [
+                "Training",
+                "Hedgehog's Dilemma",
+                "Toji",
+                "The New Kid ~ Emergency",
+            ],
+        }
+        for question, choices in contents_map.items():
+            q = Question.objects.create(content=question)
+            Choice.objects.bulk_create(
+                [Choice(content=c, correct=bool(i), question=q) for i, c in enumerate(choices)]
+            )
 
         self.user = User.objects.create_user(username="Shinji")
         self.student = Student.objects.create(user=self.user)
 
+    def test_info_view(self):
+        """访问个人中心"""
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:info"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
     def test_contest_view(self):
-        """访问首页，登录，然后开始作答"""
+        """访问首页，登录，然后开始作答，再原地刷新"""
 
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -67,9 +98,81 @@ class ContestViewTests(TestCase):
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        draft = self.user.student.draft_response
 
-    def test_auto_submission(self):
-        """自动提交"""
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.context["draft_response"], draft)
+
+    def test_contest_update_view(self):
+        """暂存"""
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        answer = self.user.student.draft_response.answer_set.all()[0]
+        question = answer.question
+        choice = question.choice_set.all()[0]
+
+        # 正常暂存
+        form = {
+            f"question-{question.id}": f"choice-{choice.id}",
+            "csrf_token_etc": "Whatever",
+        }
+        response = self.client.post(reverse("quiz:contest_update"), form)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        answer.refresh_from_db()
+        self.assertEqual(answer.choice, choice)
+
+        # “时光飞逝”
+        self.user.student.draft_response.deadline -= constants.DEADLINE_DURATION
+        # -1 s
+        self.user.student.draft_response.deadline -= timedelta(seconds=1)
+        self.user.student.draft_response.save()
+
+        # 超时后禁止
+        response = self.client.post(reverse("quiz:contest_update"), form)
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_bad_contest_update(self):
+        """暂存非法数据"""
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        answer = self.user.student.draft_response.answer_set.all()[0]
+        question = answer.question
+
+        response = self.client.post(
+            reverse("quiz:contest_update"),
+            {f"question-{question.id}": "not a choice"},
+        )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+        response = self.client.post(
+            reverse("quiz:contest_update"),
+            {"question--3": "choice-0"},
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+        response = self.client.post(
+            reverse("quiz:contest_update"),
+            {f"question-{question.id}": "choice--3"},
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_bad_contest_submit(self):
+        """非法提交"""
+        self.client.force_login(self.user)
+
+        # 还没发卷呢
+        response = self.client.post(reverse("quiz:contest_submit"))
+        self.assertNotEqual(response.status_code, HTTPStatus.OK)
+
+    def test_status(self):
+        """自动提交的状态"""
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.context["status"], "")
 
@@ -112,6 +215,33 @@ class ContestViewTests(TestCase):
         response = self.client.post(reverse("quiz:contest_submit"))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(response.url, reverse("quiz:info"))
+
+        response = self.client.get(reverse("quiz:info"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(self.user.student.final_score(), 0)
+
+    def test_too_many_tries(self):
+        """答题次数超限"""
+        template_response = Response(submit_at=timezone.now(), student=self.user.student)
+        Response.objects.bulk_create(
+            [template_response for _ in range(constants.MAX_TRIES - 1)]
+        )
+
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertTrue(hasattr(self.user.student, "draft_response"))
+
+        response = self.client.post(reverse("quiz:contest_submit"))
+        self.assertNotEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        self.user.student.refresh_from_db()
+        self.assertEqual(self.user.student.response_set.count(), constants.MAX_TRIES)
+
+        response = self.client.get(reverse("quiz:contest"))
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        self.user.student.refresh_from_db()
+        self.assertFalse(hasattr(self.user.student, "draft_response"))
 
     def test_non_student_user(self):
         """如果登录了但不是学生，应当禁止访问"""
