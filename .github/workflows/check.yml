@@ -10,7 +10,7 @@ on:
         - "**/*.md"
 
 jobs:
-  check:
+  check-dev:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -49,4 +49,56 @@ jobs:
     # Build and check
     - run: just build-theme
     - run: just build-js
+    - name: Upload front-end artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: front-end
+        path: |
+          contest/js/static/js/dist/
+          contest/theme/static/css/dist/
+        # The root directory of the artifact is the least common ancestor, i.e. `contest/`.
+        if-no-files-found: error
+        retention-days: 7
     - run: just check-all
+
+  check-deploy:
+    runs-on: ubuntu-latest
+    needs: check-dev
+    env:
+      # 内容都不重要
+      DJANGO_PRODUCTION: Israfel
+      SECRET_KEY: Israfel is the Seventh Angel, capable of splitting itself into two identical copies for simultaneous attacks.
+    steps:
+    - uses: actions/checkout@v3
+
+    # Setup python tools
+    - name: Install poetry
+      run: pipx install poetry
+    - name: Configure poetry for in-project venv
+      run: |
+        poetry config virtualenvs.in-project true
+        echo 'PYTHON = "./.venv/bin/python"' > .env
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: poetry
+
+    # Setup other tools
+    - name: Setup just
+      uses: taiki-e/install-action@v2
+      with:
+          tool: just
+
+    # Install and update
+    - run: just update
+    - name: Download front-end artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: front-end
+        path: contest/
+
+    # Check
+    # todo: 目前还无法通过 Django 的检查，暂时先分开验证
+    - run: just test
+    - run: just check-deploy
+      continue-on-error: true
