@@ -1,0 +1,15 @@
+env:
+  browser: true
+  es2021: true
+extends: standard
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+rules:
+  indent:
+    - error
+    - 4
+  camelcase: 0
+  comma-dangle:
+    - error
+    - only-multiline

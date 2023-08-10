@@ -32,7 +32,7 @@ mypy:
 test: (manage "test" "quiz")
 
 # 检查所有
-check-all: mypy test (manage "check")
+check-all: mypy test (manage "check") (manage "makemigrations" "--check")
 
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")

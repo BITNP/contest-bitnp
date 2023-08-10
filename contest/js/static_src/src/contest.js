@@ -1,17 +1,17 @@
 import Swal from 'sweetalert2'
 
-import { get_data } from "./util"
+import { get_data } from './util'
 
 /** 时间允差，毫秒 */
 const TIME_MARGIN = 10 * 1e3
 
-const update_url = get_data("update-url")
-const deadline = Date.parse(get_data("deadline"))
-const deadline_duration_seconds = get_data("deadline-duration")
+const update_url = get_data('update-url')
+const deadline = Date.parse(get_data('deadline'))
+const deadline_duration_seconds = get_data('deadline-duration')
 
 //! 作答
 
-const form = document.querySelector("form")
+const form = document.querySelector('form')
 const filed_sets = Array.from(form.querySelectorAll('fieldset'))
 const inputs = filed_sets.map(set => Array.from(set.querySelectorAll('input')))
 /** @type {HTMLDivElement} */
@@ -31,9 +31,9 @@ async function update_contest_progress () {
         method: 'POST',
         body: new FormData(form)
     })
-    if (!response.ok && response.status == 403) {
+    if (!response.ok && response.status === 403) {
         // 锁定表单
-        filed_sets.forEach(set => set.disabled = true)
+        filed_sets.forEach(set => { set.disabled = true })
 
         // 提示提交
         const result = await Swal.fire({
@@ -75,7 +75,7 @@ setTimeout(update_contest_progress_periodically, deadline - Date.now() - TIME_MA
 
 /** 时间进度 */
 class TimeProgress {
-    constructor() {
+    constructor () {
         /** @type {HTMLDivElement} */
         this.bar = document.querySelector('div#time-progress-bar')
         /** @type {HTMLSpanElement} */
@@ -112,7 +112,7 @@ class TimeProgress {
                 setTimeout(() => { this.update() }, 100)
             }
         } else {
-            this.bar.style.width = `100%`
+            this.bar.style.width = '100%'
             this.text.textContent = '0秒'
         }
 

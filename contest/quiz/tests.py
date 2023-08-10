@@ -19,7 +19,10 @@ from .models import (
 
 
 class ResponseModelTests(TestCase):
+    """答卷等模型"""
+
     def setUp(self):
+        """初始化"""
         self.question = Question.objects.create(
             content="The ultimate question of life, the universe, and everything."
         )
@@ -32,7 +35,6 @@ class ResponseModelTests(TestCase):
 
     def test_finalize_answer(self):
         """回答草稿可以转换为回答"""
-
         draft = DraftAnswer(question=self.question, choice=self.choice)
         final = draft.finalize(Response())
 
@@ -42,14 +44,16 @@ class ResponseModelTests(TestCase):
 
     def test_finalize_response(self):
         """答卷草稿可以转换为答卷"""
-
         draft = DraftResponse.objects.create(deadline=timezone.now(), student=self.student)
         final, answers = draft.finalize(submit_at=timezone.now())
         self.assertIsInstance(final, Response)
 
 
 class ContestViewTests(TestCase):
+    """竞赛等视图"""
+
     def setUp(self):
+        """初始化"""
         contents_map = {
             "Angel Attack": [
                 "Emergency in Tokai",
@@ -82,7 +86,6 @@ class ContestViewTests(TestCase):
 
     def test_info_view(self):
         """访问个人中心"""
-
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:info"))
@@ -90,7 +93,6 @@ class ContestViewTests(TestCase):
 
     def test_contest_view(self):
         """访问首页，登录，然后开始作答，再原地刷新"""
-
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -259,13 +261,15 @@ class ContestViewTests(TestCase):
 
 
 class EmptyDataTests(TestCase):
+    """空题库"""
+
     def setUp(self):
+        """初始化"""
         self.user = User.objects.create_user(username="Asuka")
         self.student = Student.objects.create(user=self.user)
 
     def test_contest_without_any_question(self):
         """空题库时尝试答题"""
-
         self.client.force_login(self.user)
 
         with self.assertRaisesMessage(ValueError, "Sample larger than population"):
