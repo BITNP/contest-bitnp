@@ -4,6 +4,12 @@ set dotenv-load
 # 这样能跳过 poetry 使用虚拟环境，稍快一些。
 python := env_var_or_default("PYTHON", "python")
 
+is_dev := if env_var_or_default("DJANGO_PRODUCTION", "") == "" {
+    "true"
+} else {
+    "false"
+}
+
 src_dir := "contest"
 
 
@@ -34,11 +40,15 @@ test: (manage "test" "quiz")
 # 检查所有
 check-all: mypy test (manage "check") (manage "makemigrations" "--check")
 
+# （部署）检查
+check-deploy: && test (manage "check" "--deploy")
+    @echo \$DJANGO_PRODUCTION: {{ env_var("DJANGO_PRODUCTION") }}
+
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")
-    poetry install --no-root
-    pnpm --dir {{ src_dir }}/theme/static_src/ install
-    pnpm --dir {{ src_dir }}/js/static_src/ install
+    poetry install --no-root {{ if is_dev == "false" { "--without dev" } else { "" } }}
+    {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/theme/static_src/ install" } else { "" } }}
+    {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/js/static_src/ install" } else { "" } }}
 
 # 监视 theme 并随时构建
 watch-theme: (manage "tailwind start")

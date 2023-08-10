@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from __future__ import annotations
 
+from os import environ, getenv
 from pathlib import Path
 from shutil import which
 
@@ -21,12 +22,45 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-$cwq@cw1*q!9490s%a-%b=#vf*l(hhed$swpy5eu#f0&ahx=v4"
+if getenv("DJANGO_PRODUCTION"):
+    SECRET_KEY = environ["SECRET_KEY"]
+else:
+    SECRET_KEY = getenv(
+        "SECRET_KEY",
+        default="django-insecure-$cwq@cw1*q!9490s%a-%b=#vf*l(hhed$swpy5eu#f0&ahx=v4",
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not bool(getenv("DJANGO_PRODUCTION"))
 
-ALLOWED_HOSTS: list[str] = []
+
+def _debug_only(*args) -> tuple:
+    """只在`DEBUG`下启用
+
+    Examples
+    --------
+    ```
+    SOME_CONFIG = [
+        "pre",
+        *_debug_only("dev"),
+        "post",
+    ]
+    ```
+
+    `DEBUG`下`SOME_CONFIG`是`["pre", "dev", "post"]`，否则是`["pre", "post"]`。
+    """
+    if DEBUG:
+        return args
+    else:
+        return ()
+
+
+ALLOWED_HOSTS: list[str] = [
+    ".localhost",
+    "127.0.0.1",
+    "[::1]",
+]
+# 这是 DEBUG 下的默认
 
 
 # Application definition
@@ -42,10 +76,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_cas_ng",
-    "tailwind",
-    "theme",
-    "js",
-    "django_browser_reload",
+    "tailwind",  # 因为含模板 tag，即使无需构建前端也必要
+    "theme",  # todo: 提供 static，由 Django 负责静态文件时需要
+    "js",  # todo: 同 theme
+    *_debug_only("django_browser_reload"),
 ]
 
 MIDDLEWARE = [
@@ -56,7 +90,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    *_debug_only("django_browser_reload.middleware.BrowserReloadMiddleware"),
     "django_cas_ng.middleware.CASMiddleware",
 ]
 
@@ -156,12 +190,13 @@ CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
 # Tailwind
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
 
-TAILWIND_APP_NAME = "theme"
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+if DEBUG:
+    TAILWIND_APP_NAME = "theme"
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
 
-# `just manage tailwind install`需要 Node.js
-NPM_BIN_PATH = which("pnpm")
-# Windows 有`$PATHEXT`问题，而`subprocess.run()`应尽量保证是完成路径。
-# https://github.com/timonweb/django-tailwind/pull/181
+    # `just manage tailwind install`需要 Node.js
+    NPM_BIN_PATH = which("pnpm")
+    # Windows 有`$PATHEXT`问题，而`subprocess.run()`应尽量保证是完成路径。
+    # https://github.com/timonweb/django-tailwind/pull/181
