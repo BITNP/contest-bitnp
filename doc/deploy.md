@@ -14,7 +14,7 @@
 $ export DJANGO_PRODUCTION="任何非空字符串"
 $ export SECRET_KEY="The secret key must be a large random value and it must be kept secret"
 
-$ echo 'PYTHON = "./.venv/bin/python" > .env'
+$ echo 'PYTHON = "./.venv/bin/python"' > .env
 $ just update  # 安装依赖、数据库等
 $ just check-deploy  # 检查
 
