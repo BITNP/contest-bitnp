@@ -1,9 +1,18 @@
+"""常量
+
+视图、模板中的所有常量。
+"""
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import NamedTuple
 
 
 class PageMeta(NamedTuple):
+    """页面的元数据
+
+    用于 ROUTES。
+    """
+
     title: str
     """标题用于`<title>`、`<h1>`等"""
 
@@ -13,6 +22,11 @@ class PageMeta(NamedTuple):
 
 @dataclass(frozen=True)
 class ConstantsNamespace:
+    """常量的命名空间
+
+    为了避免修改，使用 dataclass 而非 dict。
+    """
+
     DEADLINE_DURATION = timedelta(minutes=15)
     """作答限时"""
 

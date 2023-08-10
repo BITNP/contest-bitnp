@@ -41,14 +41,51 @@ priority = "default"
 
 [tool.ruff]
 select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # Pyflakes
-    "I", # isort
-    "N", # pep8-naming
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "D",   # pydocstyle
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "DJ",  # flake8-django
+    "FA",  # flake8-future-annotations
+    "PYI", # flake8-pyi
+    "TID", # flake8-tidy-imports
+    "TCH", # flake8-type-checking
+    "PGH", # pygrep-hooks
+]
+ignore = [
+    "D105", # undocumented-magic-method
+    "D203", # in favor of blank-line-before-class (D211)
+    "D213", # in favor of multi-line-summary-first-line (D212)
+    "D400", # ends-in-period, because of Chinese
+    "D415", # ends-in-punctuation, because of Chinese
 ]
 line-length = 95
 ignore-init-module-imports = true
+
+[tool.ruff.per-file-ignores]
+# No need to document Django defaults
+# - D100: Missing docstring in public module
+# - D101: Missing docstring in public class
+# - D104: Missing docstring in public package
+"apps.py" = ["D100", "D101"]
+"admin.py" = ["D100", "D101"]
+"models.py" = [
+    "D100",
+    "D101", # 有`Meta`即可
+    "D102", # undocumented-public-method，有`@admin.display`即可
+    "D106", # undocumented-public-nested-class，例如`Meta`
+]
+"tests.py" = ["D100"]
+"urls.py" = ["D100"]
+"views.py" = ["D100"]
+"**/templatetags/__init__.py" = ["D104"]
 
 [tool.black]
 line-length = 95

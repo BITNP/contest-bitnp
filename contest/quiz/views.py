@@ -44,7 +44,6 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
     """
-
     if draft.outdated():
         # 提交之前的草稿
         response, answers = draft.finalize(submit_at=draft.deadline)
@@ -61,14 +60,8 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
 
 def manage_status(
     user: User | AnonymousUser,
-) -> (
-    Literal["not taking"]
-    | Literal["deadline passed"]
-    | Literal["taking contest"]
-    | Literal[""]
-):
+) -> Literal["not taking", "deadline passed", "taking contest", ""]:
     """检查状态及自动提交"""
-
     if user.is_authenticated and is_student(user):
         student = user.student
 
@@ -85,9 +78,17 @@ def manage_status(
 
 
 class IndexView(TemplateView):
+    """首页"""
+
     template_name = "index.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
+        """补充上下文数据
+
+        status: Literal["not taking", "deadline passed", "taking contest", ""] — 自动提交状态
+        constants: ConstantsNamespace — 常量
+
+        """
         context = super().get_context_data(**kwargs)
 
         context["status"] = manage_status(self.request.user)
@@ -98,6 +99,8 @@ class IndexView(TemplateView):
 
 @method_decorator(student_only, name="dispatch")
 class InfoView(LoginRequiredMixin, IndexView):
+    """个人中心"""
+
     template_name = "info.html"
 
 
@@ -105,6 +108,7 @@ class InfoView(LoginRequiredMixin, IndexView):
 @student_only
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
+    """发卷"""
     student: Student = request.user.student
 
     if hasattr(student, "draft_response"):
@@ -147,6 +151,11 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
+    """暂存答卷
+
+    正常暂存则回复 200 OK，超时则回复 403 Forbidden。
+    请求非法会视情况回复 400 Bad Request 或 404 Not Found。
+    """
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
 
@@ -187,6 +196,10 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 @user_passes_test(is_student_taking_contest)
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
+    """交卷
+
+    只是将之前暂存的草稿归档，而本次发送的数据完全无用。
+    """
     student: Student = request.user.student
 
     # 1. Convert from draft

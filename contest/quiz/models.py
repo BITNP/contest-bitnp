@@ -20,11 +20,11 @@ class User(AbstractUser):
 class Question(models.Model):
     content = models.CharField("题干内容", max_length=200)
 
-    def __str__(self) -> str:
-        return self.content
-
     class Meta:
         verbose_name_plural = verbose_name = "题目"
+
+    def __str__(self) -> str:
+        return self.content
 
 
 class Choice(models.Model):
@@ -33,11 +33,11 @@ class Choice(models.Model):
 
     question = models.ForeignKey(Question, verbose_name="题干", on_delete=models.CASCADE)
 
-    def __str__(self) -> str:
-        return self.content
-
     class Meta:
         verbose_name_plural = verbose_name = "选项"
+
+    def __str__(self) -> str:
+        return self.content
 
 
 class Student(models.Model):
@@ -48,22 +48,25 @@ class Student(models.Model):
         verbose_name="用户",
     )
 
-    @admin.display(description="最终得分")
-    def final_score(self) -> float:
-        return max([0] + [r.score() for r in self.response_set.all()])
-
     name = models.CharField("姓名", max_length=50)
+
+    class Meta:
+        verbose_name_plural = verbose_name = "学生"
 
     def __str__(self) -> str:
         return self.name
 
-    class Meta:
-        verbose_name_plural = verbose_name = "学生"
+    @admin.display(description="最终得分")
+    def final_score(self) -> float:
+        return max([0] + [r.score() for r in self.response_set.all()])
 
 
 class Response(models.Model):
     submit_at = models.DateTimeField("提交时刻")
     student = models.ForeignKey(Student, verbose_name="作答者", on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = verbose_name = "答卷"
 
     def __str__(self) -> str:
         return f"{self.student.name} 在 {self.submit_at} 提交的答卷"
@@ -78,9 +81,6 @@ class Response(models.Model):
                 constants.SCORE * len(self.answer_set.filter(choice__correct=True)) / n_answers
             )
 
-    class Meta:
-        verbose_name_plural = verbose_name = "答卷"
-
 
 class Answer(models.Model):
     response = models.ForeignKey(Response, verbose_name="答卷", on_delete=models.CASCADE)
@@ -89,11 +89,11 @@ class Answer(models.Model):
         Choice, verbose_name="所选选项", blank=True, null=True, on_delete=models.CASCADE
     )
 
-    def __str__(self) -> str:
-        return f"“{self.question}” → “{self.choice}”"
-
     class Meta:
         verbose_name_plural = verbose_name = "回答"
+
+    def __str__(self) -> str:
+        return f"“{self.question}” → “{self.choice}”"
 
 
 class DraftResponse(models.Model):
@@ -105,11 +105,11 @@ class DraftResponse(models.Model):
     )
     deadline = models.DateTimeField("截止时刻")
 
-    def __str__(self) -> str:
-        return f"{self.student.name} 的答卷草稿"
-
     class Meta:
         verbose_name_plural = verbose_name = "答卷草稿"
+
+    def __str__(self) -> str:
+        return f"{self.student.name} 的答卷草稿"
 
     def finalize(self, submit_at: datetime) -> tuple[Response, list[Answer]]:
         """转换为正式 Response
@@ -142,11 +142,11 @@ class DraftAnswer(models.Model):
         Choice, verbose_name="所选选项", blank=True, null=True, on_delete=models.CASCADE
     )
 
-    def __str__(self) -> str:
-        return f"“{self.question}” → “{self.choice}”"
-
     class Meta:
         verbose_name_plural = verbose_name = "回答草稿"
+
+    def __str__(self) -> str:
+        return f"“{self.question}” → “{self.choice}”"
 
     def finalize(self, response: Response) -> Answer:
         """转换为正式 Answer
