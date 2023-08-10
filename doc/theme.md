@@ -16,6 +16,8 @@
 
 `just serve`会监视一般源代码，但对 theme 不知情；`just watch-theme`会监视模板生成 CSS，进而让浏览器页面刷新。因此，开发时需要两个进程同时工作。
 
+根据 [Django 文档](https://docs.djangoproject.com/en/4.2/ref/django-admin/#runserver)，添加文件不会让服务器重启。如果您是初次构建前端，可能需要手动重启服务器。
+
 ## 示例
 
 以下是[初始化 django-tailwind](https://django-tailwind.readthedocs.io/en/latest/installation.html) 时生成的`base.html`。
