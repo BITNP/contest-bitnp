@@ -50,11 +50,15 @@ check-all: mypy test (manage "check") (manage "makemigrations" "--check")
 check-deploy: && test (manage "check" "--deploy")
     @echo \$DJANGO_PRODUCTION: {{ env_var("DJANGO_PRODUCTION") }}
 
-# 更新依赖、数据库等（拉取他人提交后建议运行）
-update: && (manage "migrate")
+# 更新依赖
+[private]
+update-dependencies:
     poetry install --no-root {{ if is_dev == "false" { "--without dev" } else { "" } }} {{ poetry_install_additional_args }}
     {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/theme/static_src/ install" } else { "" } }}
     {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/js/static_src/ install" } else { "" } }}
+
+# 更新依赖、数据库等（拉取他人提交后建议运行）
+update: update-dependencies (manage "migrate")
 
 # 监视 theme 并随时构建
 watch-theme: (manage "tailwind start")
