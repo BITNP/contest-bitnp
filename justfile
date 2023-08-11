@@ -10,6 +10,12 @@ is_dev := if env_var_or_default("DJANGO_PRODUCTION", "") == "" {
     "false"
 }
 
+poetry_install_additional_args := if env_var_or_default("CI", "") == "" {
+    ""
+} else {
+    "--sync"
+}
+
 src_dir := "contest"
 
 
@@ -46,7 +52,7 @@ check-deploy: && test (manage "check" "--deploy")
 
 # 更新依赖、数据库等（拉取他人提交后建议运行）
 update: && (manage "migrate")
-    poetry install --no-root {{ if is_dev == "false" { "--without dev" } else { "" } }}
+    poetry install --no-root {{ if is_dev == "false" { "--without dev" } else { "" } }} {{ poetry_install_additional_args }}
     {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/theme/static_src/ install" } else { "" } }}
     {{ if is_dev == "true" { "pnpm --dir " + src_dir + "/js/static_src/ install" } else { "" } }}
 

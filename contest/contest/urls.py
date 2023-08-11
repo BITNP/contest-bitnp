@@ -20,10 +20,18 @@ from django.contrib import admin
 from django.urls import include, path
 from django_cas_ng import views as cas_views
 
+from .settings import DEBUG
+
 urlpatterns = [
     path("", include("quiz.urls")),
     path("admin/", admin.site.urls),
     path("accounts/login/", cas_views.LoginView.as_view(), name="login"),
     path("accounts/logout/", cas_views.LogoutView.as_view(), name="logout"),
-    path("__reload__/", include("django_browser_reload.urls")),
 ]
+
+if DEBUG:
+    urlpatterns.extend(
+        [
+            path("__reload__/", include("django_browser_reload.urls")),
+        ]
+    )
