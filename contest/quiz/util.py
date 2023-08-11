@@ -75,6 +75,7 @@ def student_only(
                 "not_student.html",
                 {
                     "constants": constants,
+                    "response_status": HTTPStatus.FORBIDDEN,
                 },
                 status=HTTPStatus.FORBIDDEN,
             )
@@ -142,6 +143,7 @@ def pass_or_forbid(
                     {
                         "constants": constants,
                         "reason": forbid_reason,
+                        "response_status": HTTPStatus.FORBIDDEN,
                     },
                     status=HTTPStatus.FORBIDDEN,
                 )
