@@ -16,7 +16,8 @@ if (status === 'deadline passed') {
         icon: 'warning',
         confirmButtonText: '好'
     })
-} else if (status !== 'taking contest') {
+}
+if (status !== 'taking contest') {
     // 为了这段程序不加载或还没加载时也正常，采用`<a>`而非`<button>`。
 
     /** @type {HTMLAnchorElement} */
