@@ -1,5 +1,6 @@
 from datetime import timedelta
 from http import HTTPStatus
+from itertools import count, cycle
 
 from django.test import TestCase
 from django.urls import reverse
@@ -54,6 +55,7 @@ class ContestViewTests(TestCase):
 
     def setUp(self):
         """初始化"""
+        # 制造一张卷子够用的题目
         contents_map = {
             "Angel Attack": [
                 "Emergency in Tokai",
@@ -75,7 +77,11 @@ class ContestViewTests(TestCase):
                 "The New Kid ~ Emergency",
             ],
         }
-        for question, choices in contents_map.items():
+        questions_count = count()
+        for question, choices in cycle(contents_map.items()):
+            if next(questions_count) >= constants.N_QUESTIONS_PER_RESPONSE:
+                break
+
             q = Question.objects.create(content=question)
             Choice.objects.bulk_create(
                 [Choice(content=c, correct=bool(i), question=q) for i, c in enumerate(choices)]
