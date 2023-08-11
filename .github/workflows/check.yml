@@ -57,7 +57,7 @@ jobs:
           contest/*/static_src/pnpm-lock.yaml
 
     # Install and update
-    - run: just update
+    - run: just update-dependencies
 
     # Build and check
     - run: just build-theme
@@ -130,7 +130,7 @@ jobs:
           tool: just
 
     # Install and update
-    - run: just update
+    - run: just update-dependencies
     - name: Download front-end artifacts
       uses: actions/download-artifact@v3
       with:
