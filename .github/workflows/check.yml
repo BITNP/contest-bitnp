@@ -138,7 +138,5 @@ jobs:
         path: contest/
 
     # Check
-    # todo: 目前还无法通过 Django 的检查，暂时先分开验证
-    - run: just test
     - run: just check-deploy
-      continue-on-error: true
+      # 会有警告，但正常退出
