@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from http import HTTPStatus
 from random import sample
 from typing import TYPE_CHECKING
 
@@ -116,7 +117,16 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     else:
         # 如果超出答题次数，拒绝
         if student.response_set.count() >= constants.MAX_TRIES:
-            return HttpResponseForbidden(f"最多尝试{constants.MAX_TRIES}次，您不能再尝试。")
+            return render(
+                request,
+                "403.html",
+                {
+                    "constants": constants,
+                    "reason": f"最多尝试{constants.MAX_TRIES}次，您不能再尝试。",
+                    "response_status": HTTPStatus.FORBIDDEN,
+                },
+                status=HTTPStatus.FORBIDDEN,
+            )
 
         # If there's no draft response, create one
         draft_response = DraftResponse(
