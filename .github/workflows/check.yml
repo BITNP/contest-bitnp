@@ -118,10 +118,17 @@ jobs:
       run: |
         poetry config virtualenvs.in-project true
         echo 'PYTHON = "./.venv/bin/python"' > .env
+    - name: Cache python dependencies
+      uses: actions/cache@v3
+      with:
+        key: |
+          venv-without-dev-${{ runner.os }}-python@3.9-poetry@1.5.1-${{ hashFiles('poetry.lock') }}
+        # 这里忽略了 python 小版本
+        path: |
+          .venv/
     - uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-        cache: poetry
 
     # Setup other tools
     - name: Setup just
