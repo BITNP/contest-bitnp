@@ -3,7 +3,7 @@ from __future__ import annotations
 from random import sample
 from typing import TYPE_CHECKING
 
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     HttpResponse,
@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
-from .util import is_student, is_student_taking_contest, student_only
+from .util import is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
     from typing import Any, Literal
@@ -148,7 +148,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 @login_required
 @student_only
-@user_passes_test(is_student_taking_contest)
+@pass_or_forbid(is_student_taking_contest, "请先前往答题再暂存答卷。")
 @require_POST
 def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     """暂存答卷
@@ -193,7 +193,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
 @login_required
 @student_only
-@user_passes_test(is_student_taking_contest)
+@pass_or_forbid(is_student_taking_contest, "请先前往答题再提交答卷。")
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     """交卷
