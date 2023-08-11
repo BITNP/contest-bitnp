@@ -60,6 +60,14 @@ class Student(models.Model):
     def final_score(self) -> float:
         return max([0] + [r.score() for r in self.response_set.all()])
 
+    @admin.display(description="剩余答题机会次数")
+    def n_left_tries(self) -> int:
+        """剩余答题机会次数
+
+        不会考虑草稿。
+        """
+        return constants.MAX_TRIES - self.response_set.count()
+
 
 class Response(models.Model):
     submit_at = models.DateTimeField("提交时刻")
