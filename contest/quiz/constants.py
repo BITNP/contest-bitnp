@@ -37,10 +37,10 @@ class ConstantsNamespace:
     DEADLINE_DURATION = timedelta(minutes=15)
     """作答限时"""
 
-    N_QUESTIONS_PER_RESPONSE = 3
+    N_QUESTIONS_PER_RESPONSE = 10
     """每套题的题数"""
 
-    MAX_TRIES = 100
+    MAX_TRIES = 3
     """答题次数上限"""
 
     YEAR = 2023
