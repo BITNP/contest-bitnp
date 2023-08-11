@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs'
 
 export default {
     input: {
-        status: './src/status.js',
+        index_and_info: './src/index_and_info.js',
         contest: './src/contest.js',
         toggle_mobile_menu: './src/toggle_mobile_menu.js',
     },

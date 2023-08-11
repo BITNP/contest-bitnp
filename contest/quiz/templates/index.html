@@ -2,7 +2,7 @@
 {% load my_humanize %}
 {% load static %}
 {% block scripts %}
-  <script type='module' src="{% static 'js/dist/status.js' %}"></script>
+  <script type='module' src="{% static 'js/dist/index_and_info.js' %}"></script>
   {{ status | json_script:"data:status" }}
 {% endblock scripts %}
 {% block header %}
@@ -38,6 +38,7 @@
           <p class="text-lg leading-8 text-gray-500">希望同学们掌握好答题时间，并做好充分的答题准备，预祝同学们考个好成绩！</p>
           <div class="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
             <a href="{% url 'quiz:contest' %}"
+               id="url-quiz-contest"
                class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
               <!-- https://heroicons.com/ arrow-left-on-rectangle -->
               <svg class="h-6 w-6 inline"

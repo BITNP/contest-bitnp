@@ -2,7 +2,7 @@
 {% load my_humanize humanize %}
 {% load static %}
 {% block scripts %}
-  <script type='module' src="{% static 'js/dist/status.js' %}"></script>
+  <script type='module' src="{% static 'js/dist/index_and_info.js' %}"></script>
   {{ status | json_script:"data:status" }}
 {% endblock scripts %}
 {% block content %}
@@ -23,6 +23,7 @@
       {% if n_left_tries > 0 %}
         <div class="m-4 text-center">
           <a href="{% url 'quiz:contest' %}"
+             id="url-quiz-contest"
              class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
             <!-- https://heroicons.com/ arrow-left-on-rectangle -->
             <svg class="h-6 w-6 inline"
