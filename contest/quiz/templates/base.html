@@ -33,15 +33,19 @@
                   {% for key, page in constants.ROUTES.items %}
                     {# 若应显示 #}
                     {% if not page.login_required or user.is_authenticated %}
-                      {% url key as url %}
-                      <a class="{% if url == request.path_info|urlencode %}
-                                  bg-gray-900 text-white
-                                {% else %}
-                                  text-gray-300 hover:bg-gray-700 hover:text-white
-                                {% endif %}
-                                rounded-md px-3 py-2 text-sm font-medium"
-                         {% if url == request.path_info|urlencode %}aria-current="page"{% endif %}
-                         href="{{ url }}">{{ page.title }}</a>
+                      {% with current_url=request.path_info|urlencode %}
+                        {% url key as url %}
+                        {% if not page.reluctant or url == current_url %}
+                          <a class="{% if url == current_url %}
+                                      bg-gray-900 text-white
+                                    {% else %}
+                                      text-gray-300 hover:bg-gray-700 hover:text-white
+                                    {% endif %}
+                                    rounded-md px-3 py-2 text-sm font-medium"
+                             {% if url == current_url %}aria-current="page"{% endif %}
+                             href="{{ url }}">{{ page.title }}</a>
+                        {% endif %}
+                      {% endwith %}
                     {% endif %}
                   {% endfor %}
                 </div>
@@ -97,15 +101,19 @@
             {% for key, page in constants.ROUTES.items %}
               {# 若应显示 #}
               {% if not page.login_required or user.is_authenticated %}
-                {% url key as url %}
-                <a class="{% if url == request.path_info|urlencode %}
-                            bg-gray-900 text-white
-                          {% else %}
-                            text-gray-300 hover:bg-gray-700 hover:text-white
-                          {% endif %}
-                          block rounded-md px-3 py-2 text-base font-medium"
-                   {% if url == request.path_info|urlencode %}aria-current="page"{% endif %}
-                   href="{{ url }}">{{ page.title }}</a>
+                {% with current_url=request.path_info|urlencode %}
+                  {% url key as url %}
+                  {% if not page.reluctant or url == current_url %}
+                    <a class="{% if url == current_url %}
+                                bg-gray-900 text-white
+                              {% else %}
+                                text-gray-300 hover:bg-gray-700 hover:text-white
+                              {% endif %}
+                              block rounded-md px-3 py-2 text-base font-medium"
+                       {% if url == current_url %}aria-current="page"{% endif %}
+                       href="{{ url }}">{{ page.title }}</a>
+                  {% endif %}
+                {% endwith %}
               {% endif %}
             {% endfor %}
           </div>

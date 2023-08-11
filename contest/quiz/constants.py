@@ -19,6 +19,13 @@ class PageMeta(NamedTuple):
     login_required: bool
     """是否仅在登录后显示"""
 
+    reluctant: bool = False
+    """是否仅位于此页时显示
+
+    - `True`: 位于此页时显示，位于其它页时隐藏
+    - `False`: 总显示
+    """
+
 
 @dataclass(frozen=True)
 class ConstantsNamespace:
@@ -44,7 +51,7 @@ class ConstantsNamespace:
 
     ROUTES = {
         "quiz:index": PageMeta(title="主页", login_required=False),
-        "quiz:contest": PageMeta(title="答题", login_required=True),
+        "quiz:contest": PageMeta(title="答题", login_required=True, reluctant=True),
         "quiz:info": PageMeta(title="个人中心", login_required=True),
     }
 
