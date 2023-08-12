@@ -75,6 +75,7 @@ def student_only(
                 "not_student.html",
                 {
                     "constants": constants,
+                    "response_status": HTTPStatus.FORBIDDEN,
                 },
                 status=HTTPStatus.FORBIDDEN,
             )
@@ -98,3 +99,55 @@ def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
     如果去掉`@student_only`，则非学生使用者访问时会转到登录页面，莫名奇妙；现在这样则会提示必须是学生才行。
     """
     return hasattr(user, "student") and hasattr(user.student, "draft_response")
+
+
+def pass_or_forbid(
+    test_func: Callable[[User], bool], forbid_reason: str, *, template_name="403.html"
+):
+    """通过测试或禁止访问
+
+    Decorator for views that checks that the user passes the given test,
+    response with 403 Forbidden if necessary.
+
+    The `test_func` should be a callable that returns `True` if the user passes.
+
+    Examples
+    --------
+    ```
+    @login_required
+    @pass_or_forbid(is_children, "You are not chosen by the Marduk Institute.")
+    def my_view(request: AuthenticatedHttpRequest) -> HttpResponse:
+        ...
+    ```
+
+    如果去掉`@login_required`，则不区分“未登录者”和“登录但无法通过测试者”，回应模糊。
+
+    Notes
+    -----
+    Derived from `django.contrib.auth.decorators.user_passes_test`.
+
+    https://github.com/django/django/blob/59f475470494ce5b8cbff816b1e5dafcbd10a3a3/django/contrib/auth/decorators.py#L10
+    """
+
+    def decorator(
+        view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
+    ) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if test_func(request.user):
+                return view_func(request, *args, **kwargs)
+            else:
+                return render(
+                    request,
+                    template_name,
+                    {
+                        "constants": constants,
+                        "reason": forbid_reason,
+                        "response_status": HTTPStatus.FORBIDDEN,
+                    },
+                    status=HTTPStatus.FORBIDDEN,
+                )
+
+        return wrapper
+
+    return decorator
