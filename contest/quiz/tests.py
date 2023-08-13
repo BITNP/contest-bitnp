@@ -50,6 +50,21 @@ class ResponseModelTests(TestCase):
         self.assertIsInstance(final, Response)
 
 
+class BaseViewTests(TestCase):
+    """`base.html`"""
+
+    def setUp(self):
+        """初始化"""
+        self.user = User.objects.create_user(username="Shinji")
+
+    def test_no_permission_admin_view(self):
+        """无权限者访问 admin 模块的报错能正常渲染"""
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("admin:index"))
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+
 class ContestViewTests(TestCase):
     """竞赛等视图"""
 
