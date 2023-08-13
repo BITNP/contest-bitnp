@@ -3,7 +3,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN pnpm config set registry https://registry.npmmirror.com/
 COPY contest /usr/src/app
 WORKDIR /usr/src/app
-RUN pnpm --dir /usr/src/app/theme/static_src/ install && \
+RUN mkdir -p /usr/src/app/js/static_src/node_modules /usr/src/app/theme/static_src/node_modules && \
+    rm -rf /usr/src/app/js/static_src/node_modules /usr/src/app/theme/static_src/node_modules && \
+    pnpm --dir /usr/src/app/theme/static_src/ install && \
     pnpm --dir /usr/src/app/js/static_src/ install
 
 RUN pnpm --dir /usr/src/app/theme/static_src/ run build && \
