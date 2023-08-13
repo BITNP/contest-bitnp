@@ -23,12 +23,10 @@ RUN apt-get update && \
 COPY --from=build /usr/src/app /usr/src/app
 WORKDIR /usr/src/app
 
-COPY poetry.lock /usr/src/app/poetry.lock
-COPY pyproject.toml /usr/src/app/pyproject.toml
+COPY requirements.txt /usr/src/app/requirements.txt
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install poetry --no-cache-dir && \
+    pip install -r requirements.txt --no-cache-dir && \
     touch /usr/src/app/README.md && \
-    poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi && \
     python3 manage.py collectstatic --noinput
 
 COPY deploy/entrypoint.sh /entrypoint.sh
