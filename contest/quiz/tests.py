@@ -117,20 +117,24 @@ class ContestViewTests(TestCase):
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
 
     def test_contest_view(self):
         """访问首页，登录，然后开始作答，再原地刷新"""
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
 
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
         draft = self.user.student.draft_response
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
         self.assertEqual(response.context["draft_response"], draft)
 
     def test_contest_update_view(self):
