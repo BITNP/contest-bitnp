@@ -102,7 +102,10 @@ def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
 
 
 def pass_or_forbid(
-    test_func: Callable[[User], bool], forbid_reason: str, *, template_name="403.html"
+    test_func: Callable[[User], bool],
+    forbid_reason: str,
+    *,
+    template_name="403-with-reason.html",
 ):
     """通过测试或禁止访问
 

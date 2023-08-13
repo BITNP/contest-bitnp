@@ -119,7 +119,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         if student.response_set.count() >= constants.MAX_TRIES:
             return render(
                 request,
-                "403.html",
+                "403-with-reason.html",
                 {
                     "constants": constants,
                     "reason": f"最多尝试{constants.MAX_TRIES}次，您不能再尝试。",

@@ -2,6 +2,8 @@ from datetime import timedelta
 from http import HTTPStatus
 from itertools import count, cycle
 
+from django.http import HttpRequest
+from django.shortcuts import render
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -63,6 +65,10 @@ class BaseViewTests(TestCase):
 
         response = self.client.get(reverse("admin:index"))
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_no_context(self):
+        """无上下文也能渲染"""
+        render(HttpRequest(), "base.html")
 
 
 class ContestViewTests(TestCase):
