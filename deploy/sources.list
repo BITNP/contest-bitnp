@@ -1,0 +1,3 @@
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main
+deb http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main
