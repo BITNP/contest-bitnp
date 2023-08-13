@@ -59,6 +59,9 @@ ALLOWED_HOSTS: list[str] = [
     ".localhost",
     "127.0.0.1",
     "[::1]",
+    "contest.bitnp.net",  # production
+    "contest-test.bitnp.net",  # for deployment test
+    "everything411.top",
 ]
 # 这是 DEBUG 下的默认
 
@@ -162,6 +165,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -182,10 +186,16 @@ AUTHENTICATION_BACKENDS = [
     "quiz.auth_backends.CASBackend",
 ]
 CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
-CAS_VERSION = "2"
 CAS_LOGIN_URL_NAME = LOGIN_URL
 CAS_LOGOUT_URL_NAME = "logout"  # 会用于 Django 提供的模板，如 admin
 CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
+CAS_CHECK_NEXT = False
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://contest.bitnp.net",
+    "https://contest-test.bitnp.net",
+    "https://everything411.top",
+]
 
 # Tailwind
 # https://django-tailwind.readthedocs.io/en/latest/installation.html

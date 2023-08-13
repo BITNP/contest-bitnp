@@ -15,6 +15,7 @@ Django = "^4.2"
 humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
 django-tailwind = "^3.6.0"
+pyyaml = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
@@ -22,6 +23,10 @@ mypy = "^1.4.1"
 django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
 ipython = "^8.14.0"
 django-tailwind = { extras = ["reload"], version = "^3.6.0" }
+
+[tool.poetry.group.deploy.dependencies]
+gunicorn = "^21.2.0"
+uvicorn = "^0.23.2"
 
 [tool.poetry.group.coverage]
 optional = true
