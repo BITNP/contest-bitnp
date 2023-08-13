@@ -1,9 +1,0 @@
-# todo: 整理来自 PHP 旧项目的文件
-# https://git.bitnp.net/Lytning/national-defense-knowledge-contest
-/static/vendor/
-/static/layer/
-/static/js/
-/static/css/
-
-# todo: 换尺寸合适的图
-/static/img/home.jpg
