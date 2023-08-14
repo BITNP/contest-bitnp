@@ -23,6 +23,7 @@ mypy = "^1.4.1"
 django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
 ipython = "^8.14.0"
 django-tailwind = { extras = ["reload"], version = "^3.6.0" }
+django-debug-toolbar = "^4.1.0"
 
 [tool.poetry.group.deploy.dependencies]
 gunicorn = "^21.2.0"

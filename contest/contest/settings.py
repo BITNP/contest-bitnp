@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "theme",  # todo: 提供 static，由 Django 负责静态文件时需要
     "js",  # todo: 同 theme
     *_debug_only("django_browser_reload"),
+    *_debug_only("debug_toolbar"),
 ]
 
 MIDDLEWARE = [
@@ -93,6 +94,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    *_debug_only("debug_toolbar.middleware.DebugToolbarMiddleware"),
     *_debug_only("django_browser_reload.middleware.BrowserReloadMiddleware"),
     "django_cas_ng.middleware.CASMiddleware",
 ]
