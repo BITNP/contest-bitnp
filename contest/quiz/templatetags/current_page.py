@@ -29,8 +29,8 @@ def current_page_title(context: dict, default="") -> str:
     3. 若也无，则返回`default`。
     """
     request: HttpRequest = context["request"]
-    constants: ConstantsNamespace | None
-    if (constants := context.get("constants")) is not None:
+    if "constants" in context:
+        constants: ConstantsNamespace = context["constants"]
         for key, page in constants.ROUTES.items():
             if request.path_info == reverse(key):
                 return page.title
