@@ -3,7 +3,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN pnpm config set registry https://registry.npmmirror.com/
 COPY contest /usr/src/app
 WORKDIR /usr/src/app
-RUN pnpm --dir /usr/src/app/theme/static_src/ install && \
+RUN mkdir -p /usr/src/app/js/static_src/node_modules /usr/src/app/theme/static_src/node_modules && \
+    rm -rf /usr/src/app/js/static_src/node_modules /usr/src/app/theme/static_src/node_modules && \
+    pnpm --dir /usr/src/app/theme/static_src/ install && \
     pnpm --dir /usr/src/app/js/static_src/ install
 
 RUN pnpm --dir /usr/src/app/theme/static_src/ run build && \
@@ -23,12 +25,10 @@ RUN apt-get update && \
 COPY --from=build /usr/src/app /usr/src/app
 WORKDIR /usr/src/app
 
-COPY poetry.lock /usr/src/app/poetry.lock
-COPY pyproject.toml /usr/src/app/pyproject.toml
+COPY requirements.txt /usr/src/app/requirements.txt
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install poetry --no-cache-dir && \
+    pip install -r requirements.txt --no-cache-dir && \
     touch /usr/src/app/README.md && \
-    poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi && \
     python3 manage.py collectstatic --noinput
 
 COPY deploy/entrypoint.sh /entrypoint.sh
