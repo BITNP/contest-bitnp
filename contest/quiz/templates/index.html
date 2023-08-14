@@ -65,7 +65,13 @@
               </a>
             {% else %}
               {# 未在答题 and 不能再发新卷 ⇒ 提示无机会 #}
-              <p class="text-sm font-semibold leading-6">您已答完全部{{ constants.MAX_TRIES }}次机会</p>
+              <p class="text-sm font-semibold leading-6">
+                {% if user.student %}
+                  您已答完全部{{ constants.MAX_TRIES }}次机会
+                {% else %}
+                  只有学生能答题
+                {% endif %}
+              </p>
             {% endif %}
             <a class="text-sm font-semibold leading-6 hover:text-gray-500"
                href="{% url 'quiz:info' %}">个人中心 <span aria-hidden="true">→</span></a>
