@@ -24,16 +24,16 @@ register = template.Library()
 def current_page_title(context: dict, default="") -> str:
     """当前页面的标题
 
-    1. 查找`constants.ROUTES: ConstantsNamespace`。
+    1. 查找`constants.ROUTES: dict[str, PageMeta]`。
     2. 若无匹配，则尝试`response_status: HTTPStatus`。
     3. 若也无，则返回`default`。
     """
     request: HttpRequest = context["request"]
-    constants: ConstantsNamespace = context["constants"]
-
-    for key, page in constants.ROUTES.items():
-        if request.path_info == reverse(key):
-            return page.title
+    if "constants" in context:
+        constants: ConstantsNamespace = context["constants"]
+        for key, page in constants.ROUTES.items():
+            if request.path_info == reverse(key):
+                return page.title
 
     if "response_status" in context:
         status: HTTPStatus = context["response_status"]

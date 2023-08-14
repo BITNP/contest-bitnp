@@ -2,6 +2,8 @@ from datetime import timedelta
 from http import HTTPStatus
 from itertools import count, cycle
 
+from django.http import HttpRequest
+from django.shortcuts import render
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -50,6 +52,25 @@ class ResponseModelTests(TestCase):
         self.assertIsInstance(final, Response)
 
 
+class BaseViewTests(TestCase):
+    """`base.html`"""
+
+    def setUp(self):
+        """初始化"""
+        self.user = User.objects.create_user(username="Shinji")
+
+    def test_no_permission_admin_view(self):
+        """无权限者访问 admin 模块的报错能正常渲染"""
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("admin:index"))
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_no_context(self):
+        """无上下文也能渲染"""
+        render(HttpRequest(), "base.html")
+
+
 class ContestViewTests(TestCase):
     """竞赛等视图"""
 
@@ -96,20 +117,24 @@ class ContestViewTests(TestCase):
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
 
     def test_contest_view(self):
         """访问首页，登录，然后开始作答，再原地刷新"""
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
 
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
         draft = self.user.student.draft_response
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertIn("constants", response.context)
         self.assertEqual(response.context["draft_response"], draft)
 
     def test_contest_update_view(self):
