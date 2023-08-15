@@ -43,7 +43,10 @@
           {% for a in draft_response.answer_set.all %}
             <fieldset class="my-4 disabled:text-gray-400"
                       {% if draft_response.outdated %}disabled{% endif %}>
-              <legend class="text-lg font-bold">{{ a.question }}</legend>
+              <p class="text-lg">
+                <span class="enabled:text-gray-600">{{ forloop.counter }}.</span>
+                <legend class="inline font-bold">{{ a.question }}</legend>
+              </p>
               {% for choice in a.question.choice_set.all %}
                 <label class="block hover:bg-red-100 my-2">
                   <input type="radio"
