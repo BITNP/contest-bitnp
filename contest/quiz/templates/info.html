@@ -44,23 +44,27 @@
       {% endif %}
     {% endwith %}
   </div>
-  <section class="prose">
-    <h2>答题记录</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>提交时刻</th>
-          <th>单次成绩</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in user.student.response_set.all|dictsortreversed:"submit_at" %}
-          <tr>
-            <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
-            <td>{{ r.score | as_score }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  {% with response_set=user.student.response_set.all %}
+    {% if response_set %}
+      <section class="prose">
+        <h2>答题记录</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>提交时刻</th>
+              <th>单次成绩</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in response_set|dictsortreversed:"submit_at" %}
+              <tr>
+                <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
+                <td>{{ r.score | as_score }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    {% endif %}
+  {% endwith %}
 {% endblock content %}
