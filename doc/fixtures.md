@@ -33,3 +33,11 @@ $ poetry run python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
 ```
 
 目前不常用，故不收入`justfile`。
+
+### `problems.yaml`
+
+来自 PHP 旧项目。
+
+```shell
+$ poetry run python ./scripts/convert_problems_csv.py ./fixtures/problems.csv
+```
