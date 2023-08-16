@@ -18,12 +18,14 @@ from shutil import which
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+# Security Settings
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if getenv("DJANGO_PRODUCTION"):
     SECRET_KEY = environ["SECRET_KEY"]
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 else:
     SECRET_KEY = getenv(
         "SECRET_KEY",
@@ -32,6 +34,21 @@ else:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not bool(getenv("DJANGO_PRODUCTION"))
+
+ALLOWED_HOSTS = [
+    ".localhost",
+    "127.0.0.1",
+    "[::1]",
+    "contest.bitnp.net",  # production
+    "contest-test.bitnp.net",  # for deployment test
+    "everything411.top",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://contest.bitnp.net",
+    "https://contest-test.bitnp.net",
+    "https://everything411.top",
+]
 
 
 def _debug_only(*args) -> tuple:
@@ -53,17 +70,6 @@ def _debug_only(*args) -> tuple:
         return args
     else:
         return ()
-
-
-ALLOWED_HOSTS: list[str] = [
-    ".localhost",
-    "127.0.0.1",
-    "[::1]",
-    "contest.bitnp.net",  # production
-    "contest-test.bitnp.net",  # for deployment test
-    "everything411.top",
-]
-# 这是 DEBUG 下的默认
 
 
 # Application definition
@@ -192,12 +198,6 @@ CAS_LOGIN_URL_NAME = LOGIN_URL
 CAS_LOGOUT_URL_NAME = "logout"  # 会用于 Django 提供的模板，如 admin
 CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
 CAS_CHECK_NEXT = False
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://contest.bitnp.net",
-    "https://contest-test.bitnp.net",
-    "https://everything411.top",
-]
 
 # Tailwind
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
