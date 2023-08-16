@@ -35,7 +35,7 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not bool(getenv("DJANGO_PRODUCTION"))
 
-ALLOWED_HOSTS: list[str] = [
+ALLOWED_HOSTS = [
     ".localhost",
     "127.0.0.1",
     "[::1]",
