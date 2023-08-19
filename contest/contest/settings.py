@@ -39,15 +39,11 @@ ALLOWED_HOSTS = [
     ".localhost",
     "127.0.0.1",
     "[::1]",
-    "contest.bitnp.net",  # production
-    "contest-test.bitnp.net",  # for deployment test
-    "everything411.top",
+    "contest.bitnp.net",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://contest.bitnp.net",
-    "https://contest-test.bitnp.net",
-    "https://everything411.top",
 ]
 
 
@@ -193,11 +189,17 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "quiz.auth_backends.CASBackend",
 ]
-CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
+
+if getenv("DJANGO_PRODUCTION"):
+    CAS_SERVER_URL = "https://login.bit.edu.cn/cas/"
+    CAS_ROOT_PROXIED_AS = "https://contest.bitnp.net"
+else:
+    CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
+    CAS_CHECK_NEXT = False
+
 CAS_LOGIN_URL_NAME = LOGIN_URL
 CAS_LOGOUT_URL_NAME = "logout"  # 会用于 Django 提供的模板，如 admin
 CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
-CAS_CHECK_NEXT = False
 
 # Tailwind
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
