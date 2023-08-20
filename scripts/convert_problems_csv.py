@@ -1,7 +1,6 @@
 """PHP旧项目导出的数据 → YAML fixture
 
-Examples
---------
+Examples:
 ```
 $ cat ./fixtures/problems.csv
 id,type,description,answer,choices

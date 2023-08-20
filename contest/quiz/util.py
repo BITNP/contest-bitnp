@@ -37,8 +37,7 @@ if TYPE_CHECKING:
 def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
     """是否为学生
 
-    Examples
-    --------
+    Examples:
     ```
     @user_passes_test(is_student)
     def my_view(request: HttpRequest) -> HttpResponse:
@@ -53,8 +52,7 @@ def student_only(
 ) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
     """If not student, render `not_student.html`
 
-    Examples
-    --------
+    Examples:
     ```
     @login_required
     @student_only
@@ -86,8 +84,7 @@ def student_only(
 def is_student_taking_contest(user: AbstractBaseUser | AnonymousUser) -> bool:
     """是否为正在参赛的学生
 
-    Examples
-    --------
+    Examples:
     ```
     @login_required
     @student_only
@@ -114,8 +111,7 @@ def pass_or_forbid(
 
     The `test_func` should be a callable that returns `True` if the user passes.
 
-    Examples
-    --------
+    Examples:
     ```
     @login_required
     @pass_or_forbid(is_children, "You are not chosen by the Marduk Institute.")
@@ -125,8 +121,7 @@ def pass_or_forbid(
 
     如果去掉`@login_required`，则不区分“未登录者”和“登录但无法通过测试者”，回应模糊。
 
-    Notes
-    -----
+    Notes:
     Derived from `django.contrib.auth.decorators.user_passes_test`.
 
     https://github.com/django/django/blob/59f475470494ce5b8cbff816b1e5dafcbd10a3a3/django/contrib/auth/decorators.py#L10

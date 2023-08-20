@@ -51,8 +51,7 @@ CSRF_TRUSTED_ORIGINS = [
 def _debug_only(*args) -> tuple:
     """只在`DEBUG`下启用
 
-    Examples
-    --------
+    Examples:
     ```
     SOME_CONFIG = [
         "pre",

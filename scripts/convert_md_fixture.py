@@ -1,7 +1,6 @@
 """Simple Markdown → YAML fixture
 
-Examples
---------
+Examples:
 ```
 $ python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
 ```
