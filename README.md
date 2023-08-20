@@ -167,7 +167,7 @@ $ just update
    $ just serve
    ```
 
-3. 访问 [localhost:8000/quiz/](http://localhost:8000/quiz/)，用户名、密码请咨询他人。
+3. 访问 [localhost:8000](http://localhost:8000)，用户名、密码请咨询他人。
 
 ### ✅ 检查
 
@@ -213,7 +213,7 @@ $ poetry export --output requirements.txt --without-hashes --without-urls --with
 
 > **Note**
 >
-> [现在仓库中的`requirements.txt`](../requirements.txt)还手动删除了`python_version`、`sys_platform`，没考虑 python 3.9 和 3.10 依赖不同版本、Windows 和 Unix 不同等情况。之后出问题了再改。
+> [现在仓库中的`requirements.txt`](./requirements.txt)还手动删除了`python_version`、`sys_platform`，没考虑 python 3.9 和 3.10 依赖不同版本、Windows 和 Unix 不同等情况。之后出问题了再改。
 
 ### 构建容器镜像
 
