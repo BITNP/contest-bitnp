@@ -25,7 +25,7 @@
           <div class="-my-[0.3125rem] ml-0.5 h-[1.125rem] w-1 rounded-full bg-indigo-600"></div>
         </div>
         <div>
-          作答：还剩<span id="contest-progress-text">{{ constants.N_QUESTIONS_PER_RESPONSE }}</span>题
+          作答：还剩<span id="contest-progress-text">{{ constants.n_questions_per_response_total }}</span>题
         </div>
         <div class="ml-4 h-2 flex flex-auto rounded-full bg-gray-100"
              aria-hidden="true">
@@ -44,7 +44,9 @@
                     {% if draft_response.outdated %}disabled{% endif %}>
             <p class="text-lg">
               <span class="enabled:text-gray-600">{{ forloop.counter }}.</span>
-              <legend class="inline font-bold">{{ a.question }}</legend>
+              <legend class="inline font-bold">
+                {{ a.question.content }}（{# todo constants.SCORE[a.question.category] | as_score #}）
+              </legend>
             </p>
             {% for choice in a.question.choice_set.all %}
               <label class="block hover:bg-red-100 my-2">
@@ -52,7 +54,7 @@
                        name="question-{{ a.question.id }}"
                        value="choice-{{ choice.id }}"
                        {% if a.choice.id == choice.id %}checked{% endif %}>
-                {{ choice }}
+                {{ choice.content }}
               </label>
             {% endfor %}
           </fieldset>

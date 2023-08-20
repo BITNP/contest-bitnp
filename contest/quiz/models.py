@@ -18,13 +18,20 @@ class User(AbstractUser):
 
 
 class Question(models.Model):
+    class Category(models.TextChoices):
+        """类型"""
+
+        RADIO = "R", "单项选择"
+        BINARY = "B", "判断"
+
     content = models.CharField("题干内容", max_length=200)
+    category = models.CharField("类型", max_length=1, choices=Category.choices)
 
     class Meta:
         verbose_name_plural = verbose_name = "题目"
 
     def __str__(self) -> str:
-        return self.content
+        return f"{self.content}（{self.Category(self.category).label}）"
 
 
 class Choice(models.Model):
@@ -81,13 +88,12 @@ class Response(models.Model):
 
     @admin.display(description="得分")
     def score(self) -> float:
-        if (n_answers := self.answer_set.count()) == 0:
-            return 0
-        else:
-            # 未选择、错误不计分，正确计分
-            return (
-                constants.SCORE * len(self.answer_set.filter(choice__correct=True)) / n_answers
-            )
+        # 未选择、错误不计分，正确计分
+        return sum(
+            score
+            * len(self.answer_set.filter(question__category=category, choice__correct=True))
+            for category, score in constants.SCORE.items()
+        )
 
 
 class Answer(models.Model):

@@ -105,6 +105,18 @@ class InfoView(LoginRequiredMixin, IndexView):
     template_name = "info.html"
 
 
+def select_questions() -> list[Question]:
+    """选题组卷"""
+    questions = []
+
+    for category, n_questions in constants.N_QUESTIONS_PER_RESPONSE.items():
+        questions.extend(
+            sample(list(Question.objects.filter(category=category)), k=n_questions)
+        )
+
+    return questions
+
+
 @login_required
 @student_only
 @require_GET
@@ -135,7 +147,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         )
 
         # Randomly select some questions
-        questions = sample(list(Question.objects.all()), k=constants.N_QUESTIONS_PER_RESPONSE)
+        questions = select_questions()
         # 题目不够时，会抛出异常
         # 因此必须先选题再保存，不然可能保存空的 DraftResponse
 

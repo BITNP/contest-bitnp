@@ -34,11 +34,30 @@ class ConstantsNamespace:
     为了避免修改，使用 dataclass 而非 dict。
     """
 
+    N_QUESTIONS_PER_RESPONSE = {
+        "B": 5,
+        "R": 5,
+    }
+    """每套题各题型题数
+
+    `quiz.models.Question.Category` ⇒ `int`，未列出的题型不出现。
+
+    为避免循环`import`，用`value`替代`Category`。
+    """
+
+    SCORE = {
+        "B": 8,
+        "R": 12,
+    }
+    """每种题目的分值
+
+    `quiz.models.Question.Category` ⇒ `float`，且覆盖所有`Category`
+
+    为避免循环`import`，用`value`替代`Category`。
+    """
+
     DEADLINE_DURATION = timedelta(minutes=15)
     """作答限时"""
-
-    N_QUESTIONS_PER_RESPONSE = 10
-    """每套题的题数"""
 
     MAX_TRIES = 3
     """答题次数上限"""
@@ -46,14 +65,24 @@ class ConstantsNamespace:
     YEAR = 2023
     MONTH = 9
 
-    SCORE = 100
-    """一套题的总分"""
-
     ROUTES = {
         "quiz:index": PageMeta(title="主页", login_required=False),
         "quiz:contest": PageMeta(title="答题", login_required=True, reluctant=True),
         "quiz:info": PageMeta(title="个人中心", login_required=True),
     }
+
+    @property
+    def n_questions_per_response_total(self) -> int:
+        """每套题总题数"""
+        return sum(self.N_QUESTIONS_PER_RESPONSE.values())
+
+    @property
+    def score_total(self) -> float:
+        """每套题总分"""
+        return sum(
+            self.SCORE[category] * n_questions
+            for category, n_questions in self.N_QUESTIONS_PER_RESPONSE.items()
+        )
 
 
 constants = ConstantsNamespace()
