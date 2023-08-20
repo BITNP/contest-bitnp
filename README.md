@@ -312,4 +312,3 @@ $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 [poetry]: https://python-poetry.org
 [pre-commit]: https://pre-commit.com/
 [scoop]: https://scoop.sh
-
