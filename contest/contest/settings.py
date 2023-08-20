@@ -202,6 +202,8 @@ CAS_LOGIN_URL_NAME = LOGIN_URL
 CAS_LOGOUT_URL_NAME = "logout"  # 会用于 Django 提供的模板，如 admin
 CAS_REDIRECT_URL = LOGIN_REDIRECT_URL
 CAS_ADMIN_REDIRECT = False
+CAS_APPLY_ATTRIBUTES_TO_USER = True
+CAS_RENAME_ATTRIBUTES = {'userName':'last_name'}
 
 # Tailwind
 # https://django-tailwind.readthedocs.io/en/latest/installation.html
