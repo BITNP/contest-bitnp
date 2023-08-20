@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
+from django.core import checks
 from django.db import models
 from django.utils import timezone
 
@@ -32,6 +33,41 @@ class Question(models.Model):
 
     def __str__(self) -> str:
         return f"{self.content}（{self.Category(self.category).label}）"
+
+    @classmethod
+    def check(cls, **kwargs) -> list[checks.CheckMessage]:
+        errors = super().check(**kwargs)
+
+        # 检查 constants 一致性
+        n_questions_keys = set(constants.N_QUESTIONS_PER_RESPONSE.keys())
+        categories = set(cls.Category.values)
+        score_keys = set(constants.SCORE.keys())
+
+        broken_n_questions_keys = n_questions_keys - categories
+        broken_score_keys = categories - score_keys
+
+        if broken_n_questions_keys:
+            errors.append(
+                checks.Error(
+                    "`constants.N_QUESTIONS_PER_RESPONSE`所有键都应是`Question.Category`，"
+                    "而现在包含不合法的键。",
+                    hint=(
+                        "删除`constants.N_QUESTIONS_PER_RESPONSE`的"
+                        f"`{'`, `'.join(broken_n_questions_keys)}`。"
+                    ),
+                    obj=cls,
+                )
+            )
+        if broken_score_keys:
+            errors.append(
+                checks.Error(
+                    "`constants.SCORE`应该覆盖所有`Question.Category`，而现在缺少一些。",
+                    hint=f"向`constants.SCORE`补充`{'`, `'.join(broken_score_keys)}`。",
+                    obj=cls,
+                )
+            )
+
+        return errors
 
 
 class Choice(models.Model):

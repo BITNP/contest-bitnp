@@ -1,6 +1,8 @@
 """常量
 
 视图、模板中的所有常量。
+
+为避免循环`import`，本模块尽量不引用其它模块。
 """
 from dataclasses import dataclass
 from datetime import timedelta
@@ -41,8 +43,6 @@ class ConstantsNamespace:
     """每套题各题型题数
 
     `quiz.models.Question.Category` ⇒ `int`，未列出的题型不出现。
-
-    为避免循环`import`，用`value`替代`Category`。
     """
 
     SCORE = {
@@ -51,9 +51,7 @@ class ConstantsNamespace:
     }
     """每种题目的分值
 
-    `quiz.models.Question.Category` ⇒ `float`，且覆盖所有`Category`
-
-    为避免循环`import`，用`value`替代`Category`。
+    `quiz.models.Question.Category` ⇒ `float`，且覆盖所有`Category`。
     """
 
     DEADLINE_DURATION = timedelta(minutes=15)
