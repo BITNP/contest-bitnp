@@ -28,6 +28,7 @@ erDiagram
 
     Question {
         str content
+        str category
     }
     Choice {
         str content

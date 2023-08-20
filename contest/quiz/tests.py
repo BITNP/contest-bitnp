@@ -1,6 +1,6 @@
 from datetime import timedelta
 from http import HTTPStatus
-from itertools import count, cycle
+from itertools import cycle
 
 from django.http import HttpRequest
 from django.shortcuts import render
@@ -19,6 +19,7 @@ from .models import (
     Student,
     User,
 )
+from .views import select_questions
 
 
 class ResponseModelTests(TestCase):
@@ -73,6 +74,71 @@ class BaseViewTests(TestCase):
         render(HttpRequest(), "base.html")
 
 
+class ScoreTests(TestCase):
+    """答卷分数"""
+
+    def setUp(self):
+        """初始化"""
+        self.user = User.objects.create_user(username="Misato")
+        self.student = Student.objects.create(user=self.user)
+
+        # 制造一张卷子够用的题目，每题首个选项正确
+        # https://wiki.evageeks.org/Main_Page
+        contents_map = {
+            "Characters": [
+                "Shinji Ikari",
+                "Rei Ayanami",
+                "Asuka Langley Soryu",
+                "Misato Katsuragi",
+                "Ritsuko Akagi",
+                "Gendo Ikari",
+            ],
+            "Evangelions": [
+                "Evangelion Unit-00",
+                "Evangelion Unit-01",
+                "Evangelion Unit-02",
+            ],
+            "Angels": [
+                "Adam",
+                "Sachiel",
+                "Gaghiel",
+                "Lilith",
+                "Zeruel",
+                "Tabris",
+            ],
+        }
+        pool = cycle(contents_map.items())
+        for category, n_question in constants.N_QUESTIONS_PER_RESPONSE.items():
+            for _ in range(n_question):
+                question, choices = next(pool)
+                q = Question.objects.create(content=question, category=category)
+                Choice.objects.bulk_create(
+                    [
+                        Choice(content=c, correct=i == 0, question=q)
+                        for i, c in enumerate(choices)
+                    ]
+                )
+
+    def test_select_questions(self):
+        """组卷符合要求"""
+        questions = select_questions()
+        for category, n_question in constants.N_QUESTIONS_PER_RESPONSE.items():
+            self.assertEqual(len([q for q in questions if q.category == category]), n_question)
+
+    def test_full_score(self):
+        """全对答卷得满分"""
+        questions = select_questions()
+
+        response = Response.objects.create(submit_at=timezone.now(), student=self.student)
+        Answer.objects.bulk_create(
+            [
+                Answer(response=response, question=q, choice=q.choice_set.all()[0])
+                for q in questions
+            ]
+        )
+        self.assertEqual(response.score(cache=False), constants.score_total)
+
+
 class ContestViewTests(TestCase):
     """竞赛等视图"""
 
@@ -100,15 +166,18 @@ class ContestViewTests(TestCase):
                 "The New Kid ~ Emergency",
             ],
         }
-        questions_count = count()
-        for question, choices in cycle(contents_map.items()):
-            if next(questions_count) >= constants.N_QUESTIONS_PER_RESPONSE:
-                break
-
-            q = Question.objects.create(content=question)
-            Choice.objects.bulk_create(
-                [Choice(content=c, correct=bool(i), question=q) for i, c in enumerate(choices)]
-            )
+        pool = cycle(contents_map.items())
+        for category, n_question in constants.N_QUESTIONS_PER_RESPONSE.items():
+            # `ScoreTests`已测试临界情形，这里换一下，每类题多准备几道
+            for _ in range(n_question + 3):
+                question, choices = next(pool)
+                q = Question.objects.create(content=question, category=category)
+                Choice.objects.bulk_create(
+                    [
+                        Choice(content=c, correct=bool(i), question=q)
+                        for i, c in enumerate(choices)
+                    ]
+                )
 
         self.user = User.objects.create_user(username="Shinji")
         self.student = Student.objects.create(user=self.user)

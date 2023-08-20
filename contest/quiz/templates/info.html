@@ -11,7 +11,7 @@
     <p class="text-center font-bold mb-2">
       <span class="text-6xl">{{ user.student.final_score | as_score }}</span><span class="text-4xl">分</span>
     </p>
-    <p>满分{{ constants.SCORE }}分，取最高分。</p>
+    <p>满分{{ constants.score_total }}分，取最高分。</p>
     {% with n_left_tries=user.student.n_left_tries %}
       <p>
         {% if n_left_tries > 0 %}

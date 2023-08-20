@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
 from django.contrib.auth.models import AbstractUser
+from django.core import checks
 from django.db import models
 from django.utils import timezone
 
@@ -18,13 +20,59 @@ class User(AbstractUser):
 
 
 class Question(models.Model):
+    class Category(models.TextChoices):
+        """类型"""
+
+        RADIO = "R", "单项选择"
+        BINARY = "B", "判断"
+
     content = models.CharField("题干内容", max_length=200)
+    category = models.CharField("类型", max_length=1, choices=Category.choices)
 
     class Meta:
         verbose_name_plural = verbose_name = "题目"
 
     def __str__(self) -> str:
-        return self.content
+        return f"{self.content}（{self.Category(self.category).label}）"
+
+    @admin.display(description="分值")
+    def score(self) -> float:
+        return constants.SCORE[self.category]
+
+    @classmethod
+    def check(cls, **kwargs) -> list[checks.CheckMessage]:
+        errors = super().check(**kwargs)
+
+        # 检查 constants 一致性
+        n_questions_keys = set(constants.N_QUESTIONS_PER_RESPONSE.keys())
+        categories = set(cls.Category.values)
+        score_keys = set(constants.SCORE.keys())
+
+        broken_n_questions_keys = n_questions_keys - categories
+        broken_score_keys = categories - score_keys
+
+        if broken_n_questions_keys:
+            errors.append(
+                checks.Error(
+                    "`constants.N_QUESTIONS_PER_RESPONSE`所有键都应是`Question.Category`，"
+                    "而现在包含不合法的键。",
+                    hint=(
+                        "删除`constants.N_QUESTIONS_PER_RESPONSE`的"
+                        f"`{'`, `'.join(broken_n_questions_keys)}`。"
+                    ),
+                    obj=cls,
+                )
+            )
+        if broken_score_keys:
+            errors.append(
+                checks.Error(
+                    "`constants.SCORE`应该覆盖所有`Question.Category`，而现在缺少一些。",
+                    hint=f"向`constants.SCORE`补充`{'`, `'.join(broken_score_keys)}`。",
+                    obj=cls,
+                )
+            )
+
+        return errors
 
 
 class Choice(models.Model):
@@ -69,6 +117,15 @@ class Student(models.Model):
         return constants.MAX_TRIES - self.response_set.count()
 
 
+@lru_cache
+def _response_score(pk: int) -> float:
+    # 未选择、错误不计分，正确计分
+    return sum(
+        a.question.score()
+        for a in Response.objects.get(pk=pk).answer_set.filter(choice__correct=True)
+    )
+
+
 class Response(models.Model):
     submit_at = models.DateTimeField("提交时刻")
     student = models.ForeignKey(Student, verbose_name="作答者", on_delete=models.CASCADE)
@@ -80,14 +137,20 @@ class Response(models.Model):
         return f"{self.student.name} 在 {self.submit_at} 提交的答卷"
 
     @admin.display(description="得分")
-    def score(self) -> float:
-        if (n_answers := self.answer_set.count()) == 0:
-            return 0
+    def score(self, cache=True) -> float:
+        """计算得分
+
+        较复杂，有全局 LRU 缓存。实际中`Response`不可变，连删除都不会，因此可用 pk 作为键。
+
+        测试时可能删除`Response`，这时可`cache=False`绕过缓存。
+        """
+        # - Global cache in favor of class / instance cache.
+        # - `@lru_cache` on methods can lead to memory leaks.
+        #   https://beta.ruff.rs/docs/rules/cached-instance-method/
+        if cache:
+            return _response_score(self.pk)
         else:
-            # 未选择、错误不计分，正确计分
-            return (
-                constants.SCORE * len(self.answer_set.filter(choice__correct=True)) / n_answers
-            )
+            return _response_score.__wrapped__(self.pk)
 
 
 class Answer(models.Model):

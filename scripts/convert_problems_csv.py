@@ -49,14 +49,8 @@ data: deque[dict] = deque()
 with src_file.open(encoding="utf-8") as f:
     reader = DictReader(f)
     for row in reader:
+        # Convert
         question_pk = pk_shift + int(row["id"])
-        data.append(
-            {
-                "model": "quiz.question",
-                "pk": question_pk,
-                "fields": {"content": row["description"]},
-            }
-        )
 
         if row["choices"] in ["NULL", ""]:  # 判断题
             if row["type"] != "0":
@@ -65,15 +59,29 @@ with src_file.open(encoding="utf-8") as f:
                     f"“{row['description']}” → “{row['choices']}”",
                     stacklevel=1,
                 )
+            category = "B"
             choices = ["正确", "错误"]
-        else:  # 选择题
+        else:  # 单项选择题
             if row["type"] != "1":
                 warn(
-                    "type 和 choies 不一致，将当作选择题："
+                    "type 和 choies 不一致，将当作单项选择题："
                     f"“{row['description']}” → “{row['choices']}”",
                     stacklevel=1,
                 )
+            category = "R"
             choices = row["choices"].split("||")
+
+        # Save
+        data.append(
+            {
+                "model": "quiz.question",
+                "pk": question_pk,
+                "fields": {
+                    "content": row["description"],
+                    "category": category,
+                },
+            }
+        )
 
         for i, c in enumerate(choices):
             data.append(

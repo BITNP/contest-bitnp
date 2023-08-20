@@ -31,8 +31,10 @@ class ChoiceInline(admin.TabularInline):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    fields = ["content"]
+    fields = ["content", "category"]
     inlines = [ChoiceInline]
+    list_filter = ["category"]
+    list_display = ["content", "category"]
     search_fields = ["content"]
 
 
