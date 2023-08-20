@@ -34,6 +34,10 @@ class Question(models.Model):
     def __str__(self) -> str:
         return f"{self.content}（{self.Category(self.category).label}）"
 
+    @admin.display(description="分值")
+    def score(self) -> float:
+        return constants.SCORE[self.category]
+
     @classmethod
     def check(cls, **kwargs) -> list[checks.CheckMessage]:
         errors = super().check(**kwargs)
@@ -125,11 +129,7 @@ class Response(models.Model):
     @admin.display(description="得分")
     def score(self) -> float:
         # 未选择、错误不计分，正确计分
-        return sum(
-            score
-            * len(self.answer_set.filter(question__category=category, choice__correct=True))
-            for category, score in constants.SCORE.items()
-        )
+        return sum(a.question.score() for a in self.answer_set.filter(choice__correct=True))
 
 
 class Answer(models.Model):

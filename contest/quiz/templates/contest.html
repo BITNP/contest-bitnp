@@ -44,8 +44,9 @@
                     {% if draft_response.outdated %}disabled{% endif %}>
             <p class="text-lg">
               <span class="enabled:text-gray-600">{{ forloop.counter }}.</span>
-              <legend class="inline font-bold">
-                {{ a.question.content }}（{# todo constants.SCORE[a.question.category] | as_score #}）
+              <legend class="inline">
+                <span class="font-bold">{{ a.question.content }}</span>
+                <span class="enabled:text-gray-600">（{{ a.question.score | as_score }}分）</span>
               </legend>
             </p>
             {% for choice in a.question.choice_set.all %}
