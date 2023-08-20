@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
@@ -116,6 +117,15 @@ class Student(models.Model):
         return constants.MAX_TRIES - self.response_set.count()
 
 
+@lru_cache
+def _response_score(pk: int) -> float:
+    # 未选择、错误不计分，正确计分
+    return sum(
+        a.question.score()
+        for a in Response.objects.get(pk=pk).answer_set.filter(choice__correct=True)
+    )
+
+
 class Response(models.Model):
     submit_at = models.DateTimeField("提交时刻")
     student = models.ForeignKey(Student, verbose_name="作答者", on_delete=models.CASCADE)
@@ -127,9 +137,20 @@ class Response(models.Model):
         return f"{self.student.name} 在 {self.submit_at} 提交的答卷"
 
     @admin.display(description="得分")
-    def score(self) -> float:
-        # 未选择、错误不计分，正确计分
-        return sum(a.question.score() for a in self.answer_set.filter(choice__correct=True))
+    def score(self, cache=True) -> float:
+        """计算得分
+
+        较复杂，有全局 LRU 缓存。实际中`Response`不可变，连删除都不会，因此可用 pk 作为键。
+
+        测试时可能删除`Response`，这时可`cache=False`绕过缓存。
+        """
+        # - Global cache in favor of class / instance cache.
+        # - `@lru_cache` on methods can lead to memory leaks.
+        #   https://beta.ruff.rs/docs/rules/cached-instance-method/
+        if cache:
+            return _response_score(self.pk)
+        else:
+            return _response_score.__wrapped__(self.pk)
 
 
 class Answer(models.Model):

@@ -136,7 +136,7 @@ class ScoreTests(TestCase):
                 for q in questions
             ]
         )
-        self.assertEqual(response.score(), constants.score_total)
+        self.assertEqual(response.score(cache=False), constants.score_total)
 
 
 class ContestViewTests(TestCase):
