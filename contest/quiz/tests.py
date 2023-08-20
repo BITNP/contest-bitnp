@@ -64,7 +64,9 @@ class BaseViewTests(TestCase):
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("admin:index"))
-        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        self.assertRedirects(
+            response, f"{reverse('admin:login')}?next={reverse('admin:index')}"
+        )
 
     def test_no_context(self):
         """无上下文也能渲染"""
@@ -246,8 +248,7 @@ class ContestViewTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
         response = self.client.post(reverse("quiz:contest_submit"))
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, reverse("quiz:info"))
+        self.assertRedirects(response, reverse("quiz:info"))
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
