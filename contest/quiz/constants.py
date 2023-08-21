@@ -37,8 +37,8 @@ class ConstantsNamespace:
     """
 
     N_QUESTIONS_PER_RESPONSE = {
-        "B": 20,
-        "R": 10,
+        "B": 5,
+        "R": 15,
     }
     """每套题各题型题数
 
@@ -46,8 +46,8 @@ class ConstantsNamespace:
     """
 
     SCORE = {
-        "B": 2,
-        "R": 4,
+        "B": 5,
+        "R": 5,
     }
     """每种题目的分值
 
@@ -56,7 +56,7 @@ class ConstantsNamespace:
     如更改总分，建议一同更改`admin.py`中`ScoreFilter`的`breakpoints`。
     """
 
-    DEADLINE_DURATION = timedelta(minutes=15)
+    DEADLINE_DURATION = timedelta(seconds=300)
     """作答限时"""
 
     MAX_TRIES = 3
