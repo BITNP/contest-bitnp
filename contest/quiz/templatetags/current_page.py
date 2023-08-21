@@ -21,7 +21,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def current_page_title(context: dict, default="") -> str:
+def current_page_title(context: dict, default: str = "") -> str:
     """当前页面的标题
 
     1. 查找`constants.ROUTES: dict[str, PageMeta]`。

@@ -137,7 +137,7 @@ class Response(models.Model):
         return f"{self.student.name} 在 {self.submit_at} 提交的答卷"
 
     @admin.display(description="得分")
-    def score(self, cache=True) -> float:
+    def score(self, cache: bool = True) -> float:
         """计算得分
 
         较复杂，有全局 LRU 缓存。实际中`Response`不可变，连删除都不会，因此可用 pk 作为键。

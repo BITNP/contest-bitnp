@@ -64,7 +64,7 @@ def student_only(
     """
 
     @wraps(view_func)
-    def wrapper(request):
+    def wrapper(request: AuthenticatedHttpRequest) -> HttpResponse:
         if is_student(request.user):
             return view_func(request)
         else:
@@ -102,8 +102,11 @@ def pass_or_forbid(
     test_func: Callable[[User], bool],
     forbid_reason: str,
     *,
-    template_name="403-with-reason.html",
-):
+    template_name: str = "403-with-reason.html",
+) -> Callable[
+    [Callable[[AuthenticatedHttpRequest], HttpResponse]],
+    Callable[[AuthenticatedHttpRequest], HttpResponse],
+]:
     """通过测试或禁止访问
 
     Decorator for views that checks that the user passes the given test,
@@ -131,7 +134,7 @@ def pass_or_forbid(
         view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
     ) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
         @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
+        def wrapper(request: AuthenticatedHttpRequest, *args, **kwargs) -> HttpResponse:
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             else:
