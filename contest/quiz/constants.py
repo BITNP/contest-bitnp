@@ -37,8 +37,8 @@ class ConstantsNamespace:
     """
 
     N_QUESTIONS_PER_RESPONSE = {
-        "B": 5,
-        "R": 5,
+        "B": 20,
+        "R": 10,
     }
     """每套题各题型题数
 
@@ -46,8 +46,8 @@ class ConstantsNamespace:
     """
 
     SCORE = {
-        "B": 8,
-        "R": 12,
+        "B": 2,
+        "R": 4,
     }
     """每种题目的分值
 

@@ -50,7 +50,7 @@ class ScoreFilter(admin.SimpleListFilter):
     """URL query 中参数名"""
     key = methodcaller("score")
     """用于筛选的属性"""
-    breakpoints = [0, 60, 70, 80, 90, 100]
+    breakpoints = [0, 60, 70, 80]
     """筛选的分界线"""
 
     def lookups(
