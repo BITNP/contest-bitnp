@@ -158,7 +158,9 @@ def pass_or_forbid(
     return decorator
 
 
-def is_open(now: datetime | None = None, *, shift=timedelta(0)) -> tuple[bool, bool]:
+def is_open(
+    now: datetime | None = None, *, shift: timedelta = timedelta(0)
+) -> tuple[bool, bool]:
     """是否开放竞赛
 
     Args:
