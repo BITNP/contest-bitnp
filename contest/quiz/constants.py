@@ -59,7 +59,7 @@ class ConstantsNamespace:
     DEADLINE_DURATION = timedelta(seconds=300)
     """作答限时"""
 
-    MAX_TRIES = 3
+    MAX_TRIES = 2
     """答题次数上限"""
 
     YEAR = 2023
