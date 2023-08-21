@@ -353,6 +353,11 @@ class ContestViewTests(TestCase):
             self.user.student.refresh_from_db()
             self.assertFalse(hasattr(self.user.student, "draft_response"))
 
+        # 其它页面正常
+        for url in ["index", "info"]:
+            response = self.client.get(reverse(f"quiz:{url}"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+
     def test_non_student_user(self):
         """如果登录了但不是学生，应当禁止访问"""
         user = User.objects.create_user(username="Keel")
