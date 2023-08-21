@@ -52,7 +52,7 @@ class ScoreFilter(admin.SimpleListFilter):
         self, request: HttpRequest, model_admin: admin.ModelAdmin
     ) -> list[tuple[str, str]]:
         """Get a list of URL queries and human-readable names"""
-        breakpoints = [0, 60, 70, 80, 90, 100]
+        breakpoints = [0, 60, 70, 80]
         return [
             (f"{low}–{high}", f"[{low}, {high})")
             for low, high in zip(breakpoints[:-1], breakpoints[1:])
