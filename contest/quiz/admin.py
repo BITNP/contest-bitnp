@@ -45,19 +45,23 @@ class AnswerInline(admin.TabularInline):
 
 class ScoreFilter(admin.SimpleListFilter):
     title = "得分"
+    """侧边栏中筛选器的标题"""
     parameter_name = "score_interval"
+    """URL query 中参数名"""
     key = methodcaller("score")
+    """用于筛选的属性"""
+    breakpoints = [0, 60, 70, 80, 90, 100]
+    """筛选的分界线"""
 
     def lookups(
         self, request: HttpRequest, model_admin: admin.ModelAdmin
     ) -> list[tuple[str, str]]:
         """Get a list of URL queries and human-readable names"""
-        breakpoints = [0, 60, 70, 80, 90, 100]
         return [
             (f"{low}–{high}", f"[{low}, {high})")
-            for low, high in zip(breakpoints[:-1], breakpoints[1:])
+            for low, high in zip(self.breakpoints[:-1], self.breakpoints[1:])
         ] + [
-            (f"{breakpoints[-1]}–", f"[{breakpoints[-1]}, +∞)"),
+            (f"{self.breakpoints[-1]}–", f"[{self.breakpoints[-1]}, +∞)"),
         ]
 
     def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet | None:
