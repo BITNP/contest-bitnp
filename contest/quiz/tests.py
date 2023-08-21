@@ -323,6 +323,9 @@ class ContestViewTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(self.user.student.final_score(), 0)
 
+        response = self.client.get(reverse("quiz:contest_review", kwargs={"submission": 0}))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
     def test_too_many_tries(self):
         """答题次数超限"""
         template_response = Response(submit_at=timezone.now(), student=self.user.student)
@@ -364,6 +367,16 @@ class ContestViewTests(TestCase):
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_review_nonexistent_response(self):
+        """回顾不存在的答卷"""
+        self.client.force_login(self.user)
+
+        for submission in [0, 1, 6]:
+            response = self.client.get(
+                reverse("quiz:contest_review", kwargs={"submission": submission})
+            )
+            self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
 
 class EmptyDataTests(TestCase):
