@@ -198,22 +198,24 @@ class ContestViewTests(TestCase):
 
         self.client.force_login(self.user)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertIn("constants", response.context)
-        draft = self.user.student.draft_response
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertIn("constants", response.context)
+            draft = self.user.student.draft_response
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertIn("constants", response.context)
-        self.assertEqual(response.context["draft_response"], draft)
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertIn("constants", response.context)
+            self.assertEqual(response.context["draft_response"], draft)
 
     def test_contest_update_view(self):
         """暂存"""
         self.client.force_login(self.user)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
         answer = self.user.student.draft_response.answer_set.all()[0]
         question = answer.question
@@ -243,8 +245,9 @@ class ContestViewTests(TestCase):
         """暂存非法数据"""
         self.client.force_login(self.user)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
         answer = self.user.student.draft_response.answer_set.all()[0]
         question = answer.question
@@ -287,9 +290,10 @@ class ContestViewTests(TestCase):
         self.assertEqual(response.context["status"], "not taking")
 
         # 前往答题
-        self.client.get(reverse("quiz:contest"))
-        response = self.client.get(reverse("quiz:index"))
-        self.assertEqual(response.context["status"], "taking contest")
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            self.client.get(reverse("quiz:contest"))
+            response = self.client.get(reverse("quiz:index"))
+            self.assertEqual(response.context["status"], "taking contest")
 
         # “时光飞逝”
         self.user.student.draft_response.deadline -= constants.DEADLINE_DURATION
@@ -313,8 +317,9 @@ class ContestViewTests(TestCase):
         """正常作答，但交白卷"""
         self.client.force_login(self.user)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
         response = self.client.post(reverse("quiz:contest_submit"))
         self.assertRedirects(response, reverse("quiz:info"))
@@ -335,19 +340,21 @@ class ContestViewTests(TestCase):
 
         self.client.force_login(self.user)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTrue(hasattr(self.user.student, "draft_response"))
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertTrue(hasattr(self.user.student, "draft_response"))
 
         response = self.client.post(reverse("quiz:contest_submit"))
         self.assertNotEqual(response.status_code, HTTPStatus.FORBIDDEN)
         self.user.student.refresh_from_db()
         self.assertEqual(self.user.student.response_set.count(), constants.MAX_TRIES)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
-        self.user.student.refresh_from_db()
-        self.assertFalse(hasattr(self.user.student, "draft_response"))
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+            self.user.student.refresh_from_db()
+            self.assertFalse(hasattr(self.user.student, "draft_response"))
 
         # 其它页面正常
         for url in ["index", "info"]:
@@ -362,8 +369,9 @@ class ContestViewTests(TestCase):
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        response = self.client.get(reverse("quiz:contest"))
-        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+        with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            response = self.client.get(reverse("quiz:contest"))
+            self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
         response = self.client.get(reverse("quiz:info"))
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
@@ -392,6 +400,7 @@ class EmptyDataTests(TestCase):
         self.client.force_login(self.user)
 
         with self.assertRaisesMessage(ValueError, "Sample larger than population"):
-            self.client.get(reverse("quiz:contest"))
+            with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+                self.client.get(reverse("quiz:contest"))
 
         self.assertFalse(hasattr(self.user.student, "draft_response"))

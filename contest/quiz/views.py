@@ -22,7 +22,7 @@ from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
-from .util import is_student, is_student_taking_contest, pass_or_forbid, student_only
+from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
     from typing import Any, Literal
@@ -120,6 +120,8 @@ def select_questions() -> list[Question]:
 
 @login_required
 @student_only
+@pass_or_forbid(lambda user: is_open()[0], "尚未开放答题。")
+@pass_or_forbid(lambda user: is_open(shift=constants.DEADLINE_DURATION)[1], "答题已不再开放。")
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     """发卷"""
