@@ -1,16 +1,20 @@
 """装饰器等小工具"""
 from __future__ import annotations
 
+from datetime import timedelta
 from functools import wraps
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.shortcuts import render
+from django.utils import timezone
 
 from .constants import constants
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from datetime import datetime
 
     from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
     from django.http import (
@@ -149,3 +153,29 @@ def pass_or_forbid(
         return wrapper
 
     return decorator
+
+
+def is_open(now: datetime | None = None, *, shift=timedelta(0)) -> tuple[bool, bool]:
+    """是否开放竞赛
+
+    Args:
+        now: 当前时刻，默认为实际当前时刻
+        shift: 所考虑时刻减`now`
+
+    Returns:
+        1. 是否曾开始
+        2. 是否未结束
+    """
+    if now is None:
+        now = timezone.now()
+    concerned = now + shift
+
+    opening_time_interval: tuple[datetime | None, datetime | None] = (
+        settings.QUIZ_OPENING_TIME_INTERVAL
+    )
+    start, end = opening_time_interval
+
+    return (
+        start is None or start <= concerned,
+        end is None or concerned < end,
+    )
