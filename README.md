@@ -3,7 +3,7 @@
 [![Check](https://github.com/Phoupraw/contest-bitnp/actions/workflows/check.yml/badge.svg)](https://github.com/Phoupraw/contest-bitnp/actions/workflows/check.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Phoupraw/contest-bitnp/main.svg)](https://results.pre-commit.ci/latest/github/Phoupraw/contest-bitnp/main)
 
-# 目录
+## 目录
 
 * [开发](#开发)
    * [开始](#开始)
@@ -21,7 +21,7 @@
       * [从头开始使用容器进行部署](#从头开始使用容器进行部署)
    * [手动部署](#手动部署)
 
-# 开发
+## 开发
 
 技术细节请参考[`doc/`](./doc/)。
 
@@ -29,11 +29,11 @@
 >
 > 还可参考 [GitHub Actions](./.github/workflows/check.yml)。
 
-## 开始
+### 开始
 
-### ⚒️ 安装工具
+#### ⚒️ 安装工具
 
-#### [Poetry][poetry]
+##### [Poetry][poetry]
 
 - **功能**：本项目使用 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)][poetry] 管理 python 包。
 
@@ -51,7 +51,7 @@
 
   > 原因：这样`poetry install`时会在项目所在文件夹创建`.venv/`，比`C:/Users/…/AppData/Local/pypoetry/Cache/…`或`~/.cache/pypoetry/…`更明显。
 
-#### [Just][just]
+##### [Just][just]
 
 - **功能**：本项目源代码不在根目录，有许多命令执行时有 tricks。因此建议安装 [just][]，用 just 调用。
 
@@ -120,7 +120,7 @@
   >
   > `poetry install`创建虚拟环境后，可用`poetry env info`查看“Executable”的位置。
 
-#### [Pnpm][]
+##### [Pnpm][]
 
 - **功能**：构建前端 CSS 和 JavaScript。
 
@@ -139,7 +139,7 @@
   >
   > 也可尝试 [Installation | pnpm](https://pnpm.io/installation) 介绍的其它方法。
 
-### 👢 安装包
+#### 👢 安装包
 
 初次使用时，需要安装项目依赖的包并创建数据库：
 
@@ -149,7 +149,7 @@ $ just update
 
 以后拉取他人提交后，如果他人更新了依赖或更改了数据模型，你可能无法继续开发，此时也请`just update`。
 
-### 🏃‍♀️ 启动服务器
+#### 🏃‍♀️ 启动服务器
 
 1. 构建前端。
 
@@ -169,7 +169,7 @@ $ just update
 
 3. 访问 [localhost:8000](http://localhost:8000)，用户名、密码请咨询他人。
 
-### ✅ 检查
+#### ✅ 检查
 
 - **代码质量**
 
@@ -189,21 +189,21 @@ $ just update
   >
   > `git commit --no-verify`可绕过 pre-commit。
 
-## VS Code
+### VS Code
 
-### 任务
+#### 任务
 
 部分 just 命令配备了 problem matcher。<kbd>Ctrl</kbd>+<kbd>P</kbd>，输入`task`及空格，按提示操作可运行。
 
-### Django 魔法
+#### Django 魔法
 
-VS Code 默认的 [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) 无法识别很多 Django 魔法（如`*_set`）。可考虑禁用之，代以 [Matan Gover 的 Mypy](https://marketplace.visualstudio.com/items?itemName=matangover.mypy)。这需要你在工作区设置`mypy.dmypyExecutable`，目前的设置仅适用于 Windows。
+VS Code 默认的 [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) 无法识别很多 Django 魔法（如`*_set`）。可考虑禁用之，代以 [Matan Gover 的 Mypy](https://marketplace.visualstudio.com/items?itemName=matangover.mypy)。（也可并用）这需要你在工作区设置`mypy.dmypyExecutable`，目前的设置仅适用于 Windows。
 
-# 部署
+## 部署
 
-## 容器部署
+### 容器部署
 
-### 准备工作
+#### 准备工作
 
 为减小镜像，用 pip 替代 [poetry][]，需将[`pyproject.toml`](https://python-poetry.org/docs/pyproject/)的`tool.poetry.dependencies`、`tool.poetry.group.deploy.dependencies`转换为[`requirements.txt`](https://pip.pypa.io/en/stable/reference/requirements-file-format/)。
 
@@ -215,7 +215,7 @@ $ poetry export --output requirements.txt --without-hashes --without-urls --with
 >
 > [现在仓库中的`requirements.txt`](./requirements.txt)还手动删除了`python_version`、`sys_platform`，没考虑 python 3.9 和 3.10 依赖不同版本、Windows 和 Unix 不同等情况。之后出问题了再改。
 
-### 构建容器镜像
+#### 构建容器镜像
 
 ```shell
 $ git clone https://github.com/Phoupraw/contest-bitnp
@@ -229,11 +229,11 @@ $ docker build -t everything411/contest-bitnp .
 2. 设置用于生产的环境变量。
 3. 安装依赖，整理静态文件，添加题库，启动服务。
 
-### 从头开始使用容器进行部署
+#### 从头开始使用容器进行部署
 
-编写docker-compose.yml
+编写`docker-compose.yml`
 
-```
+```dockerfile
 version: "3"
 services:
   web:
@@ -258,13 +258,13 @@ $ docker compose up -d
 
 然后进去容器内部，创建超级管理员账号，导入：
 
-```
+```shell
 $ docker exec -it contest_web_1 bash
 (in container) # python manage.py createsuperuser
 (in container) # python manage.py loaddata fixtures/*.yml
 ```
 
-## 手动部署
+### 手动部署
 
 需要 [poetry][]、[just][]，安装方法及配置请参考上文。
 
@@ -281,9 +281,9 @@ $ just update  # 安装依赖、数据库等
 $ just check-deploy  # 检查
 ```
 
-在poetry中安装部署依赖组后，可以使用uvicorn或者gunicorn来运行本网站：
+在 poetry 中安装部署依赖组后，可以使用 [uvicorn][] 或者 [gunicorn][] 来运行本网站：
 
-使用uvicorn单线程运行：
+使用 uvicorn 单线程运行：
 
 ```shell
 $ export DJANGO_PRODUCTION=1
@@ -292,7 +292,7 @@ $ cd contest-bitnp
 $ uvicorn contest.asgi::application
 ```
 
-或者使用gunicorn管理多个uvicorn工作进程：
+或者使用 gunicorn 管理多个 uvicorn 工作进程：
 
 ```shell
 $ export DJANGO_PRODUCTION=1
@@ -312,3 +312,5 @@ $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 [poetry]: https://python-poetry.org
 [pre-commit]: https://pre-commit.com/
 [scoop]: https://scoop.sh
+[uvicorn]: https://www.uvicorn.org/
+[gunicorn]: https://gunicorn.org/
