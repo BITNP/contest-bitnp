@@ -86,7 +86,7 @@ INSTALLED_APPS = [
     "django_cas_ng",
     "tailwind",  # 因为含模板 tag，即使无需构建前端也必要
     "theme",  # 提供 static，开发时由 Django 负责，部署时需 collectstatic，都需要
-    "js",  # 同 theme
+    "js",  # 提供 static 和模板 tag，总需要
     *_debug_only("django_browser_reload"),
     *_debug_only("debug_toolbar"),
 ]
