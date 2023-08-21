@@ -33,7 +33,7 @@ is_first_choice = True
 data = []
 
 for line in src_file.read_text(encoding="UTF-8").splitlines():
-    line = line.strip()
+    line = line.strip()  # noqa: PLW2901 redefined-loop-name
     if not line:  # empty
         continue
     elif line.startswith("# "):

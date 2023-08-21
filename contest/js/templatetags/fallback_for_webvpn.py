@@ -38,4 +38,8 @@ def fallback_for_webvpn() -> str:
     # 采用`<script>`，保证在`<script type='module'>`之前运行。
     # JavaScript 代码用`}))`、`(({`包裹，抵消`vpn_eval`的影响，
     # 不然`window.location`还是原来的。
-    return format_html("<script>}})){}(({{</script>", mark_safe(_fallback_js))
+    return format_html(
+        "<script>}})){}(({{</script>",
+        mark_safe(_fallback_js),  # noqa: S308 suspicious-mark-safe-usage
+    )
+    # 内容是自己产生的，目的就是运行

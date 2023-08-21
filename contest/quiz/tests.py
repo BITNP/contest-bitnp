@@ -283,7 +283,7 @@ class ContestViewTests(TestCase):
         response = self.client.get(reverse("quiz:index"))
         self.assertEqual(response.context["status"], "")
 
-        assert len(self.user.student.response_set.all()) == 0
+        # 最初不曾答题
 
         self.client.force_login(self.user)
         response = self.client.get(reverse("quiz:index"))

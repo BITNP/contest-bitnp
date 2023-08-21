@@ -120,8 +120,10 @@ def select_questions() -> list[Question]:
 
 @login_required
 @student_only
-@pass_or_forbid(lambda user: is_open()[0], "尚未开放答题。")
-@pass_or_forbid(lambda user: is_open(shift=constants.DEADLINE_DURATION)[1], "答题已不再开放。")
+@pass_or_forbid(lambda _user: is_open()[0], "尚未开放答题。")
+@pass_or_forbid(
+    lambda _user: is_open(shift=constants.DEADLINE_DURATION)[1], "答题已不再开放。"
+)
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     """发卷"""

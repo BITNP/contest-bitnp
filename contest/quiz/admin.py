@@ -54,7 +54,7 @@ class ScoreFilter(admin.SimpleListFilter):
     """筛选的分界线"""
 
     def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
+        self, _request: HttpRequest, _model_admin: admin.ModelAdmin
     ) -> list[tuple[str, str]]:
         """Get a list of URL queries and human-readable names"""
         return [
@@ -64,7 +64,7 @@ class ScoreFilter(admin.SimpleListFilter):
             (f"{self.breakpoints[-1]}–", f"[{self.breakpoints[-1]}, +∞)"),
         ]
 
-    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet | None:
+    def queryset(self, _request: HttpRequest, queryset: QuerySet) -> QuerySet | None:
         """Filter the query
 
         Returns the filtered queryset based on the value
@@ -75,7 +75,8 @@ class ScoreFilter(admin.SimpleListFilter):
             return None
 
         interval = value.split("–")
-        if len(interval) != 2:
+        if len(interval) != 2:  # noqa: PLR2004 magic-value-comparison
+            # 区间端点一定是两个
             return None
 
         if interval[1] != "":
