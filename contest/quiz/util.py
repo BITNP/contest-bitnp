@@ -64,9 +64,9 @@ def student_only(
     """
 
     @wraps(view_func)
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         if is_student(request.user):
-            return view_func(request)
+            return view_func(request, *args, **kwargs)
         else:
             return render(
                 request,

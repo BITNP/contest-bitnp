@@ -40,9 +40,9 @@
       <form action="{% url 'quiz:contest_submit' %}" method="post">
         {% csrf_token %}
         {% for a in draft_response.answer_set.all %}
-          <fieldset class="my-4 px-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"
+          <fieldset class="my-4 p-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"
                     {% if draft_response.outdated %}disabled{% endif %}>
-            <p class="text-lg">
+            <p class="text-lg my-0">
               <span class="enabled:text-gray-600">{{ forloop.counter }}.</span>
               <legend class="inline">
                 <span class="font-bold">{{ a.question.content }}</span>
