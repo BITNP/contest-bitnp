@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load my_humanize humanize %}
+{% block content %}
+  <p class="prose">提交时刻：{{ response.submit_at }}（{{ response.submit_at | naturaltime }}）。</p>
+  <p class="prose">单次成绩：{{ response.score | as_score }}分。</p>
+  <form class="prose">
+    {% for a in response.answer_set.all %}
+      <fieldset class="my-4 p-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"
+                disabled>
+        <p class="text-lg my-0">
+          <span>{{ forloop.counter }}.</span>
+          <legend class="inline">
+            <span class="font-bold">{{ a.question.content }}</span>
+            <span>（{{ a.question.score | as_score }}分）</span>
+          </legend>
+        </p>
+        {% for choice in a.question.choice_set.all %}
+          <label class="block hover:bg-red-100 my-2">
+            <input type="radio"
+                   name="question-{{ a.question.id }}"
+                   value="choice-{{ choice.id }}"
+                   {% if a.choice.id == choice.id %}checked{% endif %}>
+            {{ choice.content }}
+          </label>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+  </form>
+{% endblock content %}

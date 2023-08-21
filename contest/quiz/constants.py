@@ -69,6 +69,7 @@ class ConstantsNamespace:
         "quiz:index": PageMeta(title="主页", login_required=False),
         "quiz:contest": PageMeta(title="答题", login_required=True, reluctant=True),
         "quiz:info": PageMeta(title="个人中心", login_required=True),
+        "quiz:contest_review": PageMeta(title="回顾", login_required=True, reluctant=True),
     }
 
     @property

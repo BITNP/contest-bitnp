@@ -10,4 +10,9 @@ urlpatterns = [
     path("contest/", views.contest, name="contest"),
     path("contest/update/", views.contest_update, name="contest_update"),
     path("contest/submit/", views.contest_submit, name="contest_submit"),
+    path(
+        "contest/review/<int:submission>/",
+        views.ContestReviewView.as_view(),
+        name="contest_review",
+    ),
 ]

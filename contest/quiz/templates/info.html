@@ -58,7 +58,9 @@
           <tbody>
             {% for r in response_set|dictsortreversed:"submit_at" %}
               <tr>
-                <td>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</td>
+                <td>
+                  <a href='{% url 'quiz:contest_review' forloop.revcounter0 %}'>{{ r.submit_at }}（{{ r.submit_at | naturaltime }}）</a>
+                </td>
                 <td>{{ r.score | as_score }}</td>
               </tr>
             {% endfor %}
