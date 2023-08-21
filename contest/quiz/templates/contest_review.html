@@ -5,7 +5,7 @@
   <p class="prose">单次成绩：{{ response.score | as_score }}分。</p>
   <form class="prose">
     {% for a in response.answer_set.all %}
-      <fieldset class="my-4 p-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"
+      <fieldset class="my-4 -mx-6 lg:-mx-8 p-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"
                 disabled>
         <p class="text-lg my-0">
           <span>{{ forloop.counter }}.</span>
