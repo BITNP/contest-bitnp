@@ -15,6 +15,7 @@ RUN pnpm --dir /usr/src/app/theme/static_src/ run build && \
 FROM python:3-slim
 ENV DJANGO_PRODUCTION=1
 ENV SECRET_KEY=dummy_secret_key_replace_me_please
+ENV DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL=1
 
 RUN rm /etc/apt/sources.list.d/debian.sources
 COPY deploy/sources.list /etc/apt/sources.list

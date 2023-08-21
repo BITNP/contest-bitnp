@@ -281,6 +281,10 @@ $ just update  # 安装依赖、数据库等
 $ just check-deploy  # 检查
 ```
 
+> **Note**
+>
+> 若希望部署时永远开放答题，请`export DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL="任何非空字符串"`。
+
 在 poetry 中安装部署依赖组后，可以使用 [uvicorn][] 或者 [gunicorn][] 来运行本网站：
 
 使用 uvicorn 单线程运行：

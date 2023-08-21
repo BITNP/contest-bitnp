@@ -228,7 +228,7 @@ QUIZ_OPENING_TIME_INTERVAL: tuple[datetime | None, datetime | None]
 
 `None`代表不限制。例如`(START_TIME, None)`代表从`START_TIME`开放，并不再关闭。
 """
-if DEBUG:
+if DEBUG or getenv("DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL"):
     QUIZ_OPENING_TIME_INTERVAL = (None, None)
 else:
     QUIZ_OPENING_TIME_INTERVAL = (
