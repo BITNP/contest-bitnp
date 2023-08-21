@@ -222,7 +222,6 @@ if DEBUG:
     # https://github.com/timonweb/django-tailwind/pull/181
 
 # Quiz settings
-# 此处设置允许随时修改，
 
 QUIZ_OPENING_TIME_INTERVAL: tuple[datetime | None, datetime | None]
 """竞赛开放时间
