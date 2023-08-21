@@ -2,6 +2,7 @@
 {% load static %}
 {% load current_page %}
 {% load tailwind_tags %}
+{% load fallback_for_webvpn %}
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" class="h-full bg-gray-100">
   <head>
@@ -12,6 +13,7 @@
     <meta name="author" content="国防教育协会等">
     <meta name="keywords" content="北京理工大学,竞赛,军训,国防知识">
     <title>{% current_page_title %} - 国防知识竞赛</title>
+    {% fallback_for_webvpn %}
     <script type='module' src="{% static 'js/dist/toggle_mobile_menu.js' %}"></script>
     {% block scripts %}
     {% endblock scripts %}

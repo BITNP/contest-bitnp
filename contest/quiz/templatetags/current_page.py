@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django import template
-from django.urls import reverse
+from django.urls import Resolver404, resolve
 
 if TYPE_CHECKING:
     from http import HTTPStatus
@@ -31,8 +31,13 @@ def current_page_title(context: dict, default: str = "") -> str:
     request: HttpRequest = context["request"]
     if "constants" in context:
         constants: ConstantsNamespace = context["constants"]
-        for key, page in constants.ROUTES.items():
-            if request.path_info == reverse(key):
+        try:
+            view_name = resolve(request.path_info).view_name
+        except Resolver404:
+            pass
+        else:
+            if view_name in constants.ROUTES:
+                page = constants.ROUTES[view_name]
                 return page.title
 
     if "response_status" in context:

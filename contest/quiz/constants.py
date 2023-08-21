@@ -52,6 +52,8 @@ class ConstantsNamespace:
     """每种题目的分值
 
     `quiz.models.Question.Category` ⇒ `float`，且覆盖所有`Category`。
+
+    如更改总分，建议一同更改`admin.py`中`ScoreFilter`的`breakpoints`。
     """
 
     DEADLINE_DURATION = timedelta(minutes=15)
@@ -67,6 +69,7 @@ class ConstantsNamespace:
         "quiz:index": PageMeta(title="主页", login_required=False),
         "quiz:contest": PageMeta(title="答题", login_required=True, reluctant=True),
         "quiz:info": PageMeta(title="个人中心", login_required=True),
+        "quiz:contest_review": PageMeta(title="回顾", login_required=True, reluctant=True),
     }
 
     @property

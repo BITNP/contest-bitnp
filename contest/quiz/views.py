@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
+    Http404,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
@@ -21,7 +22,7 @@ from django.views.generic import TemplateView
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
-from .util import is_student, is_student_taking_contest, pass_or_forbid, student_only
+from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
     from typing import Any, Literal
@@ -119,6 +120,8 @@ def select_questions() -> list[Question]:
 
 @login_required
 @student_only
+@pass_or_forbid(lambda user: is_open()[0], "尚未开放答题。")
+@pass_or_forbid(lambda user: is_open(shift=constants.DEADLINE_DURATION)[1], "答题已不再开放。")
 @require_GET
 def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     """发卷"""
@@ -233,3 +236,31 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student.draft_response.delete()
 
     return HttpResponseRedirect(reverse("quiz:info"))
+
+
+@method_decorator(student_only, name="dispatch")
+class ContestReviewView(LoginRequiredMixin, IndexView):
+    """回顾答题记录"""
+
+    request: AuthenticatedHttpRequest
+    template_name = "contest_review.html"
+
+    def get_context_data(  # type: ignore[override]
+        #  一般父类输入应比输出宽，但这里做不到
+        self,
+        submission: int,
+        **kwargs,
+    ) -> dict[str, Any]:
+        """补充上下文数据
+
+        response: Response — 答卷
+        """
+        context = super().get_context_data(**kwargs)
+
+        responses = self.request.user.student.response_set.order_by("submit_at")
+        try:
+            context["response"] = responses[submission]
+        except IndexError:
+            raise Http404("不存在这样的答卷。") from None
+
+        return context

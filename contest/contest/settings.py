@@ -10,9 +10,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from __future__ import annotations
 
+from datetime import datetime
 from os import environ, getenv
 from pathlib import Path
 from shutil import which
+
+from zoneinfo import ZoneInfo
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,7 +86,7 @@ INSTALLED_APPS = [
     "django_cas_ng",
     "tailwind",  # 因为含模板 tag，即使无需构建前端也必要
     "theme",  # 提供 static，开发时由 Django 负责，部署时需 collectstatic，都需要
-    "js",  # 同 theme
+    "js",  # 提供 static 和模板 tag，总需要
     *_debug_only("django_browser_reload"),
     *_debug_only("debug_toolbar"),
 ]
@@ -217,3 +220,18 @@ if DEBUG:
     NPM_BIN_PATH = which("pnpm")
     # Windows 有`$PATHEXT`问题，而`subprocess.run()`应尽量保证是完成路径。
     # https://github.com/timonweb/django-tailwind/pull/181
+
+# Quiz settings
+
+QUIZ_OPENING_TIME_INTERVAL: tuple[datetime | None, datetime | None]
+"""竞赛开放时间
+
+`None`代表不限制。例如`(START_TIME, None)`代表从`START_TIME`开放，并不再关闭。
+"""
+if DEBUG or getenv("DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL"):
+    QUIZ_OPENING_TIME_INTERVAL = (None, None)
+else:
+    QUIZ_OPENING_TIME_INTERVAL = (
+        datetime(2023, 8, 30, tzinfo=ZoneInfo(TIME_ZONE)),
+        datetime(2023, 9, 1, tzinfo=ZoneInfo(TIME_ZONE)),
+    )
