@@ -1,7 +1,7 @@
 # contest-bitnp 国防知识竞赛
 
-[![Check](https://github.com/Phoupraw/contest-bitnp/actions/workflows/check.yml/badge.svg)](https://github.com/Phoupraw/contest-bitnp/actions/workflows/check.yml)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Phoupraw/contest-bitnp/main.svg)](https://results.pre-commit.ci/latest/github/Phoupraw/contest-bitnp/main)
+[![Check](https://github.com/BITNP/contest-bitnp/actions/workflows/check.yml/badge.svg)](https://github.com/BITNP/contest-bitnp/actions/workflows/check.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BITNP/contest-bitnp/main.svg)](https://results.pre-commit.ci/latest/github/BITNP/contest-bitnp/main)
 
 ## 目录
 
@@ -218,7 +218,7 @@ $ poetry export --output requirements.txt --without-hashes --without-urls --with
 #### 构建容器镜像
 
 ```shell
-$ git clone https://github.com/Phoupraw/contest-bitnp
+$ git clone https://github.com/BITNP/contest-bitnp
 $ cd contest-bitnp
 $ docker build -t everything411/contest-bitnp .
 ```
@@ -305,7 +305,7 @@ $ cd contest-bitnp
 $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 ```
 
-另参阅 [How to deploy Django | Django documentation | Django](https://docs.djangoproject.com/en/4.2/howto/deployment/)。
+另请参阅 [How to deploy Django | Django documentation | Django](https://docs.djangoproject.com/en/4.2/howto/deployment/)。
 
 
 [just]: https://just.systems
