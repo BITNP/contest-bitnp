@@ -305,7 +305,7 @@ $ cd contest-bitnp
 $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 ```
 
-另参阅 [How to deploy Django | Django documentation | Django](https://docs.djangoproject.com/en/4.2/howto/deployment/)。
+另请参阅 [How to deploy Django | Django documentation | Django](https://docs.djangoproject.com/en/4.2/howto/deployment/)。
 
 
 [just]: https://just.systems
