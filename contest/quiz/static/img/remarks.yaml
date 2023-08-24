@@ -1,11 +1,7 @@
 home.jpg:
-  src: PHP 旧项目？
+  src: PHP 旧项目
+  make: 重新调整比例和尺寸。
   remark: 首页图。
-
-defense.png:
-  src: PHP 旧项目。
-  make: 裁边。
-  remark: 国防教育协会徽章、文字、某种宗旨。
 
 bit-icon.svg:
   url: https://bit.edu.cn/images/gb20190805/logo_01.svg
