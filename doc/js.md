@@ -53,6 +53,12 @@ import{d as e}from"./_rollupPluginBabelHelpers-b026cde4.js";…
 Uncaught SyntaxError: import declarations may only appear at top level of a module
 ```
 
+或者被理解为[动态`import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)：
+
+```javascript
+Uncaught SyntaxError: Unexpected identifier '…'. import call expects one or two arguments.
+```
+
 于是采用两套代码：
 
 - 直接访问时（包括开发时），使用 ESM 并分割代码。
