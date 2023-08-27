@@ -15,7 +15,52 @@ $ just manage loaddata ./fixtures/…
 flowchart LR
     人类可读格式 -->|"scripts/load_*"| yaml[YAML fixture] -->|"manage loaddata"| 数据库
         -->|"manage dumpdata"| yaml -->|"scripts/dump_*"| 人类可读格式
-    数据库 -->|"scripts/dump_*"| 人类可读格式
+    数据库 -->|"manage dump_*"| 人类可读格式
+```
+
+## 格式
+
+### Simple Markdown
+
+- 忽略空行。
+- 起头依次为`#`、空格的行表示题干，其余为选项。
+- `【应选】`开头的选项应选，其余不应选。
+- 紧随题干的选项是该题的选项。
+
+```shell
+# 数据库 → 人类可读格式
+$ just manage dump_md > ./fixtures/….md
+
+# 人类可读格式 → YAML fixture
+$ python ./scripts/load_md.py ./fixtures/….md
+
+# YAML fixture → 数据库
+$ just manage loaddata ./fixtures/….yaml
+```
+
+标准示例：
+
+```markdown
+# 中国人民解放军诞生于（ ）
+
+【应选】1927年8月1日
+
+1949年8月1日
+
+1927年10月1日
+
+1949年10月1日
+```
+
+能接受但不推荐的例子：
+
+```markdown
+#   Hedgehog's Dilemma - B
+
+        Campfire Chat ~ Retrieval
+    The Square Peg
+Unexpected Farewell ~ Making Things Even
+【应选】    "Welcome Home"
 ```
 
 ## 来源

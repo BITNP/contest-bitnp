@@ -2,18 +2,6 @@
 
 Examples:
 ```
-$ cat ./fixtures/题库.md
-# 中国人民解放军诞生于(    )
-
-【应选】1927年8月1日
-
-1949年8月1日
-
-1927年10月1日
-
-1949年10月1日
-…
-
 $ python ./scripts/load_md.py ./fixtures/题库.md
 ```
 """
