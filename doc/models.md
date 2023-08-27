@@ -62,4 +62,8 @@ erDiagram
     Student ||--o| DraftResponse: working
 ```
 
+> **Note**
+>
+> 以上是设计稿，其中有些属性并未存入数据库，而只是类的方法。[django-extensions](https://pypi.org/project/django-extensions/) 的 [graph models](https://django-extensions.readthedocs.io/en/latest/graph_models.html) 可自动生成实际关系图，并且包括 Django 内置的`User`、`Session`等。
+
 数据库并不直接存储分数——需要时再结合`constants`计算。
