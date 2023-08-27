@@ -8,7 +8,7 @@ id,type,description,answer,choices
 "205","0","《联合国海洋法公约》规定专属经济区为300海里。","1",NULL
 …
 
-$ python ./scripts/convert_problems_csv.py ./fixtures/problems.csv
+$ python ./scripts/load_problems_csv.py ./fixtures/problems.csv
 ```
 
 """

@@ -7,6 +7,17 @@ $ just manage loaddata ./fixtures/…
 # 注意，只识别正斜杠。
 ```
 
+## 命名规定
+
+接近数据库称作 load，接近人称作 dump。
+
+```mermaid
+flowchart LR
+    人类可读格式 -->|"scripts/load_*"| yaml[YAML fixture] -->|"manage loaddata"| 数据库
+        -->|"manage dumpdata"| yaml -->|"scripts/dump_*"| 人类可读格式
+    数据库 -->|"scripts/dump_*"| 人类可读格式
+```
+
 ## 来源
 
 ### `NGE.yaml`
@@ -26,10 +37,10 @@ $ just manage loaddata ./fixtures/…
 > }
 > ```
 
-再用[`convert_md_fixture`](../scripts/convert_md_fixture.py)转换为`NGE.yaml`。
+再用[`load_md_fixture`](../scripts/load_md_fixture.py)转换为`NGE.yaml`。
 
 ```shell
-$ poetry run python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
+$ poetry run python ./scripts/load_md_fixture.py ./fixtures/NGE.md
 ```
 
 目前不常用，故不收入`justfile`。
@@ -39,5 +50,5 @@ $ poetry run python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
 来自 PHP 旧项目。
 
 ```shell
-$ poetry run python ./scripts/convert_problems_csv.py ./fixtures/problems.csv
+$ poetry run python ./scripts/load_problems_csv.py ./fixtures/problems.csv
 ```
