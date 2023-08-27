@@ -3,8 +3,16 @@
 [`../fixtures/`](../fixtures/)是测试数据。
 
 ```shell
-$ just manage loaddata ./fixtures/…
+# YAML fixture → 数据库
+$ just manage loaddata ./fixtures/….yaml
 # 注意，只识别正斜杠。
+```
+
+```shell
+# 清空题库
+$ just shell
+>>> from quiz.models import Question
+>>> Question.objects.all().delete()
 ```
 
 ## 命名规定
@@ -26,6 +34,7 @@ flowchart LR
 - 起头依次为`#`、空格的行表示题干，其余为选项。
 - `【应选】`开头的选项应选，其余不应选。
 - 紧随题干的选项是该题的选项。
+- 选项仅包含“正确”“错误”的题目为判断题，其余为单项选择题。
 
 ```shell
 # 数据库 → 人类可读格式
@@ -33,9 +42,6 @@ $ just manage dump_md > ./fixtures/….md
 
 # 人类可读格式 → YAML fixture
 $ python ./scripts/load_md.py ./fixtures/….md
-
-# YAML fixture → 数据库
-$ just manage loaddata ./fixtures/….yaml
 ```
 
 标准示例：
