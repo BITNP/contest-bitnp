@@ -2,7 +2,7 @@
 
 Examples:
 ```
-$ python ./scripts/load_md_fixture.py ./fixtures/NGE.md --first-correct
+$ python ./scripts/load_nge.py ./fixtures/NGE.md --first-correct
 ```
 
 """

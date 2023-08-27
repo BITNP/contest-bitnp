@@ -37,10 +37,10 @@ flowchart LR
 > }
 > ```
 
-再用[`load_md_fixture`](../scripts/load_md_fixture.py)转换为`NGE.yaml`。
+再用[`load_nge`](../scripts/load_nge.py)转换为`NGE.yaml`。
 
 ```shell
-$ poetry run python ./scripts/load_md_fixture.py ./fixtures/NGE.md --first-correct
+$ poetry run python ./scripts/load_nge.py ./fixtures/NGE.md --first-correct
 ```
 
 目前不常用，故不收入`justfile`。
