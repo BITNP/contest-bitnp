@@ -3,8 +3,70 @@
 [`../fixtures/`](../fixtures/)是测试数据。
 
 ```shell
-$ just manage loaddata ./fixtures/…
+# YAML fixture → 数据库
+$ just manage loaddata ./fixtures/….yaml
 # 注意，只识别正斜杠。
+```
+
+```shell
+# 清空题库
+$ just shell
+>>> from quiz.models import Question
+>>> Question.objects.all().delete()
+```
+
+## 命名规定
+
+接近数据库称作 load，接近人称作 dump。
+
+```mermaid
+flowchart LR
+    人类可读格式 -->|"scripts/load_*"| yaml[YAML fixture] -->|"manage loaddata"| 数据库
+        -->|"manage dumpdata"| yaml -->|"scripts/dump_*"| 人类可读格式
+    数据库 -->|"manage dump_*"| 人类可读格式
+```
+
+## 格式
+
+### Simple Markdown
+
+- 忽略空行。
+- 起头依次为`#`、空格的行表示题干，其余为选项。
+- `【应选】`开头的选项应选，其余不应选。
+- 紧随题干的选项是该题的选项。
+- 选项仅包含“正确”“错误”的题目为判断题，其余为单项选择题。
+
+```shell
+# 数据库 → 人类可读格式
+$ just manage dump_md > ./fixtures/….md
+
+# 人类可读格式 → YAML fixture
+$ python ./scripts/load_md.py ./fixtures/….md
+```
+
+标准示例：
+
+```markdown
+# 中国人民解放军诞生于（ ）
+
+【应选】1927年8月1日
+
+1949年8月1日
+
+1927年10月1日
+
+1949年10月1日
+```
+
+能接受但不推荐的例子：
+
+```markdown
+#   Hedgehog's Dilemma - B
+
+        Campfire Chat ~ Retrieval
+    The Square Peg
+Unexpected Farewell ~ Making Things Even
+【应选】    "Welcome Home"
 ```
 
 ## 来源
@@ -26,10 +88,10 @@ $ just manage loaddata ./fixtures/…
 > }
 > ```
 
-再用[`convert_md_fixture`](../scripts/convert_md_fixture.py)转换为`NGE.yaml`。
+再用[`load_nge`](../scripts/load_nge.py)转换为`NGE.yaml`。
 
 ```shell
-$ poetry run python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
+$ poetry run python ./scripts/load_nge.py ./fixtures/NGE.md --first-correct
 ```
 
 目前不常用，故不收入`justfile`。
@@ -39,5 +101,5 @@ $ poetry run python ./scripts/convert_md_fixture.py ./fixtures/NGE.md
 来自 PHP 旧项目。
 
 ```shell
-$ poetry run python ./scripts/convert_problems_csv.py ./fixtures/problems.csv
+$ poetry run python ./scripts/load_problems_csv.py ./fixtures/problems.csv
 ```

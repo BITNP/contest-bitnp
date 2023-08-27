@@ -104,6 +104,10 @@ convention = "google"
 "urls.py" = ["D100"]
 "views.py" = ["D100"]
 "**/templatetags/__init__.py" = ["D104"]
+"**/management/__init__.py" = ["D104"]
+"**/management/commands/__init__.py" = ["D104"]
+"**/management/commands/*.py" = ["D101"]
+"scripts/*.py" = ["S101"] # assert
 
 [tool.black]
 line-length = 95
