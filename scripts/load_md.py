@@ -19,12 +19,14 @@ $ python ./scripts/load_md.py ./fixtures/题库.md
 """
 from __future__ import annotations
 
+import re
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from collections import deque
 from dataclasses import dataclass
 from itertools import count
 from pathlib import Path
 from typing import TYPE_CHECKING
+from warnings import warn
 
 if TYPE_CHECKING:
     from typing import Generator, Iterator
@@ -65,14 +67,31 @@ def dump_objects(
     question_content: str, choices: list[Choice], question_pk: int
 ) -> Generator[dict[str, str | int | dict], None, None]:
     """Dump objects into YAML fixture format"""
+    # 1. Validate and normalize
     if all(c.content in ["正确", "错误"] for c in choices):
         category = "B"
         assert len(choices) == 2, f"判断题选项不正常：{choices}"  # noqa: PLR2004
     else:
         category = "R"
 
-    assert len([c for c in choices if c.correct]) == 1, f"正确选项应当只有一个：{choices}"
+    assert (
+        len([c for c in choices if c.correct]) == 1
+    ), f"正确选项应当只有一个，可能忘了用“# ”分隔题目：{choices}"
 
+    assert len(choices) > 1, f"选项不应只有一个：{choices}"
+
+    if re.search(R"[ABCD]", question_content):
+        warn(f"题干可能包含答案：{question_content}", stacklevel=1)
+
+    if re.search(R"[,?!]", question_content):
+        warn(f"题干包含半角标点：{question_content}", stacklevel=1)
+
+    question_content = re.sub(R"[\s　]*[（\(][\s　]*[）\)][\s　]*", "（ ）", question_content)
+
+    if category == "B" and "（ ）" in question_content:
+        warn(f"判断题设了空：{question_content}", stacklevel=1)
+
+    # 2. Dump
     yield {
         "model": "quiz.question",
         "pk": question_pk,
