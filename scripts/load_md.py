@@ -68,11 +68,14 @@ def dump_objects(
 
     assert len(choices) > 1, f"选项不应只有一个：{choices}"
 
-    if re.search(R"[ABCD]", question_content):
+    if re.search(R"\b[ABCD]\b", question_content):
         warn(f"题干可能包含答案：{question_content}", stacklevel=1)
 
     if re.search(R"[,?!]", question_content):
         warn(f"题干包含半角标点：{question_content}", stacklevel=1)
+
+    if re.search(R"['\"]", question_content):
+        warn(f"题干包含直引号，建议改用上下引号：{question_content}", stacklevel=1)
 
     question_content = re.sub(R"[\s　]*[（\(][\s　]*[）\)][\s　]*", "（ ）", question_content)
 
