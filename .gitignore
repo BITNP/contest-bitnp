@@ -1,5 +1,7 @@
 /fixtures/NGE.yaml
 /fixtures/problems.*
+/fixtures/*题库*.md
+/fixtures/*题库*.yaml
 
 node_modules
 
