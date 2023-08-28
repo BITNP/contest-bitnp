@@ -21,7 +21,11 @@ register = template.Library()
 def natural_delta(value: timedelta) -> str:
     """时间间隔"""
     humanize.i18n.activate("zh_CN")
-    return humanize.naturaldelta(value)
+
+    # humanize 内置的 locale/zh_CN/LC_MESSAGES/humanize.po 中，所有“分”都指“分钟”，
+    # 而其余都是数字，因此直接替换即可。
+    # https://github.com/python-humanize/humanize/blob/a1574be55c878f42c2795c3944b97ab8e0248299/src/humanize/locale/zh_CN/LC_MESSAGES/humanize.po#L262-L271
+    return humanize.naturaldelta(value).replace("分", "分钟")
 
 
 @register.filter

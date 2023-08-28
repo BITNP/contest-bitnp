@@ -105,7 +105,7 @@ class TimeProgress {
             this.bar.style.width = `${100 * this.progress}%`
 
             if (this.seconds_left > 100) {
-                this.text.textContent = `${Math.round(this.seconds_left / 60)}分`
+                this.text.textContent = `${Math.round(this.seconds_left / 60)}分钟`
                 setTimeout(() => { this.update() }, 1000)
             } else {
                 this.text.textContent = `约${Math.round(this.seconds_left)}秒`
