@@ -6,9 +6,12 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 _fallback_js = r"""
-if (window.location.hostname === 'webvpn.bit.edu.cn') {
+if (window.location.hostname.endsWith('vpn.bit.edu.cn')) {
     window.addEventListener('error', async (event) => {
-        if (event.error instanceof SyntaxError && event.error.message === "import declarations may only appear at top level of a module") {
+        if (event.error instanceof SyntaxError && (
+            event.error.message.includes('import declaration')
+            || event.error.message.includes('import call')
+        )) {
             event.preventDefault()
 
             const source = new URL(event.filename)
