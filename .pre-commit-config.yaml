@@ -10,7 +10,7 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=2048]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.286"
+    rev: "v0.0.287"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --show-fixes]
@@ -40,7 +40,7 @@ repos:
           - eslint-plugin-n@^15.0.0 || ^16.0.0
           - eslint-plugin-promise@^6.0.0
   - repo: https://github.com/crate-ci/typos
-    rev: v1.16.8
+    rev: v1.16.10
     hooks:
       - id: typos
 
