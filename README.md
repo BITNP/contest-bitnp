@@ -2,6 +2,7 @@
 
 [![Check](https://github.com/BITNP/contest-bitnp/actions/workflows/check.yml/badge.svg)](https://github.com/BITNP/contest-bitnp/actions/workflows/check.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BITNP/contest-bitnp/main.svg)](https://results.pre-commit.ci/latest/github/BITNP/contest-bitnp/main)
+[![Dockerhub image](https://img.shields.io/badge/dockerhub-image-important.svg?logo=Docker)](https://hub.docker.com/r/everything411/contest-bitnp)
 
 ## 目录
 
