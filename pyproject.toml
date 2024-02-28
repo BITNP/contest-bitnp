@@ -36,6 +36,14 @@ optional = true
 coverage = { extras = ["toml"], version = "^7.2.7" }
 django-coverage-plugin = "^3.1.0"
 
+[tool.poetry.group.agg]
+optional = true
+
+[tool.poetry.group.agg.dependencies]
+polars = {extras = ["xlsx2csv"], version = "^0.19.1"}
+rich = "^13.5.2"
+xlsxwriter = "^3.1.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -43,7 +51,7 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "default"
+priority = "primary"
 
 [tool.ruff]
 select = [
