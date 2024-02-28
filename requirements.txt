@@ -6,7 +6,7 @@ click==8.1.4
 colorama==0.4.6
 django-cas-ng==4.3.0
 django-tailwind==3.6.0
-django==4.2.7
+django==4.2.10
 gunicorn==21.2.0
 h11==0.14.0
 humanize==4.7.0
