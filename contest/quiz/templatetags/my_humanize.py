@@ -3,6 +3,7 @@
 补充`django.contrib.humanize`。
 https://docs.djangoproject.com/en/4.2/ref/contrib/humanize/
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

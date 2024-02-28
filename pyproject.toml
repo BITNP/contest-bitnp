@@ -54,6 +54,9 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 priority = "primary"
 
 [tool.ruff]
+line-length = 95
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -86,13 +89,12 @@ ignore = [
     "ANN101", # missing-type-self
     "ANN102", # missing-type-cls
 ]
-line-length = 95
 ignore-init-module-imports = true
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # No need to document Django defaults
 # - D100: Missing docstring in public module
 # - D101: Missing docstring in public class
