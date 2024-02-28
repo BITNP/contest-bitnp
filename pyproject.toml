@@ -10,7 +10,7 @@ readme = "README.md"
 packages = [{ include = "contest" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.12"
 Django = "^4.2"
 humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
