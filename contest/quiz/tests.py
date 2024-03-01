@@ -399,8 +399,9 @@ class EmptyDataTests(TestCase):
         """空题库时尝试答题"""
         self.client.force_login(self.user)
 
-        with self.assertRaisesMessage(ValueError, "Sample larger than population"):
-            with self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
-                self.client.get(reverse("quiz:contest"))
+        with self.assertRaisesMessage(
+            ValueError, "Sample larger than population"
+        ), self.settings(QUIZ_OPENING_TIME_INTERVAL=(None, None)):
+            self.client.get(reverse("quiz:contest"))
 
         self.assertFalse(hasattr(self.user.student, "draft_response"))

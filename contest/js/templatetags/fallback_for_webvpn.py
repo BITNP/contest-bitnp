@@ -25,7 +25,7 @@ if (window.location.hostname.endsWith('vpn.bit.edu.cn')) {
         }
     })
 }
-"""  # noqa: E501
+"""
 
 
 @register.simple_tag

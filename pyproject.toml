@@ -79,6 +79,8 @@ select = [
     "ARG", # flake8-unused-arguments
     "PGH", # pygrep-hooks
     "TRY", # tryceratops
+    "SIM", # flake8-simplify
+    "RUF100", # unused-noqa
 ]
 ignore = [
     "D105",   # undocumented-magic-method
