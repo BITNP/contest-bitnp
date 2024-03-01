@@ -4,6 +4,7 @@
 
 为避免循环`import`，本模块尽量不引用其它模块。
 """
+
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import NamedTuple

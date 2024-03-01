@@ -1,4 +1,5 @@
 """装饰器等小工具"""
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -52,7 +53,7 @@ def is_student(user: AbstractBaseUser | AnonymousUser) -> bool:
 
 
 def student_only(
-    view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
+    view_func: Callable[[AuthenticatedHttpRequest], HttpResponse],
 ) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
     """If not student, render `not_student.html`
 
@@ -135,7 +136,7 @@ def pass_or_forbid(
     """
 
     def decorator(
-        view_func: Callable[[AuthenticatedHttpRequest], HttpResponse]
+        view_func: Callable[[AuthenticatedHttpRequest], HttpResponse],
     ) -> Callable[[AuthenticatedHttpRequest], HttpResponse]:
         @wraps(view_func)
         def wrapper(request: AuthenticatedHttpRequest, *args, **kwargs) -> HttpResponse:
@@ -175,9 +176,9 @@ def is_open(
         now = timezone.now()
     concerned = now + shift
 
-    opening_time_interval: tuple[datetime | None, datetime | None] = (
-        settings.QUIZ_OPENING_TIME_INTERVAL
-    )
+    opening_time_interval: tuple[
+        datetime | None, datetime | None
+    ] = settings.QUIZ_OPENING_TIME_INTERVAL
     start, end = opening_time_interval
 
     return (

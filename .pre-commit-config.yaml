@@ -10,25 +10,20 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=2048]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.0.292"
+    rev: "v0.2.2"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --show-fixes]
-  - repo: https://github.com/psf/black
-    rev: 23.9.1
-    hooks:
-      - id: black
-        args:
-          - --preview
+      - id: ruff-format
   - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.34.0
+    rev: v1.34.1
     hooks:
       - id: djlint-reformat-django
         args:
           - --quiet
       - id: djlint-django
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.51.0
+    rev: v9.0.0-beta.1
     hooks:
       - id: eslint
         args:
@@ -40,7 +35,7 @@ repos:
           - eslint-plugin-n@^15.0.0 || ^16.0.0
           - eslint-plugin-promise@^6.0.0
   - repo: https://github.com/crate-ci/typos
-    rev: v1.16.18
+    rev: typos-v0.10.21
     hooks:
       - id: typos
 

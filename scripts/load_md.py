@@ -5,6 +5,7 @@ Examples:
 $ python ./scripts/load_md.py ./fixtures/题库.md
 ```
 """
+
 from __future__ import annotations
 
 import re
