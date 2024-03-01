@@ -33,7 +33,7 @@ def _dump() -> Generator[str, None, None]:
 
 
 class Command(BaseCommand):
-    help = """Database → Simple Markdown"""  # noqa: A003
+    help = """Database → Simple Markdown"""
 
     def handle(self, *_args, **_options) -> None:
         """The actual logic"""

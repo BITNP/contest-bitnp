@@ -26,19 +26,19 @@ jobs:
     - name: Cache poetry
       uses: actions/cache@v3
       with:
-        key: ${{ runner.os }}-pipx@${{ steps.pipx-env.outputs.VERSION }}-poetry@1.5.1
+        key: ${{ runner.os }}-pipx@${{ steps.pipx-env.outputs.VERSION }}-poetry@1.8.1
         path: |
           ${{ steps.pipx-env.outputs.LOCAL_VENVS }}/poetry/
           ${{ steps.pipx-env.outputs.BIN_DIR }}/poetry
     - name: Install poetry
-      run: pipx install poetry==1.5.1
+      run: pipx install poetry==1.8.1
     - name: Configure poetry for in-project venv
       run: |
         poetry config virtualenvs.in-project true
         echo 'PYTHON = "./.venv/bin/python"' > .env
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.12'
         cache: poetry
 
     # Setup other tools
@@ -109,12 +109,12 @@ jobs:
     - name: Cache poetry
       uses: actions/cache@v3
       with:
-        key: ${{ runner.os }}-pipx@${{ steps.pipx-env.outputs.VERSION }}-poetry@1.5.1
+        key: ${{ runner.os }}-pipx@${{ steps.pipx-env.outputs.VERSION }}-poetry@1.8.1
         path: |
           ${{ steps.pipx-env.outputs.LOCAL_VENVS }}/poetry/
           ${{ steps.pipx-env.outputs.BIN_DIR }}/poetry
     - name: Install poetry
-      run: pipx install poetry==1.5.1
+      run: pipx install poetry==1.8.1
     - name: Configure poetry for in-project venv
       run: |
         poetry config virtualenvs.in-project true
@@ -123,13 +123,13 @@ jobs:
       uses: actions/cache@v3
       with:
         key: |
-          venv-without-dev-${{ runner.os }}-python@3.9-poetry@1.5.1-${{ hashFiles('poetry.lock') }}
+          venv-without-dev-${{ runner.os }}-python@3.12-poetry@1.8.1-${{ hashFiles('poetry.lock') }}
         # 这里忽略了 python 小版本
         path: |
           .venv/
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.12'
 
     # Setup other tools
     - name: Setup just

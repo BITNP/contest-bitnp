@@ -12,6 +12,7 @@ $ python ./scripts/load_problems_csv.py ./fixtures/problems.csv
 ```
 
 """
+
 from __future__ import annotations
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter

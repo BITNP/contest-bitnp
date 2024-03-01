@@ -1,5 +1,4 @@
 {
     "python.analysis.typeCheckingMode": "basic",
-    "python.formatting.provider": "black",
     "mypy.dmypyExecutable": "${workspaceFolder}/.venv/Scripts/dmypy.exe",
 }

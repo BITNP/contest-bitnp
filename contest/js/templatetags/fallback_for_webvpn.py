@@ -1,4 +1,5 @@
 """针对 WebVPN 的备用方案"""
+
 from django import template
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -24,7 +25,7 @@ if (window.location.hostname.endsWith('vpn.bit.edu.cn')) {
         }
     })
 }
-"""  # noqa: E501
+"""
 
 
 @register.simple_tag

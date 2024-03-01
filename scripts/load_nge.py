@@ -6,6 +6,7 @@ $ python ./scripts/load_nge.py ./fixtures/NGE.md --first-correct
 ```
 
 """
+
 from __future__ import annotations
 
 from argparse import ArgumentParser, BooleanOptionalAction, RawDescriptionHelpFormatter

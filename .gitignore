@@ -3,6 +3,10 @@
 /fixtures/*题库*.md
 /fixtures/*题库*.yaml
 
+*.xlsx
+*.csv
+*.jsonl
+
 node_modules
 
 # Byte-compiled / optimized / DLL files
