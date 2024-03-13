@@ -176,9 +176,9 @@ def is_open(
         now = timezone.now()
     concerned = now + shift
 
-    opening_time_interval: tuple[
-        datetime | None, datetime | None
-    ] = settings.QUIZ_OPENING_TIME_INTERVAL
+    opening_time_interval: tuple[datetime | None, datetime | None] = (
+        settings.QUIZ_OPENING_TIME_INTERVAL
+    )
     start, end = opening_time_interval
 
     return (
