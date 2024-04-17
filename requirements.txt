@@ -10,7 +10,7 @@ django==4.2.11
 gunicorn==21.2.0
 h11==0.14.0
 humanize==4.9.0
-idna==3.6
+idna==3.7
 lxml==5.1.0
 packaging==23.2
 python-cas==1.6.0
