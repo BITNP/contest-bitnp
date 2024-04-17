@@ -15,6 +15,10 @@ $ just shell
 >>> Question.objects.all().delete()
 ```
 
+> [!TIP]
+>
+> 上面的命令只能清除格式正确时的题库数据。如果导入过错误的数据，上面的命令没有用，可以考虑直接删除整个数据库（删除`/contest/db.sqlite3`）。
+
 ## 命名规定
 
 接近数据库称作 load，接近人称作 dump。
