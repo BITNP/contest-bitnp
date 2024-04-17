@@ -10,6 +10,9 @@ $ just manage loaddata ./fixtures/….yaml
 
 ```shell
 # 清空题库
+
+*提示：下面的命令只能清楚题库格式正确时的题库数据，如果导入过错误的数据，下面的命令没有用，得去/contest/下面直接删除数据库文件（算是一个bug）*
+
 $ just shell
 >>> from quiz.models import Question
 >>> Question.objects.all().delete()
