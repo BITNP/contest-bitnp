@@ -10,7 +10,6 @@ $ just manage loaddata ./fixtures/….yaml
 
 ```shell
 # 清空题库
-
 $ just shell
 >>> from quiz.models import Question
 >>> Question.objects.all().delete()
