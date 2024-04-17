@@ -9,6 +9,14 @@
 3. Django 服务器验证信息。若未见过，则在数据库中新建`User`、`Student`。
 4. Django 服务器向使用者展示后续页面。
 
+## 个人信息
+
+学校的正式 CAS 服务器会将姓名存储到`userName`。
+
+经过`settings.py`中`CAS_RENAME_ATTRIBUTES`规定的重命名，Django 中`User`的`username`是学号，`last_name`是姓名（不保证唯一），`first_name`空。
+
+`Student`的`name`目前仍是学号，原本设计的是姓名。
+
 ## 版本问题
 
 学校的 CAS 服务器可能是 2.0。Django 侧若用 3.0，会从 CAS 服务器接收到不合法的 HTML，导致无法正常登录。
