@@ -10,7 +10,7 @@ $ python ./scripts/load_nge.py ./fixtures/NGE.md --first-correct
 from __future__ import annotations
 
 from argparse import ArgumentParser, BooleanOptionalAction, RawDescriptionHelpFormatter
-from itertools import count
+from itertools import count, cycle
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -44,6 +44,7 @@ def build_parser() -> ArgumentParser:
 def load(lines: Iterable[str], *, assume_first_choice_is_correct: bool = False) -> list[dict]:
     """Simple Markdown → A list of records"""
     questions_count = count()
+    question_category = cycle(["R", "B"])
     choices_count = count()
     last_question_pk = 0
     is_first_choice = True
@@ -59,7 +60,11 @@ def load(lines: Iterable[str], *, assume_first_choice_is_correct: bool = False) 
                 {
                     "model": "quiz.question",
                     "pk": last_question_pk,
-                    "fields": {"content": line.removeprefix("# ")},
+                    "fields": {
+                        "content": line.removeprefix("# "),
+                        # 这只用于测试，就随便标题目类型了。
+                        "category": next(question_category),
+                    },
                 }
             )
 
