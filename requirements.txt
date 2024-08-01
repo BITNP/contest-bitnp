@@ -7,7 +7,7 @@ colorama==0.4.6
 django-cas-ng==4.3.0
 django-tailwind==3.8.0
 django==4.2.14
-gunicorn==21.2.0
+gunicorn==22.0.0
 h11==0.14.0
 humanize==4.10.0
 idna==3.7
