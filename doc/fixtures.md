@@ -73,13 +73,19 @@ Unexpected Farewell ~ Making Things Even
 【应选】    "Welcome Home"
 ```
 
-## 来源
+## 其它格式
+
+下面这些格式只在迁移、测试时需要，一般可以忽略。
 
 ### `NGE.yaml`
 
+> [!WARNING]
+>
+> [`NGE.md`](../fixtures/NGE.md)并非 simple markdown 格式。另外，NGE的数据并不规范，例如判断题可能有不知两个选项。
+
 从 [FGC:Main - EvaWiki](https://wiki.evageeks.org/FGC:Main) 复制得到`NGE.md`。
 
-> **Note**
+> [!NOTE]
 >
 > 利用以下[用户样式](https://add0n.com/stylus.html)可隐藏不相关内容，方便复制。
 >
