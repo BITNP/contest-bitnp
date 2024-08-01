@@ -14,7 +14,7 @@ jobs:
   check-dev:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Setup python tools
     - name: Get pipx environment
@@ -97,7 +97,7 @@ jobs:
       DJANGO_PRODUCTION: Israfel
       SECRET_KEY: Israfel is the Seventh Angel, capable of splitting itself into two identical copies for simultaneous attacks.
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Setup python tools
     - name: Get pipx environment
