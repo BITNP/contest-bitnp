@@ -16,7 +16,16 @@ if TYPE_CHECKING:
 
 
 class User(AbstractUser):
-    pass
+    def get_full_name(self) -> str:
+        """获取全名
+
+        与`username`不同，全名不能保证唯一。
+        """
+        if self.first_name:
+            # the first_name plus the last_name, with a space in between.
+            return super().get_full_name()
+        else:
+            return self.last_name or self.username
 
 
 class Question(models.Model):
