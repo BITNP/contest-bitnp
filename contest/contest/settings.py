@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_celery_beat',
     "django_cas_ng",
     "tailwind",  # 因为含模板 tag，即使无需构建前端也必要
     "theme",  # 提供 static，开发时由 Django 负责，部署时需 collectstatic，都需要
@@ -244,3 +245,13 @@ else:
         datetime(2023, 9, 1, tzinfo=ZoneInfo(TIME_ZONE)),
         datetime(2023, 9, 3, tzinfo=ZoneInfo(TIME_ZONE)),
     )
+
+if DEBUG:
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Modify in Release
+
+CELERY_TIMEZONE = TIME_ZONE
+# DJANGO_CELERY_BEAT_TZ_AWARE = False
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_ENABLE_UTC = False

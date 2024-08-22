@@ -16,6 +16,10 @@ humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
 django-tailwind = "^3.6.0"
 pyyaml = "^6.0.1"
+celery = "^5.4.0"
+eventlet = "^0.36.1"
+django-celery-beat = "^2.6.0"
+redis = "^5.0.8"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
