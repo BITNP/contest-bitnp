@@ -1,5 +1,5 @@
 set dotenv-load
-set shell := ["powershell.exe", "-c"]
+
 # 你可以在项目根目录创建`.env`文件，写入`PYTHON = "./.venv/Scripts/python.exe"`等。
 # 这样能跳过 poetry 使用虚拟环境，稍快一些。
 python := env_var_or_default("PYTHON", "python")
@@ -73,9 +73,3 @@ watch-js:
 # 构建 js
 build-js:
     pnpm --dir {{ src_dir }}/js/static_src/ run build
-
-task-beat:
-    cd {{ src_dir }} ; celery -A contest beat -l info
-
-task-worker:
-    cd {{ src_dir }} ; celery -A contest worker -P eventlet -l info
