@@ -16,6 +16,8 @@ humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
 django-tailwind = "^3.6.0"
 pyyaml = "^6.0.1"
+django-redis = "^5.2.0"  # 添加 django-redis 依赖
+
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
