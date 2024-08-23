@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from .util import AuthenticatedHttpRequest
 
 
-def continue_or_finalize(draft: DraftResponse) -> bool:
+def continue_or_finalize(student_: Student) -> bool:
     """自动提交
 
     若草稿已超期，则定稿，否则什么也不做。
@@ -49,14 +49,51 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
     """
-    if draft.outdated():
-        # 提交之前的草稿
-        response, answers = draft.finalize(submit_at=draft.deadline)
+    draft_response: DraftResponse = student_.draft_response
 
+    if draft_response.outdated():
+        # 提交之前的草稿
+        cache_key = f"draft_response_{student_.user}"
+        # 从 Redis 获取现有的答案缓存
+        cached_answers = cache.get(cache_key, {})
+
+        for question_id, choice_id in cached_answers.items():
+            # Filter out tokens
+            if not question_id.startswith("question-"):
+                continue
+
+            if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+                return False
+                # return HttpResponseBadRequest(
+                #     f"Invalid choice ID “{choice_id}” for “{question_id}”."
+                # )
+            answer: DraftAnswer = get_object_or_404(
+                draft_response.answer_set,
+                question_id=int(question_id.removeprefix("question-")),
+            )
+
+            answer.choice = get_object_or_404(
+                Choice.objects,
+                pk=int(choice_id.removeprefix("choice-")),
+                question=answer.question,
+            )
+
+            answer.save()
+
+        # 1. Convert from draft
+        response, answers = student_.draft_response.finalize(submit_at=timezone.now())
+
+        # 2. Save
         response.save()
         response.answer_set.bulk_create(answers)
+        student_.draft_response.delete()
 
-        draft.delete()
+        # response, answers = draft.finalize(submit_at=draft.deadline)
+
+        # response.save()
+        # response.answer_set.bulk_create(answers)
+
+        # draft.delete()
 
         return True
 
@@ -73,7 +110,7 @@ def manage_status(
         if not hasattr(student, "draft_response"):
             return "not taking"
         else:
-            finalized = continue_or_finalize(student.draft_response)
+            finalized = continue_or_finalize(student)
             if finalized:
                 return "deadline passed"
             else:
@@ -196,29 +233,10 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
         )
 
     cache_key = f"draft_response_{student.user}"
-    # 从 Redis 获取现有的答案缓存
-    cached_answers = cache.get(cache_key, {})
+    # 从 Redis 获取现有的答案json缓存
 
-
-    for question_id, choice_id in request.POST.items():
-        print(question_id, choice_id)
-        if not question_id.startswith("question-"):
-            continue
-
-        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-            return HttpResponseBadRequest(
-                f"Invalid choice ID “{choice_id}” for “{question_id}”."
-            )
-
-        question_id_int = int(question_id.removeprefix("question-"))
-        choice_id_int = int(choice_id.removeprefix("choice-"))
-
-        # 更新缓存中的答案
-        cached_answers[question_id_int] = choice_id_int
-
-    # 将更新后的答案重新存入 Redis
-    cache.set(cache_key, cached_answers)
-
+    print(cache_key)
+    cache.set(cache_key, request.POST)
 
     return HttpResponse("Updated.")
 
@@ -239,7 +257,7 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     # 从 Redis 获取现有的答案缓存
     cached_answers = cache.get(cache_key, {})
 
-    for question_id, choice_id in request.POST.items():
+    for question_id, choice_id in cached_answers.items():
         # Filter out tokens
         if not question_id.startswith("question-"):
             continue
