@@ -266,7 +266,7 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     # 从 Redis 获取现有的答案缓存
     cached_answers = cache.get(cache_key, {})
 
-    for question_id, choice_id in cached_answers.items():
+    for question_id, choice_id in request.POST.items():
         # Filter out tokens
         if not question_id.startswith("question-"):
             continue
