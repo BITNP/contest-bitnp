@@ -5,6 +5,9 @@
   <script type='module' src="{% static 'js/dist/index_and_info.js' %}"></script>
   {{ status | json_script:"data:status" }}
 {% endblock scripts %}
+{% block main_bg_style %}
+  bg-img-info
+{% endblock main_bg_style %}
 {% block content %}
   <div class="prose mb-4 prose-a:no-underline">
     <h2>成绩</h2>

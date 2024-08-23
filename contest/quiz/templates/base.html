@@ -18,6 +18,15 @@
     {% block scripts %}
     {% endblock scripts %}
     {% tailwind_css %}
+    {# 一般样式编译时能确定，请用 Tailwind；若需`{% static … %}`（部署时才确定），再加到这里 #}
+    <style>
+      .bg-img-contest {
+        background-image: url('{% static "img/bg-contest.jpg" %}');
+      }
+      .bg-img-info {
+        background-image: url('{% static "img/bg-info.jpg" %}');
+      }
+    </style>
   </head>
   <body class="h-full">
     <div class="min-h-full grid grid-rows-[auto_1fr_auto]">
@@ -139,15 +148,20 @@
         {% endblock heading %}
       </header>
       {% block main %}
-        <main>
-          <div class="mx-auto max-w-2xl py-6 px-6 lg:px-8">
+        <main class="bg-fixed bg-center
+                     {% block main_bg_style %}
+                     {% endblock main_bg_style %}">
+          <div class="mx-auto max-w-2xl py-6 px-6 lg:px-8
+                      {% block main_container_bg_style %}
+                        bg-gray-100/85 shadow
+                      {% endblock main_container_bg_style %}">
             {% block content %}
             {% endblock content %}
           </div>
         </main>
       {% endblock main %}
       <!-- Footer -->
-      <footer class="mt-4 pt-2 bg-gray-50 shadow-inner">
+      <footer class="pt-5 bg-gray-50 shadow-inner">
         <div class="flex gap-2 justify-center p-2">
           <img src="{% static 'img/bit-icon.svg' %}" alt="" class="h-8">
           <img src="{% static 'img/bit-text.svg' %}" alt="北京理工大学" class="h-8">
