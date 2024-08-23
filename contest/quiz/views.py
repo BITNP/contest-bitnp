@@ -101,7 +101,7 @@ class IndexView(TemplateView):
 
 @method_decorator(student_only, name="dispatch")
 class InfoView(LoginRequiredMixin, IndexView):
-    """个人中心"""
+    """历史成绩"""
 
     template_name = "info.html"
 
