@@ -236,7 +236,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     # 从 Redis 获取现有的答案json缓存
 
     print(cache_key)
-    cache.set(cache_key, request.POST)
+    cache.set(cache_key, request.POST, timeout=None)
 
     return HttpResponse("Updated.")
 
