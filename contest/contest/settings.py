@@ -244,3 +244,18 @@ else:
         datetime(2023, 9, 1, tzinfo=ZoneInfo(TIME_ZONE)),
         datetime(2023, 9, 3, tzinfo=ZoneInfo(TIME_ZONE)),
     )
+
+# 添加redis缓存
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件
+import mimetypes
+mimetypes.add_type('application/javascript', '.js')
