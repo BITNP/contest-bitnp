@@ -3,6 +3,7 @@
 /fixtures/*题库*.md
 /fixtures/*题库*.yaml
 
+*.rdb
 *.xlsx
 *.csv
 *.jsonl
