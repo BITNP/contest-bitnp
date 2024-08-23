@@ -20,6 +20,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
+from django.core.cache import cache
+from django.db import transaction
+
 from .constants import constants
 from .models import Choice, DraftResponse, Question
 from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
@@ -192,6 +195,50 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
             f"You have missed the deadline: {draft_response.deadline.isoformat()}"
         )
 
+    cache_key = f"draft_response_{student.user}"
+    # 从 Redis 获取现有的答案缓存
+    cached_answers = cache.get(cache_key, {})
+
+
+    for question_id, choice_id in request.POST.items():
+        print(question_id, choice_id)
+        if not question_id.startswith("question-"):
+            continue
+
+        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+            return HttpResponseBadRequest(
+                f"Invalid choice ID “{choice_id}” for “{question_id}”."
+            )
+
+        question_id_int = int(question_id.removeprefix("question-"))
+        choice_id_int = int(choice_id.removeprefix("choice-"))
+
+        # 更新缓存中的答案
+        cached_answers[question_id_int] = choice_id_int
+
+    # 将更新后的答案重新存入 Redis
+    cache.set(cache_key, cached_answers)
+
+
+    return HttpResponse("Updated.")
+
+
+@login_required
+@student_only
+@pass_or_forbid(is_student_taking_contest, "请先前往答题再提交答卷。")
+@require_POST
+def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
+    """交卷
+
+    只是将之前暂存的草稿归档，而本次发送的数据完全无用。
+    """
+    student: Student = request.user.student
+    draft_response: DraftResponse = student.draft_response
+
+    cache_key = f"draft_response_{student.user}"
+    # 从 Redis 获取现有的答案缓存
+    cached_answers = cache.get(cache_key, {})
+
     for question_id, choice_id in request.POST.items():
         # Filter out tokens
         if not question_id.startswith("question-"):
@@ -214,20 +261,6 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
         )
 
         answer.save()
-
-    return HttpResponse("Updated.")
-
-
-@login_required
-@student_only
-@pass_or_forbid(is_student_taking_contest, "请先前往答题再提交答卷。")
-@require_POST
-def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
-    """交卷
-
-    只是将之前暂存的草稿归档，而本次发送的数据完全无用。
-    """
-    student: Student = request.user.student
 
     # 1. Convert from draft
     response, answers = student.draft_response.finalize(submit_at=timezone.now())
