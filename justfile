@@ -1,3 +1,4 @@
+set shell := ["powershell.exe", "-c"]
 set dotenv-load
 
 # 你可以在项目根目录创建`.env`文件，写入`PYTHON = "./.venv/Scripts/python.exe"`等。
