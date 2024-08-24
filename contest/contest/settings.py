@@ -75,6 +75,7 @@ def _debug_only(*args) -> tuple:
 # Application definition
 
 INSTALLED_APPS = [
+    'django_celery_beat',
     "quiz.apps.QuizConfig",
     "quiz.templatetags",
     "django.contrib.humanize",
@@ -255,6 +256,16 @@ CACHES = {
         },
     }
 }
+
+if DEBUG:
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Modify in Release
+
+CELERY_TIMEZONE = TIME_ZONE
+# DJANGO_CELERY_BEAT_TZ_AWARE = False
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_ENABLE_UTC = False
 
 # 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件
 # 有MIME报错的时候可以解除注释然后强制刷新前端运行看看

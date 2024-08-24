@@ -3,16 +3,17 @@ from django.core.cache import cache
 import redis
 import logging
 from django.utils import timezone
-# from ..quiz.models import (
-#     Answer,
-#     Choice,
-#     DraftAnswer,
-#     DraftResponse,
-#     Question,
-#     Response,
-#     Student,
-#     User,
-# )
+from django.shortcuts import get_object_or_404
+# 这里的Lint报错是因为celery运行的时候需要cd到非根目录，
+# 导致运行的时候如果直接import contest.quiz.models会找不到
+# 所以就直接默认已经在contest路径里开始索引，因此lint会报错
+# 但是实际上是可以运行的，忽略Lint报错即可
+from quiz.models import (
+    Choice,
+    DraftAnswer,
+    DraftResponse,
+    Student,
+)
 # Get an instance of a logger
 logger = logging.getLogger('django')
 
@@ -22,45 +23,58 @@ def auto_save_redis_to_database():
     # 获取 Redis 连接
     r = redis.Redis(host='127.0.0.1', port=6379, db=1)
     # 使用 scan_iter 获取所有键
-    for key in r.scan_iter('*_ddl'):
-        pure_key = key.decode('utf-8')[3:]
-        ddl = cache.get(pure_key)
+    keys = r.scan_iter('*_ddl')
+    for key in keys:
+        ddl_key = key.decode('utf-8')[3:]
+        print(ddl_key)
+        ddl = cache.get(ddl_key)
         now = timezone.now()
-        if ddl < now:
-            print('redis auto save')
-            # Student.objects.filter(user=int(pure_key)).update(draft_response=None)
+        if ddl is not None:
+            if ddl < now:
+                print(f'{ddl_key} redis auto save')
+                student = Student.objects.get(name=ddl_key[:-4])
+                draft_response: DraftResponse = student.draft_response
 
-            # cache_key = f"{pure_key[:-4]}_json"
-            # # 从 Redis 获取现有的答案缓存
-            # cached_answers = cache.get(cache_key, {})
+                cache_key = f"{ddl_key[:-4]}_json"
+                # # 从 Redis 获取现有的答案缓存
+                cached_answers = cache.get(cache_key, {})
 
-            # for question_id, choice_id in cached_answers.items():
-            #     # Filter out tokens
-            #     if not question_id.startswith("question-"):
-            #         continue
+                for question_id, choice_id in cached_answers.items():
+                    # Filter out tokens
+                    if not question_id.startswith("question-"):
+                        continue
 
-            #     if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-            #         return False
-            #         # return HttpResponseBadRequest(
-            #         #     f"Invalid choice ID “{choice_id}” for “{question_id}”."
-            #         # )
-            #     answer: DraftAnswer = get_object_or_404(
-            #         draft_response.answer_set,
-            #         question_id=int(question_id.removeprefix("question-")),
-            #     )
+                    if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+                        print(f'{key} not choice-')
+                        return
 
-            #     answer.choice = get_object_or_404(
-            #         Choice.objects,
-            #         pk=int(choice_id.removeprefix("choice-")),
-            #         question=answer.question,
-            #     )
+                    answer: DraftAnswer = get_object_or_404(
+                        draft_response.answer_set,
+                        question_id=int(question_id.removeprefix("question-")),
+                    )
 
-            #     answer.save()
+                    answer.choice = get_object_or_404(
+                        Choice.objects,
+                        pk=int(choice_id.removeprefix("choice-")),
+                        question=answer.question,
+                    )
 
-            # # 1. Convert from draft
-            # response, answers = student_.draft_response.finalize(submit_at=timezone.now())
+                    answer.save()
 
-            # # 2. Save
-            # response.save()
-            # response.answer_set.bulk_create(answers)
-            # student_.draft_response.delete()
+                # 1. Convert from draft
+                response, answers = student.draft_response.finalize(submit_at=timezone.now())
+
+                # 2. Save
+                response.save()
+                response.answer_set.bulk_create(answers)
+                student.draft_response.delete()
+
+                cache.delete(f"{student.user}_json")
+                cache.delete(f"{student.user}_ddl")
+                cache.delete(f"{student.user}_sequence")
+        else:
+            print(f'{key} None')
+
+    # 关闭 Redis 连接
+    del keys
+    r.close()

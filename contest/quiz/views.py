@@ -52,7 +52,7 @@ def continue_or_finalize(student_: Student) -> bool:
 
     if draft_response.outdated():
         # 提交之前的草稿
-        cache_key = f"draft_response_{student_.user}"
+        cache_key = f"{student_.user}_json"
         # 从 Redis 获取现有的答案缓存
         cached_answers = cache.get(cache_key, {})
 
@@ -79,6 +79,9 @@ def continue_or_finalize(student_: Student) -> bool:
 
             answer.save()
 
+        cache.delete(f"{student_.user}_json")
+        cache.delete(f"{student_.user}_ddl")
+        cache.delete(f"{student_.user}_sequence")
         # 1. Convert from draft
         response, answers = student_.draft_response.finalize(submit_at=timezone.now())
 
@@ -163,7 +166,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
     if hasattr(student, "draft_response"):
         draft_response: DraftResponse = student.draft_response
-        cache_key = f"draft_response_{student.user}"
+        cache_key = f"{student.user}_json"
         # 从 Redis 获取现有的答案缓存
         cached_answers = cache.get(cache_key, {})
 
@@ -244,7 +247,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     """
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
-
+    # print(student.name)
     # Check deadline.
     if draft_response.outdated():
         return HttpResponseForbidden(
@@ -254,13 +257,15 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     # 从 Redis 获取现有的答案json缓存
 
     # 获取序列号
-    cache_key = f"draft_response_{student.user}"
+    cache_key = student.user
     sequence = cache.get(f"{cache_key}_sequence")
 
     if sequence is None or sequence < int(time.time()):
         sequence = int(time.time())
         cache.set(f"{cache_key}_sequence", sequence, timeout=None)
-        cache.set(cache_key, request.POST, timeout=None)
+        cache.set(f"{cache_key}_ddl", draft_response.deadline, timeout=None)
+        cache.set(f"{cache_key}_json", request.POST, timeout=None)
+        
         return HttpResponse("Updated.")
     else:
         return HttpResponse("old sequence! Didn't Update.")
@@ -278,7 +283,7 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
 
-    cache_key = f"draft_response_{student.user}"
+    cache_key = f"{student.user}_json"
     # 从 Redis 获取现有的答案缓存
     cached_answers = cache.get(cache_key, {})
 
@@ -306,6 +311,9 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
 
             answer.save()
 
+    cache.delete(f"{student.user}_json")
+    cache.delete(f"{student.user}_ddl")
+    cache.delete(f"{student.user}_sequence")
     # 1. Convert from draft
     response, answers = student.draft_response.finalize(submit_at=timezone.now())
 
