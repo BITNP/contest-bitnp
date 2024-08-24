@@ -243,6 +243,7 @@ class ContestViewTests(TestCase):
 
     def test_bad_contest_update(self):
         """暂存非法数据
+
         这里每次更新的时候没有写入后端，所以测试的话获取的应该是不对的,这里就先不要测了
         """
         self.client.force_login(self.user)
