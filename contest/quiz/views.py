@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.http import (
     Http404,
     HttpResponse,
@@ -19,9 +20,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
-
-from django.core.cache import cache
-from django.db import transaction
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
