@@ -3,6 +3,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from random import sample
 from typing import TYPE_CHECKING
+import time
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -87,13 +88,6 @@ def continue_or_finalize(student_: Student) -> bool:
         response.save()
         response.answer_set.bulk_create(answers)
         student_.draft_response.delete()
-
-        # response, answers = draft.finalize(submit_at=draft.deadline)
-
-        # response.save()
-        # response.answer_set.bulk_create(answers)
-
-        # draft.delete()
 
         return True
 
@@ -232,13 +226,28 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
             f"You have missed the deadline: {draft_response.deadline.isoformat()}"
         )
 
-    cache_key = f"draft_response_{student.user}"
     # 从 Redis 获取现有的答案json缓存
 
-    print(cache_key)
-    cache.set(cache_key, request.POST, timeout=None)
+    # 获取序列号
+    cache_key = f"draft_response_{student.user}"
+    sequence = cache.get(f"{cache_key}_sequence")
 
-    return HttpResponse("Updated.")
+    print(sequence)
+
+    if sequence is None:
+        sequence = int(time.time())
+        cache.set(f"{cache_key}_sequence", sequence, timeout=None)
+        cache.set(cache_key, request.POST, timeout=None)
+        return HttpResponse("Updated.")
+    else:
+        if sequence < int(time.time()):
+            sequence = int(time.time())
+            cache.set(f"{cache_key}_sequence", sequence, timeout=None)
+            cache.set(cache_key, request.POST, timeout=None)
+            return HttpResponse("Updated.")
+        else:
+            return HttpResponse("old sequence! Didn't Update.")
+
 
 
 @login_required
