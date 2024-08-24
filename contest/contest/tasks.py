@@ -1,3 +1,5 @@
+"""定时清理"""
+
 import logging
 
 import redis
@@ -22,6 +24,7 @@ logger = logging.getLogger("django")
 
 @shared_task
 def auto_save_redis_to_database() -> None:
+    """同步 Redis 缓存到数据库"""
     # 获取 Redis 连接
     r = redis.Redis(host="127.0.0.1", port=6379, db=1)
     # 使用 scan_iter 获取所有键

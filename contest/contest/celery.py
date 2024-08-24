@@ -1,3 +1,5 @@
+"""定时任务设置"""
+
 import os
 
 from celery import Celery

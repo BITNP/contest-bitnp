@@ -165,8 +165,10 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     if hasattr(student, "draft_response"):
         """重发做到一半，但是未提交的试卷"""
         draft_response: DraftResponse = student.draft_response
+
+        # 同步 Redis 缓存到数据库
+        # TODO: 现在渲染模板没用缓存，仍在查实际数据库
         cache_key = f"{draft_response.id}_json"
-        # 从 Redis 获取现有的答案缓存,存储到实际的数据库中，缓存在这里没有使用，后面还是要查实际数据库
         cached_answers = cache.get(cache_key, {})
 
         if cached_answers is not None:

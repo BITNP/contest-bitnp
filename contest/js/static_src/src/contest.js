@@ -2,9 +2,6 @@ import Swal from 'sweetalert2'
 
 import { get_data } from './util'
 
-/** 时间允差，毫秒 */
-const TIME_MARGIN = 10 * 1e3
-
 const update_url = get_data('update-url')
 const deadline = Date.parse(get_data('deadline'))
 const deadline_duration_seconds = get_data('deadline-duration')
@@ -50,7 +47,7 @@ function update_contest_progress_end () {
                 filed_sets.forEach(set => { set.disabled = true })
                 sub_btn.disabled = true
                 sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, 'text-red-300/50')
-                document.querySelectorAll('a[href="/contest/"]').forEach(e => e.style = 'display: none !important')
+                document.querySelectorAll('a[href="/contest/"]').forEach(e => { e.style = 'display: none !important' })
             } else {
                 window.location.href = '/info'
             }
