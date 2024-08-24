@@ -4,7 +4,7 @@ from itertools import cycle
 
 from django.http import HttpRequest
 from django.shortcuts import render
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -20,6 +20,10 @@ from .models import (
     User,
 )
 from .views import select_questions
+
+dummy_cache = override_settings(
+    CACHES={"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"}}
+)
 
 
 class ResponseModelTests(TestCase):
@@ -139,6 +143,7 @@ class ScoreTests(TestCase):
         self.assertEqual(response.score(cache=False), constants.score_total)
 
 
+@dummy_cache
 class ContestViewTests(TestCase):
     """竞赛等视图"""
 
