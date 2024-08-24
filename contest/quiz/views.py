@@ -222,7 +222,6 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
                 question=q,
             )
 
-
     return render(
         request,
         "contest.html",
