@@ -232,8 +232,6 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     cache_key = f"draft_response_{student.user}"
     sequence = cache.get(f"{cache_key}_sequence")
 
-    print(sequence)
-
     if sequence is None:
         sequence = int(time.time())
         cache.set(f"{cache_key}_sequence", sequence, timeout=None)
