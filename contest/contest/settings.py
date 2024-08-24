@@ -242,8 +242,8 @@ if DEBUG or getenv("DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL"):
     QUIZ_OPENING_TIME_INTERVAL = (None, None)
 else:
     QUIZ_OPENING_TIME_INTERVAL = (
-        datetime(2023, 9, 1, tzinfo=ZoneInfo(TIME_ZONE)),
-        datetime(2023, 9, 3, tzinfo=ZoneInfo(TIME_ZONE)),
+        datetime(2024, 8, 27, tzinfo=ZoneInfo(TIME_ZONE)),
+        datetime(2024, 8, 30, tzinfo=ZoneInfo(TIME_ZONE)),
     )
 
 # 添加redis缓存
