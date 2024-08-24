@@ -168,8 +168,6 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         cache_key = f"{draft_response.id}_json"
         # 从 Redis 获取现有的答案缓存,存储到实际的数据库中，缓存在这里没有使用，后面还是要查实际数据库
         cached_answers = cache.get(cache_key, {})
-        print(type(cached_answers))
-        print(cached_answers)
 
         if cached_answers is not None:
             for question_id, choice_id in cached_answers.items():

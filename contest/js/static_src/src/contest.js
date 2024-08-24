@@ -62,7 +62,6 @@ function update_contest_progress_end () {
         console.log(err)
     })
     Swal.getHtmlContainer().innerHTML = '<p>答卷提交完毕，无法再更改答卷，但您还可以查看自己的答卷。</p><p>（截止前作答部分已保存）</p>'
-    
 }
 
 // 浏览器可能缓存之前答卷，因此进入页面后立即更新进度条

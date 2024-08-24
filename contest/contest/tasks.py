@@ -28,12 +28,10 @@ def auto_save_redis_to_database():
     keys = r.scan_iter("*_ddl")
     for key in keys:
         ddl_key = key.decode("utf-8")[3:]
-        print(ddl_key)
         ddl = cache.get(ddl_key)
         now = timezone.now()
         if ddl is not None:
             if ddl < now:
-                print(f"{ddl_key} redis auto save")
                 draft_response = DraftResponse.objects.get(pk=ddl_key[:-4])
 
                 cache_key = f"{ddl_key[:-4]}_json"
@@ -46,7 +44,6 @@ def auto_save_redis_to_database():
                         continue
 
                     if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                        print(f"{key} not choice-")
                         return
 
                     answer: DraftAnswer = get_object_or_404(
@@ -74,8 +71,7 @@ def auto_save_redis_to_database():
                 cache.delete(f"{draft_response.id}_ddl")
                 cache.delete(f"{draft_response.id}_sequence")
         else:
-            print(f"{key} None")
-
+            pass
     # 关闭 Redis 连接
     del keys
     r.close()
