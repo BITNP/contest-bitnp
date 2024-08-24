@@ -45,15 +45,15 @@ async function update_contest_progress_end () {
         cancelButtonText: '查看成绩',
         showCancelButton: true
     })
-    .then((msg) => {
-        if (msg.isConfirm) {
-            filed_sets.forEach(set => { set.disabled = true })
-            sub_btn.disabled = true
-            sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, "text-red-300/50")
-        } else {
-            window.location.href = "/info"
-        }
-    })
+        .then((msg) => {
+            if (msg.isConfirm) {
+                filed_sets.forEach(set => { set.disabled = true })
+                sub_btn.disabled = true
+                sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, 'text-red-300/50')
+            } else {
+                window.location.href = '/info'
+            }
+        })
     fetch(form.action, {
         method: form.method,
         body: formData,
@@ -61,7 +61,6 @@ async function update_contest_progress_end () {
         console.log(err)
     })
     Swal.getHtmlContainer().innerHTML = '<p>答卷提交完毕，无法再更改答卷，但您还可以查看自己的答卷。</p><p>（截止前作答部分已保存）</p>'
-    
 }
 
 // 浏览器可能缓存之前答卷，因此进入页面后立即更新进度条
