@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import time
 from http import HTTPStatus
 from random import sample
 from typing import TYPE_CHECKING
-import time
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.http import (
     Http404,
     HttpResponse,
@@ -20,9 +21,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
-
-from django.core.cache import cache
-from django.db import transaction
 
 from .constants import constants
 from .models import Choice, DraftResponse, Question
@@ -232,20 +230,13 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     cache_key = f"draft_response_{student.user}"
     sequence = cache.get(f"{cache_key}_sequence")
 
-    if sequence is None:
+    if sequence is None or sequence < int(time.time()):
         sequence = int(time.time())
         cache.set(f"{cache_key}_sequence", sequence, timeout=None)
         cache.set(cache_key, request.POST, timeout=None)
         return HttpResponse("Updated.")
     else:
-        if sequence < int(time.time()):
-            sequence = int(time.time())
-            cache.set(f"{cache_key}_sequence", sequence, timeout=None)
-            cache.set(cache_key, request.POST, timeout=None)
-            return HttpResponse("Updated.")
-        else:
-            return HttpResponse("old sequence! Didn't Update.")
-
+        return HttpResponse("old sequence! Didn't Update.")
 
 
 @login_required
