@@ -256,7 +256,6 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     cached_answers = cache.get(cache_key, {})
 
     if cached_answers is not None:
-
         for question_id, choice_id in cached_answers.items():
             # Filter out tokens
             if not question_id.startswith("question-"):
