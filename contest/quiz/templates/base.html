@@ -26,6 +26,11 @@
       .bg-img-info {
         background-image: url('{% static "img/bg-info.jpg" %}');
       }
+      #bitnp-logo {
+        width: 1.4em;
+        vertical-align:middle;
+        display: inline;
+      }
     </style>
   </head>
   <body class="h-full">
@@ -169,10 +174,7 @@
         <p class="text-center text-gray-500">北京理工大学 © {{ constants.YEAR }}</p>
         <div class="text-center text-gray-500 prose-a:underline">
           Powered by
-          <img src="{% static 'img/np.png' %}"
-               style="width: 1.4em;
-                      vertical-align:middle;
-                      display: inline">
+          <img id="bitnp-logo" src="{% static 'img/np.png' %}" alt="LOGO">
           <a href="https://www.bitnp.net/" target="_blank">北京理工大学网络开拓者协会</a>.
         </div>
       </footer>
