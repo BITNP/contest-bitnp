@@ -129,6 +129,10 @@ convention = "google"
 plugins = ["mypy_django_plugin.main"]
 mypy_path = "$MYPY_CONFIG_FILE_DIR/contest/"
 
+[[tool.mypy.overrides]]
+module = "celery.*"
+ignore_missing_imports = true
+
 [tool.django-stubs]
 django_settings_module = "contest.settings"
 
