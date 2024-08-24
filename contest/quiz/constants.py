@@ -57,14 +57,14 @@ class ConstantsNamespace:
     如更改总分，建议一同更改`admin.py`中`ScoreFilter`的`breakpoints`。
     """
 
-    DEADLINE_DURATION = timedelta(seconds=300)
+    DEADLINE_DURATION = timedelta(seconds=3)
     """作答限时"""
 
-    MAX_TRIES = 2
+    MAX_TRIES = 2 
     """答题次数上限"""
 
     YEAR = 2024
-    MONTH = 9
+    MONTH = 8
 
     ROUTES = {
         "quiz:index": PageMeta(title="主页", login_required=False),

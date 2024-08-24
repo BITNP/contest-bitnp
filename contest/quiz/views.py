@@ -56,32 +56,31 @@ def continue_or_finalize(student_: Student) -> bool:
         # 从 Redis 获取现有的答案缓存
         cached_answers = cache.get(cache_key, {})
 
-        for question_id, choice_id in cached_answers.items():
-            # Filter out tokens
-            if not question_id.startswith("question-"):
-                continue
+        if cached_answers:
+            for question_id, choice_id in cached_answers.items():
+                # Filter out tokens
+                if not question_id.startswith("question-"):
+                    continue
 
-            if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                return False
-                # return HttpResponseBadRequest(
-                #     f"Invalid choice ID “{choice_id}” for “{question_id}”."
-                # )
-            answer: DraftAnswer = get_object_or_404(
-                draft_response.answer_set,
-                question_id=int(question_id.removeprefix("question-")),
-            )
+                if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+                    return False
 
-            answer.choice = get_object_or_404(
-                Choice.objects,
-                pk=int(choice_id.removeprefix("choice-")),
-                question=answer.question,
-            )
+                answer: DraftAnswer = get_object_or_404(
+                    draft_response.answer_set,
+                    question_id=int(question_id.removeprefix("question-")),
+                )
 
-            answer.save()
+                answer.choice = get_object_or_404(
+                    Choice.objects,
+                    pk=int(choice_id.removeprefix("choice-")),
+                    question=answer.question,
+                )
 
-        cache.delete(f"{student_.user}_json")
-        cache.delete(f"{student_.user}_ddl")
-        cache.delete(f"{student_.user}_sequence")
+                answer.save()
+
+            cache.delete(f"{student_.user}_json")
+            cache.delete(f"{student_.user}_ddl")
+            
         # 1. Convert from draft
         response, answers = student_.draft_response.finalize(submit_at=timezone.now())
 
@@ -165,10 +164,13 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
 
     if hasattr(student, "draft_response"):
+        """重发做到一半，但是未提交的试卷"""
         draft_response: DraftResponse = student.draft_response
-        cache_key = f"{student.user}_json"
-        # 从 Redis 获取现有的答案缓存
+        cache_key = f"{draft_response.id}_json"
+        # 从 Redis 获取现有的答案缓存,存储到实际的数据库中，缓存在这里没有使用，后面还是要查实际数据库
         cached_answers = cache.get(cache_key, {})
+        print(type(cached_answers))
+        print(cached_answers)
 
         if cached_answers is not None:
             for question_id, choice_id in cached_answers.items():
@@ -193,6 +195,7 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
                 )
 
                 answer.save()
+
     else:
         # 如果超出答题次数，拒绝
         if student.response_set.count() >= constants.MAX_TRIES:
@@ -247,7 +250,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
     """
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
-    # print(student.name)
+
     # Check deadline.
     if draft_response.outdated():
         return HttpResponseForbidden(
@@ -256,19 +259,12 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
     # 从 Redis 获取现有的答案json缓存
 
-    # 获取序列号
-    cache_key = student.user
-    sequence = cache.get(f"{cache_key}_sequence")
+    cache_key = draft_response.id
 
-    if sequence is None or sequence < int(time.time()):
-        sequence = int(time.time())
-        cache.set(f"{cache_key}_sequence", sequence, timeout=None)
-        cache.set(f"{cache_key}_ddl", draft_response.deadline, timeout=None)
-        cache.set(f"{cache_key}_json", request.POST, timeout=None)
+    cache.set(f"{cache_key}_ddl", draft_response.deadline, timeout=None)
+    cache.set(f"{cache_key}_json", request.POST, timeout=None)
         
-        return HttpResponse("Updated.")
-    else:
-        return HttpResponse("old sequence! Didn't Update.")
+    return HttpResponse("Updated.")
 
 
 @login_required
@@ -278,42 +274,34 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     """交卷
 
-    只是将之前暂存的草稿归档，而本次发送的数据完全无用。
+
     """
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
 
-    cache_key = f"{student.user}_json"
-    # 从 Redis 获取现有的答案缓存
-    cached_answers = cache.get(cache_key, {})
+    for question_id, choice_id in request.POST.items():
+        # Filter out tokens
+        if not question_id.startswith("question-"):
+            continue
 
-    if cached_answers is not None:
-        for question_id, choice_id in cached_answers.items():
-            # Filter out tokens
-            if not question_id.startswith("question-"):
-                continue
-
-            if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                return HttpResponseBadRequest(
-                    f"Invalid choice ID “{choice_id}” for “{question_id}”."
-                )
-
-            answer: DraftAnswer = get_object_or_404(
-                draft_response.answer_set,
-                question_id=int(question_id.removeprefix("question-")),
+        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+            return HttpResponseBadRequest(
+                f"Invalid choice ID “{choice_id}” for “{question_id}”."
             )
 
-            answer.choice = get_object_or_404(
-                Choice.objects,
-                pk=int(choice_id.removeprefix("choice-")),
-                question=answer.question,
-            )
+        answer: DraftAnswer = get_object_or_404(
+            draft_response.answer_set,
+            question_id=int(question_id.removeprefix("question-")),
+        )
 
-            answer.save()
+        answer.choice = get_object_or_404(
+            Choice.objects,
+            pk=int(choice_id.removeprefix("choice-")),
+            question=answer.question,
+        )
 
-    cache.delete(f"{student.user}_json")
-    cache.delete(f"{student.user}_ddl")
-    cache.delete(f"{student.user}_sequence")
+        answer.save()
+
     # 1. Convert from draft
     response, answers = student.draft_response.finalize(submit_at=timezone.now())
 
@@ -321,6 +309,9 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     response.save()
     response.answer_set.bulk_create(answers)
     student.draft_response.delete()
+
+    cache.delete(f"{draft_response.id}_json")
+    cache.delete(f"{draft_response.id}_ddl")
 
     return HttpResponseRedirect(reverse("quiz:info"))
 

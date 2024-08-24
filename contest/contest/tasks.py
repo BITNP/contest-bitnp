@@ -12,7 +12,6 @@ from quiz.models import (
     Choice,
     DraftAnswer,
     DraftResponse,
-    Student,
 )
 # Get an instance of a logger
 logger = logging.getLogger('django')
@@ -32,8 +31,7 @@ def auto_save_redis_to_database():
         if ddl is not None:
             if ddl < now:
                 print(f'{ddl_key} redis auto save')
-                student = Student.objects.get(name=ddl_key[:-4])
-                draft_response: DraftResponse = student.draft_response
+                draft_response = DraftResponse.objects.get(pk=ddl_key[:-4])
 
                 cache_key = f"{ddl_key[:-4]}_json"
                 # # 从 Redis 获取现有的答案缓存
@@ -62,16 +60,16 @@ def auto_save_redis_to_database():
                     answer.save()
 
                 # 1. Convert from draft
-                response, answers = student.draft_response.finalize(submit_at=timezone.now())
+                response, answers = draft_response.finalize(submit_at=timezone.now())
 
                 # 2. Save
                 response.save()
                 response.answer_set.bulk_create(answers)
-                student.draft_response.delete()
+                draft_response.delete()
 
-                cache.delete(f"{student.user}_json")
-                cache.delete(f"{student.user}_ddl")
-                cache.delete(f"{student.user}_sequence")
+                cache.delete(f"{draft_response.id}_json")
+                cache.delete(f"{draft_response.id}_ddl")
+                cache.delete(f"{draft_response.id}_sequence")
         else:
             print(f'{key} None')
 
