@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 from http import HTTPStatus
 from random import sample
 from typing import TYPE_CHECKING
@@ -80,7 +79,7 @@ def continue_or_finalize(student_: Student) -> bool:
 
             cache.delete(f"{student_.user}_json")
             cache.delete(f"{student_.user}_ddl")
-            
+
         # 1. Convert from draft
         response, answers = student_.draft_response.finalize(submit_at=timezone.now())
 
@@ -263,7 +262,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 
     cache.set(f"{cache_key}_ddl", draft_response.deadline, timeout=None)
     cache.set(f"{cache_key}_json", request.POST, timeout=None)
-        
+
     return HttpResponse("Updated.")
 
 
@@ -272,10 +271,7 @@ def contest_update(request: AuthenticatedHttpRequest) -> HttpResponse:
 @pass_or_forbid(is_student_taking_contest, "请先前往答题再提交答卷。")
 @require_POST
 def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
-    """交卷
-
-
-    """
+    """交卷"""
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
 

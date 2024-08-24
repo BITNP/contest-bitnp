@@ -1,9 +1,11 @@
+import logging
+
+import redis
 from celery import shared_task
 from django.core.cache import cache
-import redis
-import logging
-from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
 # 这里的Lint报错是因为celery运行的时候需要cd到非根目录，
 # 导致运行的时候如果直接import contest.quiz.models会找不到
 # 所以就直接默认已经在contest路径里开始索引，因此lint会报错
@@ -13,24 +15,25 @@ from quiz.models import (
     DraftAnswer,
     DraftResponse,
 )
+
 # Get an instance of a logger
-logger = logging.getLogger('django')
+logger = logging.getLogger("django")
 
 
 @shared_task
 def auto_save_redis_to_database():
     # 获取 Redis 连接
-    r = redis.Redis(host='127.0.0.1', port=6379, db=1)
+    r = redis.Redis(host="127.0.0.1", port=6379, db=1)
     # 使用 scan_iter 获取所有键
-    keys = r.scan_iter('*_ddl')
+    keys = r.scan_iter("*_ddl")
     for key in keys:
-        ddl_key = key.decode('utf-8')[3:]
+        ddl_key = key.decode("utf-8")[3:]
         print(ddl_key)
         ddl = cache.get(ddl_key)
         now = timezone.now()
         if ddl is not None:
             if ddl < now:
-                print(f'{ddl_key} redis auto save')
+                print(f"{ddl_key} redis auto save")
                 draft_response = DraftResponse.objects.get(pk=ddl_key[:-4])
 
                 cache_key = f"{ddl_key[:-4]}_json"
@@ -43,7 +46,7 @@ def auto_save_redis_to_database():
                         continue
 
                     if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                        print(f'{key} not choice-')
+                        print(f"{key} not choice-")
                         return
 
                     answer: DraftAnswer = get_object_or_404(
@@ -71,7 +74,7 @@ def auto_save_redis_to_database():
                 cache.delete(f"{draft_response.id}_ddl")
                 cache.delete(f"{draft_response.id}_sequence")
         else:
-            print(f'{key} None')
+            print(f"{key} None")
 
     # 关闭 Redis 连接
     del keys
