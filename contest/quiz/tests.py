@@ -183,7 +183,7 @@ class ContestViewTests(TestCase):
         self.student = Student.objects.create(user=self.user)
 
     def test_info_view(self):
-        """访问个人中心"""
+        """访问历史成绩"""
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("quiz:info"))

@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 {% load my_humanize humanize %}
+{% block main_bg_style %}
+  bg-img-contest
+{% endblock main_bg_style %}
+{% block main_container_bg_style %}
+{% endblock main_container_bg_style %}
 {% block content %}
-  <p class="prose">提交时刻：{{ response.submit_at }}（{{ response.submit_at | naturaltime }}）。</p>
-  <p class="prose">单次成绩：{{ response.score | as_score }}分。</p>
+  <aside class="my-4 -mx-6 lg:-mx-8 p-4 sm:px-6 lg:px-8 bg-white shadow">
+    <p class="prose">提交时刻：{{ response.submit_at }}（{{ response.submit_at | naturaltime }}）。</p>
+    <p class="prose">单次成绩：{{ response.score | as_score }}分。</p>
+  </aside>
   <form class="prose">
     {% for a in response.answer_set.all %}
       <fieldset class="my-4 -mx-6 lg:-mx-8 p-4 sm:px-6 lg:px-8 bg-white shadow disabled:text-gray-400"

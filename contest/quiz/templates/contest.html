@@ -11,7 +11,7 @@
 {% endblock scripts %}
 {% block main %}
   {# 宽度超过 7xl / 80rem / 1280px 后，aside 与 header 右对齐 #}
-  <main class="mx-auto max-w-7xl w-full">
+  <main class="mx-auto max-w-7xl w-full bg-img-contest bg-fixed bg-center">
     {# 进度 #}
     <aside class="sticky top-0 md:top-4 mt-4 md:mr-4 min-[1280px]:mr-0 md:ml-auto md:w-80 p-2 bg-white shadow">
       <div class="grid grid-cols-[auto_1fr] mx-auto max-w-md items-center">
@@ -62,7 +62,19 @@
         {% endfor %}
         <div class="text-center">
           <button type="submit"
-                  class="px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">提交</button>
+                  class="text-lg text-red-700 font-bold px-4 py-2 bg-white shadow rounded-full hover:bg-gray-100">
+            <!-- https://heroicons.com/ arrow-up-tray -->
+            {# 图标上下不对称，不能按默认居中对齐，不然显得偏 #}
+            <svg class="size-6 inline align-text-bottom"
+                 xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="2"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            </svg>
+            提交
+          </button>
         </div>
       </form>
     </article>

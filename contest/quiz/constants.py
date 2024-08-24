@@ -63,13 +63,13 @@ class ConstantsNamespace:
     MAX_TRIES = 2
     """答题次数上限"""
 
-    YEAR = 2023
+    YEAR = 2024
     MONTH = 9
 
     ROUTES = {
         "quiz:index": PageMeta(title="主页", login_required=False),
         "quiz:contest": PageMeta(title="答题", login_required=True, reluctant=True),
-        "quiz:info": PageMeta(title="个人中心", login_required=True),
+        "quiz:info": PageMeta(title="历史成绩", login_required=True),
         "quiz:contest_review": PageMeta(title="回顾", login_required=True, reluctant=True),
     }
 

@@ -5,6 +5,9 @@
   <script type='module' src="{% static 'js/dist/index_and_info.js' %}"></script>
   {{ status | json_script:"data:status" }}
 {% endblock scripts %}
+{% block main_bg_style %}
+  bg-img-info
+{% endblock main_bg_style %}
 {% block content %}
   <div class="prose mb-4 prose-a:no-underline">
     <h2>成绩</h2>
@@ -26,7 +29,7 @@
              id="url-quiz-contest"
              class="text-lg px-4 py-2 bg-red-700 text-white shadow rounded-full hover:bg-red-500">
             <!-- https://heroicons.com/ arrow-left-on-rectangle -->
-            <svg class="h-6 w-6 inline"
+            <svg class="size-6 inline"
                  xmlns="http://www.w3.org/2000/svg"
                  fill="none"
                  viewBox="0 0 24 24"

@@ -18,6 +18,20 @@
     {% block scripts %}
     {% endblock scripts %}
     {% tailwind_css %}
+    {# 一般样式编译时能确定，请用 Tailwind；若需`{% static … %}`（部署时才确定），再加到这里 #}
+    <style>
+      .bg-img-contest {
+        background-image: url('{% static "img/bg-contest.jpg" %}');
+      }
+      .bg-img-info {
+        background-image: url('{% static "img/bg-info.jpg" %}');
+      }
+      #bitnp-logo {
+        width: 1.4em;
+        vertical-align:middle;
+        display: inline;
+      }
+    </style>
   </head>
   <body class="h-full">
     <div class="min-h-full grid grid-rows-[auto_1fr_auto]">
@@ -29,7 +43,7 @@
               <!-- Left nav -->
               <div class="flex items-center">
                 <div class="flex-shrink-0">
-                  <img class="h-8 w-8" src="{% static 'img/bit-icon.svg' %}" alt="北京理工大学">
+                  <img class="size-8" src="{% static 'img/bit-icon.svg' %}" alt="北京理工大学">
                 </div>
                 <div class="hidden md:block">
                   <div class="ml-10 flex items-baseline space-x-4">
@@ -77,7 +91,7 @@
                   <span class="absolute -inset-0.5"></span>
                   <span class="sr-only">打开主菜单</span>
                   <!-- Show if menu is closed -->
-                  <svg class="h-6 w-6"
+                  <svg class="size-6"
                        fill="none"
                        viewBox="0 0 24 24"
                        stroke-width="1.5"
@@ -86,7 +100,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                   </svg>
                   <!-- Show if menu is open -->
-                  <svg class="hidden h-6 w-6"
+                  <svg class="hidden size-6"
                        fill="none"
                        viewBox="0 0 24 24"
                        stroke-width="1.5"
@@ -139,23 +153,30 @@
         {% endblock heading %}
       </header>
       {% block main %}
-        <main>
-          <div class="mx-auto max-w-2xl py-6 px-6 lg:px-8">
+        <main class="bg-fixed bg-center
+                     {% block main_bg_style %}
+                     {% endblock main_bg_style %}">
+          <div class="mx-auto max-w-2xl py-6 px-6 lg:px-8
+                      {% block main_container_bg_style %}
+                        bg-gray-100/85 shadow
+                      {% endblock main_container_bg_style %}">
             {% block content %}
             {% endblock content %}
           </div>
         </main>
       {% endblock main %}
       <!-- Footer -->
-      <footer class="mt-4 pt-2 bg-gray-50 shadow-inner">
+      <footer class="pt-5 bg-gray-50 shadow-inner">
         <div class="flex gap-2 justify-center p-2">
           <img src="{% static 'img/bit-icon.svg' %}" alt="" class="h-8">
           <img src="{% static 'img/bit-text.svg' %}" alt="北京理工大学" class="h-8">
         </div>
         <p class="text-center text-gray-500">北京理工大学 © {{ constants.YEAR }}</p>
-        <p class="text-center text-gray-500 prose-a:underline">
-          Powered by <a href="https://www.bitnp.net/" target="_blank">Net Pioneer Association</a> of BIT. Designed by Lytning et al.
-        </p>
+        <div class="text-center text-gray-500 prose-a:underline">
+          Powered by
+          <img id="bitnp-logo" src="{% static 'img/np.png' %}" alt="LOGO">
+          <a href="https://www.bitnp.net/" target="_blank">北京理工大学网络开拓者协会</a>.
+        </div>
       </footer>
     </div>
   </body>
