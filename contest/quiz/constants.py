@@ -57,7 +57,7 @@ class ConstantsNamespace:
     如更改总分，建议一同更改`admin.py`中`ScoreFilter`的`breakpoints`。
     """
 
-    DEADLINE_DURATION = timedelta(seconds=3)
+    DEADLINE_DURATION = timedelta(seconds=300)
     """作答限时"""
 
     MAX_TRIES = 2
