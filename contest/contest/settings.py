@@ -256,7 +256,8 @@ CACHES = {
     }
 }
 
-# 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件
-import mimetypes
+# 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件,有MIME报错的时候可以解除注释然后强制刷新前端运行看看
+# 这个用法已经被取消，建议不要使用，而是更改注册表.js的属性
+# import mimetypes
 
-mimetypes.add_type("application/javascript", ".js")
+# mimetypes.add_type("application/javascript", ".js")
