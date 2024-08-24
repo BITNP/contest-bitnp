@@ -63,7 +63,7 @@ class ConstantsNamespace:
     MAX_TRIES = 2
     """答题次数上限"""
 
-    YEAR = 2023
+    YEAR = 2024
     MONTH = 9
 
     ROUTES = {
