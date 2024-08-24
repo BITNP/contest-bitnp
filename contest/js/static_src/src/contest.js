@@ -35,7 +35,7 @@ async function update_contest_progress () {
     })
 }
 
-async function update_contest_progress_end () {
+function update_contest_progress_end () {
     const formData = new FormData(form)
     Swal.fire({
         title: '此次作答已超时',
@@ -46,10 +46,11 @@ async function update_contest_progress_end () {
         showCancelButton: true
     })
     .then((msg) => {
-        if (msg.isConfirm) {
+        if (msg.isConfirmed) {
             filed_sets.forEach(set => { set.disabled = true })
             sub_btn.disabled = true
             sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, "text-red-300/50")
+            document.querySelectorAll("a[href=\"/contest/\"]").forEach(e => e.style = "display: none !important")
         } else {
             window.location.href = "/info"
         }
