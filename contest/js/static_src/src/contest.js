@@ -45,16 +45,16 @@ function update_contest_progress_end () {
         cancelButtonText: '查看成绩',
         showCancelButton: true
     })
-    .then((msg) => {
-        if (msg.isConfirmed) {
-            filed_sets.forEach(set => { set.disabled = true })
-            sub_btn.disabled = true
-            sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, "text-red-300/50")
-            document.querySelectorAll("a[href=\"/contest/\"]").forEach(e => e.style = "display: none !important")
-        } else {
-            window.location.href = "/info"
-        }
-    })
+        .then((msg) => {
+            if (msg.isConfirmed) {
+                filed_sets.forEach(set => { set.disabled = true })
+                sub_btn.disabled = true
+                sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, 'text-red-300/50')
+                document.querySelectorAll('a[href="/contest/"]').forEach(e => e.style = 'display: none !important')
+            } else {
+                window.location.href = '/info'
+            }
+        })
     fetch(form.action, {
         method: form.method,
         body: formData,
