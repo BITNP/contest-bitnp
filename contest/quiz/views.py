@@ -22,7 +22,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
 from .constants import constants
-from .models import Choice, DraftResponse, Question
+from .models import Choice, DraftAnswer, DraftResponse, Question
 from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
     from django.contrib.auth.models import AnonymousUser
 
-    from .models import DraftAnswer, Student, User
+    from .models import Student, User
     from .util import AuthenticatedHttpRequest
 
 
@@ -222,10 +222,9 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
         # 保存
         draft_response.save()
-        for q in questions:
-            draft_response.answer_set.create(
-                question=q,
-            )
+        draft_response.answer_set.bulk_create(
+            [DraftAnswer(question=q, response=draft_response) for q in questions]
+        )
 
     return render(
         request,
