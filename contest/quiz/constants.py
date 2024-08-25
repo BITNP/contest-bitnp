@@ -64,7 +64,7 @@ class ConstantsNamespace:
     """答题次数上限"""
 
     YEAR = 2024
-    MONTH = 9
+    MONTH = 8
 
     ROUTES = {
         "quiz:index": PageMeta(title="主页", login_required=False),

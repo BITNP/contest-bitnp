@@ -86,6 +86,7 @@
     # 在 justfile 开头加上以下任意一行
     set shell := ["cmd.exe", "/c"]
     set shell := ["powershell.exe", "-c"]
+    # 更改后请勿提交到仓库中，因为CI和每人的设备不一样。
     ```
 
   > **Note**

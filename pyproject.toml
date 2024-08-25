@@ -16,6 +16,11 @@ humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
 django-tailwind = "^3.6.0"
 pyyaml = "^6.0.1"
+django-redis = "^5.2.0"  # 添加 django-redis 依赖
+celery = "^5.4.0"
+eventlet = "^0.36.1"
+django-celery-beat = "^2.6.0"
+
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
@@ -123,6 +128,10 @@ convention = "google"
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 mypy_path = "$MYPY_CONFIG_FILE_DIR/contest/"
+
+[[tool.mypy.overrides]]
+module = "celery.*"
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "contest.settings"

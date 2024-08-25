@@ -1,8 +1,7 @@
-/fixtures/NGE.yaml
-/fixtures/problems.*
-/fixtures/*题库*.md
-/fixtures/*题库*.yaml
+/fixtures/*
+!/fixtures/NGE.md
 
+*.rdb
 *.xlsx
 *.csv
 *.jsonl

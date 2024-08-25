@@ -2,9 +2,6 @@ import Swal from 'sweetalert2'
 
 import { get_data } from './util'
 
-/** 时间允差，毫秒 */
-const TIME_MARGIN = 10 * 1e3
-
 const update_url = get_data('update-url')
 const deadline = Date.parse(get_data('deadline'))
 const deadline_duration_seconds = get_data('deadline-duration')
@@ -18,6 +15,8 @@ const inputs = filed_sets.map(set => Array.from(set.querySelectorAll('input')))
 const contest_bar = document.querySelector('div#contest-progress-bar')
 /** @type {HTMLSpanElement} */
 const contest_text = document.querySelector('span#contest-progress-text')
+/** @type {HTMLButtonElement} */
+const sub_btn = document.querySelector('button.text-lg')
 
 function display_contest_progress () {
     const n_completed = inputs.filter(set => set.some(i => i.checked)).length
@@ -27,36 +26,39 @@ function display_contest_progress () {
 }
 
 async function update_contest_progress () {
-    const response = await fetch(update_url, {
+    await fetch(update_url, {
         method: 'POST',
         body: new FormData(form)
     })
-    if (!response.ok && response.status === 403) {
-        // 锁定表单
-        filed_sets.forEach(set => { set.disabled = true })
-
-        // 提示提交
-        const result = await Swal.fire({
-            title: '此次作答已超时',
-            html: '<p>无法再更改答卷，但您还可以查看自己的答卷。</p><p>（截止前作答部分已尽量保存）</p>',
-            icon: 'warning',
-            confirmButtonText: '现在提交',
-            showCancelButton: true,
-            cancelButtonText: '再看看答卷',
-            showCloseButton: true,
-        })
-        if (result.isConfirmed) {
-            form.submit()
-        }
-    }
 }
 
-function update_contest_progress_periodically () {
-    // 若之前同步时仍有时间，则继续定期同步
-    if (!filed_sets[0].disabled) {
-        setTimeout(update_contest_progress_periodically, TIME_MARGIN / 16)
-    }
-    return update_contest_progress()
+function update_contest_progress_end () {
+    const formData = new FormData(form)
+    Swal.fire({
+        title: '此次作答已超时',
+        html: '<p>正在提交中...</p>',
+        icon: 'warning',
+        confirmButtonText: '查看答卷',
+        cancelButtonText: '查看成绩',
+        showCancelButton: true
+    })
+        .then((msg) => {
+            if (msg.isConfirmed) {
+                filed_sets.forEach(set => { set.disabled = true })
+                sub_btn.disabled = true
+                sub_btn.className = sub_btn.className.replace(/text-red-.*?[ ]/ig, 'text-red-300/50')
+                document.querySelectorAll('a[href="/contest/"]').forEach(e => { e.style = 'display: none !important' })
+            } else {
+                window.location.href = '/info'
+            }
+        })
+    fetch(form.action, {
+        method: form.method,
+        body: formData,
+    }).catch(err => {
+        console.log(err)
+    })
+    Swal.getHtmlContainer().innerHTML = '<p>答卷提交完毕，无法再更改答卷，但您还可以查看自己的答卷。</p><p>（截止前作答部分已保存）</p>'
 }
 
 // 浏览器可能缓存之前答卷，因此进入页面后立即更新进度条
@@ -68,8 +70,8 @@ form.addEventListener('input', () => {
     display_contest_progress()
 })
 
-// 将近截止时定期更新
-setTimeout(update_contest_progress_periodically, deadline - Date.now() - TIME_MARGIN)
+// 截止时提交
+setTimeout(update_contest_progress_end, deadline - Date.now())
 
 //! 时间
 
