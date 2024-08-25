@@ -22,7 +22,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
 from .constants import constants
-from .models import Choice, DraftResponse, Question
+from .models import Choice, DraftAnswer, DraftResponse, Question
 from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
@@ -30,11 +30,11 @@ if TYPE_CHECKING:
 
     from django.contrib.auth.models import AnonymousUser
 
-    from .models import DraftAnswer, Student, User
+    from .models import Student, User
     from .util import AuthenticatedHttpRequest
 
 
-def continue_or_finalize(student_: Student) -> bool:
+def continue_or_finalize(draft_response: DraftResponse) -> bool:
     """自动提交
 
     若草稿已超期，则定稿，否则什么也不做。
@@ -47,13 +47,9 @@ def continue_or_finalize(student_: Student) -> bool:
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
     """
-    draft_response: DraftResponse = student_.draft_response
-
     if draft_response.outdated():
-        # 提交之前的草稿
-        cache_key = f"{student_.user}_json"
         # 从 Redis 获取现有的答案缓存
-        cached_answers = cache.get(cache_key, {})
+        cached_answers = cache.get(f"{draft_response.id}_json", {})
 
         if cached_answers:
             for question_id, choice_id in cached_answers.items():
@@ -77,16 +73,18 @@ def continue_or_finalize(student_: Student) -> bool:
 
                 answer.save()
 
-            cache.delete(f"{student_.user}_json")
-            cache.delete(f"{student_.user}_ddl")
+            cache.delete(f"{draft_response.id}_json")
+            cache.delete(f"{draft_response.id}_ddl")
+
+        # 提交之前的草稿
 
         # 1. Convert from draft
-        response, answers = student_.draft_response.finalize(submit_at=timezone.now())
+        response, answers = draft_response.finalize(submit_at=timezone.now())
 
         # 2. Save
         response.save()
         response.answer_set.bulk_create(answers)
-        student_.draft_response.delete()
+        draft_response.delete()
 
         return True
 
@@ -103,7 +101,7 @@ def manage_status(
         if not hasattr(student, "draft_response"):
             return "not taking"
         else:
-            finalized = continue_or_finalize(student)
+            finalized = continue_or_finalize(student.draft_response)
             if finalized:
                 return "deadline passed"
             else:
@@ -222,16 +220,19 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
 
         # 保存
         draft_response.save()
-        for q in questions:
-            draft_response.answer_set.create(
-                question=q,
-            )
+        draft_response.answer_set.bulk_create(
+            [DraftAnswer(question=q, response=draft_response) for q in questions]
+        )
 
     return render(
         request,
         "contest.html",
         {
             "draft_response": draft_response,
+            # 为渲染模板预先从数据库查询相关内容
+            "answer_set": draft_response.answer_set.select_related(
+                "question"
+            ).prefetch_related("question__choice_set"),
             "constants": constants,
         },
     )
