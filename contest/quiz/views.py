@@ -231,6 +231,8 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         "contest.html",
         {
             "draft_response": draft_response,
+            # 为渲染模板预先从数据库查询相关内容
+            "answer_set": draft_response.answer_set.select_related("question", "choice"),
             "constants": constants,
         },
     )
