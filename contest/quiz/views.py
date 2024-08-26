@@ -110,6 +110,12 @@ def manage_status(
         return ""
 
 
+def calc_traffic() -> float:
+    """估计当前在线人数占系统能力的比例"""
+    # TODO: 此处是经验公式，应该按实际情况更新
+    return DraftResponse.objects.count() / 400
+
+
 class IndexView(TemplateView):
     """首页"""
 
@@ -126,6 +132,7 @@ class IndexView(TemplateView):
 
         context["status"] = manage_status(self.request.user)
         context["constants"] = constants
+        context["traffic"] = calc_traffic()
 
         return context
 
