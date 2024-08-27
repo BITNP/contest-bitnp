@@ -22,7 +22,7 @@ from .settings import CACHES
 
 # Get an instance of a logger
 logger = logging.getLogger("django")
-REDIS_LINK = CACHES["default"]["LOCATION"]
+REDIS_LINK = CACHES.default.LOCATION
 # redis://127.0.0.1:6379/1
 REDIS_HOST = REDIS_LINK[8:].split(":")[0]
 REDIS_PORT_DB = REDIS_LINK[8:].split(":")[1].split("/")
