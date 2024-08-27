@@ -73,3 +73,10 @@ watch-js:
 # 构建 js
 build-js:
     pnpm --dir {{ src_dir }}/js/static_src/ run build
+
+# celery
+task-beat:
+    cd {{ src_dir }} ; celery -A contest beat -l info
+
+task-worker:
+    cd {{ src_dir }} ; celery -A contest worker -P eventlet -l info
