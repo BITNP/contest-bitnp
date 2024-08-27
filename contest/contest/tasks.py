@@ -8,8 +8,6 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .settings import CACHES
-
 # 这里的Lint报错是因为celery运行的时候需要cd到非根目录，
 # 导致运行的时候如果直接import contest.quiz.models会找不到
 # 所以就直接默认已经在contest路径里开始索引，因此lint会报错
@@ -19,6 +17,8 @@ from quiz.models import (
     DraftAnswer,
     DraftResponse,
 )
+
+from .settings import CACHES
 
 # Get an instance of a logger
 logger = logging.getLogger("django")
