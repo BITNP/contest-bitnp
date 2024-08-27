@@ -8,6 +8,15 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from .settings import CACHES
+
+REDIS_LINK = CACHES["default"]["LOCATION"]
+# redis://127.0.0.1:6379/1
+REDIS_HOST = REDIS_LINK[8:].split(":")[0]
+REDIS_PORT_DB = REDIS_LINK[8:].split(":")[1].split("/")
+REDIS_PORT = int(REDIS_PORT_DB[0])
+REDIS_DB = int(REDIS_PORT_DB[1])
+
 # 这里的Lint报错是因为celery运行的时候需要cd到非根目录，
 # 导致运行的时候如果直接import contest.quiz.models会找不到
 # 所以就直接默认已经在contest路径里开始索引，因此lint会报错
@@ -26,7 +35,7 @@ logger = logging.getLogger("django")
 def auto_save_redis_to_database() -> None:
     """将过期的卷子草稿提交的celery任务"""
     # 获取 Redis 连接
-    r = redis.Redis(host="127.0.0.1", port=6379, db=1)
+    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
     # 使用 scan_iter 获取所有键
     keys = r.scan_iter("*_ddl")
     if keys is None:
