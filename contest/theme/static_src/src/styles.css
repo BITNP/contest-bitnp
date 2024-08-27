@@ -13,3 +13,14 @@
 .time-progress-severe {
     animation: blinking 1s infinite
 }
+
+/* sweetalert2 */
+div:where(.swal2-container) .swal2-icon-warning {
+    div:where(.swal2-timer-progress-bar) {
+        background: #ff9030;
+    }
+
+    div:where(.swal2-loader) {
+        border-color: #f8bb86 rgba(0, 0, 0, 0) #f8bb86 rgba(0, 0, 0, 0);
+    }
+}

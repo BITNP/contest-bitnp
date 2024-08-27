@@ -4,6 +4,7 @@
 {% block scripts %}
   <script type='module' src="{% static 'js/dist/index_and_info.js' %}"></script>
   {{ status | json_script:"data:status" }}
+  {{ traffic | json_script:"data:traffic" }}
 {% endblock scripts %}
 {% block main_bg_style %}
   bg-img-info
