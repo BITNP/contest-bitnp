@@ -40,13 +40,15 @@ def auto_save_redis_to_database() -> None:
                     # # 从 Redis 获取现有的答案缓存
                     cached_answers = cache.get(cache_key, {})
 
-                    if cached_answers is not None: # 防止未提交的是白卷
+                    if cached_answers is not None:  # 防止未提交的是白卷
                         for question_id, choice_id in cached_answers.items():
                             # Filter out tokens
                             if not question_id.startswith("question-"):
                                 continue
 
-                            if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+                            if not isinstance(choice_id, str) or not choice_id.startswith(
+                                "choice-"
+                            ):
                                 return
 
                             answer: DraftAnswer = get_object_or_404(
@@ -75,4 +77,4 @@ def auto_save_redis_to_database() -> None:
                     print(e)
 
                 r.delete(key)
-                r.delete(':1:' + ddl_key[:-4] + '_json')
+                r.delete(":1:" + ddl_key[:-4] + "_json")
