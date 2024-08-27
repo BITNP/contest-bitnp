@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from .util import AuthenticatedHttpRequest
 
 
-def continue_or_finalize(draft_response: DraftResponse) -> bool:
+def continue_or_finalize(draft: DraftResponse) -> bool:
     """自动提交
 
     若草稿已超期，则定稿，否则什么也不做。
@@ -47,9 +47,9 @@ def continue_or_finalize(draft_response: DraftResponse) -> bool:
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
     """
-    if draft_response.outdated():
+    if draft.outdated():
         # 从 Redis 获取现有的答案缓存
-        cached_answers = cache.get(f"{draft_response.id}_json", {})
+        cached_answers = cache.get(f"{draft.id}_json", {})
 
         if cached_answers:
             for question_id, choice_id in cached_answers.items():
@@ -61,7 +61,7 @@ def continue_or_finalize(draft_response: DraftResponse) -> bool:
                     return False
 
                 answer: DraftAnswer = get_object_or_404(
-                    draft_response.answer_set,
+                    draft.answer_set,
                     question_id=int(question_id.removeprefix("question-")),
                 )
 
@@ -73,18 +73,18 @@ def continue_or_finalize(draft_response: DraftResponse) -> bool:
 
                 answer.save()
 
-            cache.delete(f"{draft_response.id}_json")
-            cache.delete(f"{draft_response.id}_ddl")
+            cache.delete(f"{draft.id}_json")
+            cache.delete(f"{draft.id}_ddl")
 
         # 提交之前的草稿
 
         # 1. Convert from draft
-        response, answers = draft_response.finalize(submit_at=timezone.now())
+        response, answers = draft.finalize(submit_at=draft.deadline)
 
         # 2. Save
         response.save()
         response.answer_set.bulk_create(answers)
-        draft_response.delete()
+        draft.delete()
 
         return True
 

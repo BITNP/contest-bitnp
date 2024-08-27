@@ -29,7 +29,7 @@ def auto_save_redis_to_database() -> None:
         ddl = cache.get(f"{pk}_ddl")
         if ddl is not None and ddl < timezone.now():
             try:
-                draft_response = DraftResponse.objects.get(pk=pk)
+                draft = DraftResponse.objects.get(pk=pk)
                 cached_answers = cache.get(f"{pk}_json", {})
 
                 # 同步 Redis 缓存到数据库
@@ -46,7 +46,7 @@ def auto_save_redis_to_database() -> None:
                             return
 
                         answer: DraftAnswer = get_object_or_404(
-                            draft_response.answer_set,
+                            draft.answer_set,
                             question_id=int(question_id.removeprefix("question-")),
                         )
 
@@ -59,12 +59,12 @@ def auto_save_redis_to_database() -> None:
                         answer.save()
 
                     # 1. Convert from draft
-                    response, answers = draft_response.finalize(submit_at=timezone.now())
+                    response, answers = draft.finalize(submit_at=draft.deadline)
 
                     # 2. Save
                     response.save()
                     response.answer_set.bulk_create(answers)
-                    draft_response.delete()
+                    draft.delete()
 
             except DraftResponse.DoesNotExist as e:
                 # TODO: 需要认真报错
