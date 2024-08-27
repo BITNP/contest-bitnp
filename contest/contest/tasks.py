@@ -1,5 +1,3 @@
-"""定时清理"""
-
 import logging
 
 import redis
@@ -24,57 +22,57 @@ logger = logging.getLogger("django")
 
 @shared_task
 def auto_save_redis_to_database() -> None:
-    """同步 Redis 缓存到数据库"""
     # 获取 Redis 连接
     r = redis.Redis(host="127.0.0.1", port=6379, db=1)
     # 使用 scan_iter 获取所有键
     keys = r.scan_iter("*_ddl")
+    if keys is None:
+        return
     for key in keys:
         ddl_key = key.decode("utf-8")[3:]
         ddl = cache.get(ddl_key)
         now = timezone.now()
         if ddl is not None:
             if ddl < now:
-                draft_response = DraftResponse.objects.get(pk=ddl_key[:-4])
+                try:
+                    draft_response = DraftResponse.objects.get(id=int(ddl_key[:-4]))
+                    cache_key = f"{ddl_key[:-4]}_json"
+                    # # 从 Redis 获取现有的答案缓存
+                    cached_answers = cache.get(cache_key, {})
 
-                cache_key = f"{ddl_key[:-4]}_json"
-                # # 从 Redis 获取现有的答案缓存
-                cached_answers = cache.get(cache_key, {})
+                    if cached_answers is not None: # 防止未提交的是白卷
+                        for question_id, choice_id in cached_answers.items():
+                            # Filter out tokens
+                            if not question_id.startswith("question-"):
+                                continue
 
-                for question_id, choice_id in cached_answers.items():
-                    # Filter out tokens
-                    if not question_id.startswith("question-"):
-                        continue
+                            if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
+                                return
 
-                    if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                        return
+                            answer: DraftAnswer = get_object_or_404(
+                                draft_response.answer_set,
+                                question_id=int(question_id.removeprefix("question-")),
+                            )
 
-                    answer: DraftAnswer = get_object_or_404(
-                        draft_response.answer_set,
-                        question_id=int(question_id.removeprefix("question-")),
-                    )
+                            answer.choice = get_object_or_404(
+                                Choice.objects,
+                                pk=int(choice_id.removeprefix("choice-")),
+                                question=answer.question,
+                            )
 
-                    answer.choice = get_object_or_404(
-                        Choice.objects,
-                        pk=int(choice_id.removeprefix("choice-")),
-                        question=answer.question,
-                    )
+                            answer.save()
 
-                    answer.save()
+                    # 1. Convert from draft
+                    response, answers = draft_response.finalize(submit_at=timezone.now())
 
-                # 1. Convert from draft
-                response, answers = draft_response.finalize(submit_at=timezone.now())
+                    # 2. Save
+                    response.save()
+                    response.answer_set.bulk_create(answers)
+                    draft_response.delete()
 
-                # 2. Save
-                response.save()
-                response.answer_set.bulk_create(answers)
-                draft_response.delete()
+                except DraftResponse.DoesNotExist as e:
+                    print("here is tasks.py 74 line")
+                    print(e)
 
-                cache.delete(f"{draft_response.id}_json")
-                cache.delete(f"{draft_response.id}_ddl")
-                cache.delete(f"{draft_response.id}_sequence")
-        else:
-            pass
-    # 关闭 Redis 连接
-    del keys
-    r.close()
+                r.delete(key)
+                r.delete(':1:' + ddl_key[:-4] + '_json')
