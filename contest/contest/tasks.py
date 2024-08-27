@@ -1,3 +1,4 @@
+""" celery tasks """
 import logging
 
 import redis
