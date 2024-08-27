@@ -1,4 +1,5 @@
-""" celery tasks """
+"""celery tasks"""
+
 import logging
 
 import redis
