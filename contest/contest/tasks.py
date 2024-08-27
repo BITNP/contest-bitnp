@@ -10,13 +10,6 @@ from django.utils import timezone
 
 from .settings import CACHES
 
-REDIS_LINK = CACHES["default"]["LOCATION"]
-# redis://127.0.0.1:6379/1
-REDIS_HOST = REDIS_LINK[8:].split(":")[0]
-REDIS_PORT_DB = REDIS_LINK[8:].split(":")[1].split("/")
-REDIS_PORT = int(REDIS_PORT_DB[0])
-REDIS_DB = int(REDIS_PORT_DB[1])
-
 # 这里的Lint报错是因为celery运行的时候需要cd到非根目录，
 # 导致运行的时候如果直接import contest.quiz.models会找不到
 # 所以就直接默认已经在contest路径里开始索引，因此lint会报错
@@ -29,6 +22,12 @@ from quiz.models import (
 
 # Get an instance of a logger
 logger = logging.getLogger("django")
+REDIS_LINK = CACHES["default"]["LOCATION"]
+# redis://127.0.0.1:6379/1
+REDIS_HOST = REDIS_LINK[8:].split(":")[0]
+REDIS_PORT_DB = REDIS_LINK[8:].split(":")[1].split("/")
+REDIS_PORT = int(REDIS_PORT_DB[0])
+REDIS_DB = int(REDIS_PORT_DB[1])
 
 
 @shared_task
