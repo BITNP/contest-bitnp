@@ -113,7 +113,7 @@ def manage_status(
 def calc_traffic() -> float:
     """估计当前在线人数占系统能力的比例"""
     # TODO: 此处是经验公式，应该按实际情况更新
-    return DraftResponse.objects.count() / 400
+    return DraftResponse.objects.count() / constants.MAX_TRAFFIC
 
 
 class IndexView(TemplateView):
