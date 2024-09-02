@@ -63,6 +63,9 @@ class ConstantsNamespace:
     MAX_TRIES = 2
     """答题次数上限"""
 
+    MAX_TRAFFIC = 400
+    """最大系统承载人数"""
+
     YEAR = 2024
     MONTH = 8
 

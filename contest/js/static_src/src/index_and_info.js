@@ -32,7 +32,6 @@ if (status !== 'taking contest') {
         anchor.addEventListener('click', async (event) => {
             // 后续请求异步，必须先阻止
             event.preventDefault()
-
             // 如果系统仍有能力，正常答题；不然建议稍后参与
             // 为避免进一步向后端施压，这部分逻辑在前端实现，并尽可能拖延时间
             if (traffic < 0.90) {
@@ -52,7 +51,7 @@ if (status !== 'taking contest') {
                 let interval
                 await Swal.fire({
                     title: '非常抱歉',
-                    html: `<p>当前答题人数已达容量 ${(traffic * 100).toFixed()}%，现在答题成绩可能异常。</p><p>建议您等<strong></strong>秒再重新参与。</p>`,
+                    html: '<p>当前答题人数已达上限。</p><p>请等<strong></strong>秒再重新参与。</p>',
                     icon: 'warning',
                     timer: TIME_TO_WAIT_IF_JAMMED * 1000, // ms
                     timerProgressBar: true,
@@ -63,6 +62,8 @@ if (status !== 'taking contest') {
                             tick.textContent = `${(Swal.getTimerLeft() / 1000).toFixed()}`
                         }, 500)
                     },
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
                     willClose: () => clearInterval(interval),
                 })
 
