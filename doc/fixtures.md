@@ -81,7 +81,7 @@ Unexpected Farewell ~ Making Things Even
 
 > [!WARNING]
 >
-> [`NGE.md`](../fixtures/NGE.md)并非 simple markdown 格式。另外，NGE的数据并不规范，例如判断题可能有不知两个选项。
+> [`NGE.md`](../fixtures/NGE.md)并非 simple markdown 格式。另外，NGE的数据并不规范，例如判断题可能有不止两个选项。
 
 从 [FGC:Main - EvaWiki](https://wiki.evageeks.org/FGC:Main) 复制得到`NGE.md`。
 
