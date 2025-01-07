@@ -16,7 +16,7 @@ from django.utils import timezone
 from quiz.models import Choice, DraftAnswer, DraftResponse
 
 if TYPE_CHECKING:
-    from typing import Generator
+    from collections.abc import Generator
 
 
 @shared_task
