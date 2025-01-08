@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from django.core.management.base import BaseCommand
 
 if TYPE_CHECKING:
-    from typing import Generator
+    from collections.abc import Generator
 
 from typing import TYPE_CHECKING
 

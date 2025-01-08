@@ -92,8 +92,6 @@ ignore = [
     "D415",   # ends-in-punctuation, because of Chinese
     "ANN002", # missing-type-args
     "ANN003", # missing-type-kwargs
-    "ANN101", # missing-type-self
-    "ANN102", # missing-type-cls
 ]
 ignore-init-module-imports = true
 

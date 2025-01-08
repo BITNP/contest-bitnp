@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 from warnings import warn
 
 if TYPE_CHECKING:
-    from typing import Generator, Iterator
+    from collections.abc import Generator, Iterator
 
 # 参考`django.core.serializers.pyyaml`。
 # https://github.com/django/django/blob/9946f0b0d9356b55e819f861b31615fa5b548f99/django/core/serializers/pyyaml.py
