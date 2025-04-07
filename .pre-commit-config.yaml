@@ -10,7 +10,7 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=2048]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.8.6"
+    rev: "v0.11.4"
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --show-fixes]
@@ -23,7 +23,7 @@ repos:
           - --quiet
       - id: djlint-django
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.17.0
+    rev: v9.24.0
     hooks:
       - id: eslint
         args:
@@ -35,7 +35,7 @@ repos:
           - eslint-plugin-n@^15.0.0 || ^16.0.0
           - eslint-plugin-promise@^6.0.0
   - repo: https://github.com/crate-ci/typos
-    rev: dictgen-v0.3.1
+    rev: v1
     hooks:
       - id: typos
 
