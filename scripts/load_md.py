@@ -63,9 +63,9 @@ def dump_objects(
     else:
         category = "R"
 
-    assert (
-        len([c for c in choices if c.correct]) == 1
-    ), f"正确选项应当只有一个，可能忘了用“# ”分隔题目：{choices}"
+    assert len([c for c in choices if c.correct]) == 1, (
+        f"正确选项应当只有一个，可能忘了用“# ”分隔题目：{choices}"
+    )
 
     assert len(choices) > 1, f"选项不应只有一个：{choices}"
 
