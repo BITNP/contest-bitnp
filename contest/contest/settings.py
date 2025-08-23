@@ -213,10 +213,16 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 if getenv("DJANGO_PRODUCTION"):
-    CAS_SERVER_URL = "https://login.bit.edu.cn/cas/"
+    CAS_SERVER_URL = "https://sso.bit.edu.cn/cas/"
     CAS_ROOT_PROXIED_AS = "https://contest.bitnp.net"
 else:
-    CAS_SERVER_URL = "https://login.bit.edu.cn/devcas/"
+    # CAS_SERVER_URL = "https://sso.bit.edu.cn/devcas/"
+
+    # After upgrading to SSO, the devcas entrypoint has been removed.
+    # Now you should start a mock CAS server. 
+    MOCK_SERVER_URL = "http://localhost:28080/cas/"
+
+    CAS_SERVER_URL = MOCK_SERVER_URL
     CAS_CHECK_NEXT = False
 
 CAS_LOGIN_URL_NAME = LOGIN_URL
