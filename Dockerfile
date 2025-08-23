@@ -27,7 +27,7 @@ COPY --from=build /usr/src/app /usr/src/app
 WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/requirements.txt
-RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+RUN pip config set global.index-url https://mirrors.ustc.edu.cn/pypi/simple && \
     pip install -r requirements.txt --no-cache-dir && \
     touch /usr/src/app/README.md && \
     python3 manage.py collectstatic --noinput

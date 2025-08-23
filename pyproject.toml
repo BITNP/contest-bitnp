@@ -55,8 +55,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [[tool.poetry.source]]
-name = "tuna"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+name = "ustc"
+url = "https://mirrors.ustc.edu.cn/pypi/simple"
 priority = "primary"
 
 [tool.ruff]
