@@ -142,15 +142,15 @@ DATABASES = {
     }
 }
 
-if getenv("DJANGO_PRODUCTION"):
+if getenv("DJANGO_PRODUCTION") and getenv("DATABASE_PASSWORD"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": getenv("POSTGRES_DB", "contest"),
-            "USER": getenv("POSTGRES_USER", "contest"),
-            "PASSWORD": getenv("POSTGRES_PASSWORD", ""),
-            "HOST": getenv("POSTGRES_HOST", "localhost"),
-            "PORT": getenv("POSTGRES_PORT", "5432"),
+            "NAME": "contest",
+            "USER": "bitnp",
+            "PASSWORD": getenv("DATABASE_PASSWORD"),
+            "HOST": getenv("DATABASE_HOST") or "127.0.0.1",
+            "PORT": getenv("DATABASE_PORT") or "5432",
             "CONN_MAX_AGE": 60,
         }
     }
@@ -219,7 +219,7 @@ else:
     # CAS_SERVER_URL = "https://sso.bit.edu.cn/devcas/"
 
     # After upgrading to SSO, the devcas entrypoint has been removed.
-    # Now you should start a mock CAS server. 
+    # Now you should start a mock CAS server.
     MOCK_SERVER_URL = "http://localhost:28080/cas/"
 
     CAS_SERVER_URL = MOCK_SERVER_URL
