@@ -21,6 +21,8 @@ celery = "^5.4.0"
 eventlet = "^0.36.1"
 django-celery-beat = "^2.6.0"
 python-dotenv = "^1.0.1"
+locust = "^2.39.0"  # 添加 locust 用于压力测试
+pyquery = "^2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
