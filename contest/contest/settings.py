@@ -142,12 +142,12 @@ DATABASES = {
     }
 }
 
-if getenv("DJANGO_PRODUCTION") and getenv("DATABASE_PASSWORD"):
+if (getenv("DJANGO_PRODUCTION") or getenv("DJANGO_TESTING")) and getenv("DATABASE_PASSWORD"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "contest",
-            "USER": "bitnp",
+            "NAME": getenv("DATABASE_NAME") or "postgres",
+            "USER": getenv("DATABASE_USER") or "postgres",
             "PASSWORD": getenv("DATABASE_PASSWORD"),
             "HOST": getenv("DATABASE_HOST") or "127.0.0.1",
             "PORT": getenv("DATABASE_PORT") or "5432",
@@ -212,7 +212,7 @@ AUTHENTICATION_BACKENDS = [
     "quiz.auth_backends.CASBackend",
 ]
 
-if getenv("DJANGO_PRODUCTION"):
+if getenv("DJANGO_PRODUCTION") and not getenv("DJANGO_TESTING"):
     CAS_SERVER_URL = "https://sso.bit.edu.cn/cas/"
     CAS_ROOT_PROXIED_AS = "https://contest.bitnp.net"
 else:
@@ -220,7 +220,8 @@ else:
 
     # After upgrading to SSO, the devcas entrypoint has been removed.
     # Now you should start a mock CAS server.
-    MOCK_SERVER_URL = "http://localhost:28080/cas/"
+    # MOCK_SERVER_URL = "http://localhost:28080/cas/"
+    MOCK_SERVER_URL = "http://cas.bit-staging.bitnp.net/cas/"
 
     CAS_SERVER_URL = MOCK_SERVER_URL
     CAS_CHECK_NEXT = False
