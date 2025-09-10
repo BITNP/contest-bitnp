@@ -4,6 +4,9 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/BITNP/contest-bitnp/main.svg)](https://results.pre-commit.ci/latest/github/BITNP/contest-bitnp/main)
 [![Dockerhub image](https://img.shields.io/badge/dockerhub-image-important.svg?logo=Docker)](https://hub.docker.com/r/everything411/contest-bitnp)
 
+> [!NOTE]
+> GitHub 全年都会报告 Django 安全漏洞，而本项目只在夏秋之交使用。为减轻维护压力，每年会存档仓库；解除存档请联系[管理员](https://github.com/orgs/BITNP/people)。
+
 ## 目录
 
 * [开发](#开发)
