@@ -66,7 +66,7 @@ class ConstantsNamespace:
     MAX_TRAFFIC = 800
     """最大系统承载人数"""
 
-    YEAR = 2025
+    YEAR = 2026
     MONTH = 8
 
     ROUTES = {
