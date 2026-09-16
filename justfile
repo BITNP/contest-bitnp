@@ -80,3 +80,15 @@ task-beat:
 
 task-worker:
     cd {{ src_dir }} ; celery -A contest worker -P eventlet -l info
+
+# 预置压力测试数据（学生、题库），详见 stress/README.md
+seed-stress count="200":
+    {{ python }} ./stress/seed.py --students {{ count }}
+
+# 运行压力测试（需先安装 k6）
+stress:
+    k6 run ./stress/contest.js
+
+# 压力测试冒烟（2 VU × 1 轮）
+stress-smoke:
+    k6 run --vus 2 --iterations 1 ./stress/contest.js

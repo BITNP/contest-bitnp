@@ -1,6 +1,9 @@
 /fixtures/*
 !/fixtures/NGE.md
 
+# 压力测试输出
+stress/results/
+
 *.rdb
 *.xlsx
 *.csv
