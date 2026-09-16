@@ -276,11 +276,10 @@ export function workflow () {
             const questions = fetchContest()
 
             // 逐题暂存，模拟前端行为
+            const picked = randomAnswers(questions)
             const answers = {}
             for (const question of Object.keys(questions)) {
-                answers[question] = questions[question][
-                    Math.floor(Math.random() * questions[question].length)
-                ]
+                answers[question] = picked[question]
                 update(answers)
             }
 
