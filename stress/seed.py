@@ -36,7 +36,6 @@ django.setup()
 
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-
 from quiz.constants import constants
 from quiz.models import Choice, Question, Student, User
 
@@ -143,7 +142,9 @@ def create_students(count: int, prefix: str, password: str) -> None:
         for index, user in enumerate(users, start)
     ]
     Student.objects.bulk_create(students)
-    print(f"已创建 {count} 名学生，用户名 {prefix}{start:04d} … {prefix}{start + count - 1:04d}")
+    print(
+        f"已创建 {count} 名学生，用户名 {prefix}{start:04d} … {prefix}{start + count - 1:04d}"
+    )
 
 
 def main() -> None:
