@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
+from django.db import transaction
 from django.http import (
     Http404,
     HttpResponse,
@@ -14,7 +15,7 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseRedirect,
 )
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -22,7 +23,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 
 from .constants import constants
-from .models import Choice, DraftAnswer, DraftResponse, Question
+from .models import Choice, DraftAnswer, DraftResponse, Question, parse_choices
 from .util import is_open, is_student, is_student_taking_contest, pass_or_forbid, student_only
 
 if TYPE_CHECKING:
@@ -47,48 +48,44 @@ def continue_or_finalize(draft: DraftResponse) -> bool:
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#django.db.models.Model.delete
     https://docs.djangoproject.com/en/4.2/ref/models/instances/#refreshing-objects-from-database
     """
-    if draft.outdated():
-        # 从 Redis 获取现有的答案缓存
-        cached_answers = cache.get(f"{draft.id}_json", {})
+    if not draft.outdated():
+        return False
 
-        if cached_answers:
-            for question_id, choice_id in cached_answers.items():
-                # Filter out tokens
-                if not question_id.startswith("question-"):
-                    continue
+    # 从 Redis 获取现有的答案缓存
+    cached_answers = cache.get(f"{draft.id}_json", {})
+    if cached_answers is None:
+        cached_answers = {}
 
-                if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                    return False
+    try:
+        with transaction.atomic():
+            # 锁定草稿，防止与交卷、Celery 任务并发定稿
+            # （SQLite 不支持`SELECT … FOR UPDATE`，自动忽略）
+            locked = DraftResponse.objects.select_for_update().get(pk=draft.pk)
 
-                answer: DraftAnswer = get_object_or_404(
-                    draft.answer_set,
-                    question_id=int(question_id.removeprefix("question-")),
-                )
+            # 同步 Redis 缓存到数据库
+            try:
+                locked.apply_choices(cached_answers)
+            except ValueError:
+                # 缓存不合式，不定稿，等待下次处理
+                return False
 
-                answer.choice = get_object_or_404(
-                    Choice.objects,
-                    pk=int(choice_id.removeprefix("choice-")),
-                    question=answer.question,
-                )
+            # 提交之前的草稿
 
-                answer.save()
+            # 1. Convert from draft
+            response, answers = locked.finalize(submit_at=locked.deadline)
 
-            cache.delete(f"{draft.id}_json")
-            cache.delete(f"{draft.id}_ddl")
+            # 2. Save
+            response.save()
+            response.answer_set.bulk_create(answers)
+            locked.delete()
+    except DraftResponse.DoesNotExist:
+        # 已被交卷或 Celery 任务并发定稿，无需重复
+        pass
 
-        # 提交之前的草稿
+    cache.delete(f"{draft.id}_json")
+    cache.delete(f"{draft.id}_ddl")
 
-        # 1. Convert from draft
-        response, answers = draft.finalize(submit_at=draft.deadline)
-
-        # 2. Save
-        response.save()
-        response.answer_set.bulk_create(answers)
-        draft.delete()
-
-        return True
-
-    return False
+    return True
 
 
 def manage_status(
@@ -171,34 +168,28 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
         """重发做到一半，但是未提交的试卷"""
         draft_response: DraftResponse = student.draft_response
 
-        # 同步 Redis 缓存到数据库
-        # TODO: 现在渲染模板没用缓存，仍在查实际数据库
-        cache_key = f"{draft_response.id}_json"
-        cached_answers = cache.get(cache_key, {})
+        # 为渲染模板预先从数据库查询相关内容
+        answers = list(
+            draft_response.answer_set.select_related("question").prefetch_related(
+                "question__choice_set"
+            )
+        )
 
-        if cached_answers is not None:
-            for question_id, choice_id in cached_answers.items():
-                # Filter out tokens
-                if not question_id.startswith("question-"):
-                    continue
+        # 用 Redis 中暂存的选择覆盖内存中的实例，只影响本次渲染
+        # 交卷或超时自动提交时才写入数据库
+        cached_answers = cache.get(f"{draft_response.id}_json", {})
+        if cached_answers:
+            try:
+                parsed = parse_choices(cached_answers)
+            except ValueError as e:
+                return HttpResponseBadRequest(str(e))
 
-                if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-                    return HttpResponseBadRequest(
-                        f"Invalid choice ID “{choice_id}” for “{question_id}”."
-                    )
-
-                answer: DraftAnswer = get_object_or_404(
-                    draft_response.answer_set,
-                    question_id=int(question_id.removeprefix("question-")),
-                )
-
-                answer.choice = get_object_or_404(
-                    Choice.objects,
-                    pk=int(choice_id.removeprefix("choice-")),
-                    question=answer.question,
-                )
-
-                answer.save()
+            valid_choices = {c.pk: c for c in Choice.objects.filter(pk__in=parsed.values())}
+            for answer in answers:
+                choice_id = parsed.get(answer.question_id)
+                choice = valid_choices.get(choice_id) if choice_id is not None else None
+                if choice is not None and choice.question_id == answer.question_id:
+                    answer.choice = choice
 
     else:
         # 如果超出答题次数，拒绝
@@ -231,15 +222,18 @@ def contest(request: AuthenticatedHttpRequest) -> HttpResponse:
             [DraftAnswer(question=q, response=draft_response) for q in questions]
         )
 
+        answers = list(
+            draft_response.answer_set.select_related("question").prefetch_related(
+                "question__choice_set"
+            )
+        )
+
     return render(
         request,
         "contest.html",
         {
             "draft_response": draft_response,
-            # 为渲染模板预先从数据库查询相关内容
-            "answer_set": draft_response.answer_set.select_related(
-                "question"
-            ).prefetch_related("question__choice_set"),
+            "answer_set": answers,
             "constants": constants,
         },
     )
@@ -283,36 +277,27 @@ def contest_submit(request: AuthenticatedHttpRequest) -> HttpResponse:
     student: Student = request.user.student
     draft_response: DraftResponse = student.draft_response
 
-    for question_id, choice_id in request.POST.items():
-        # Filter out tokens
-        if not question_id.startswith("question-"):
-            continue
+    try:
+        with transaction.atomic():
+            # 锁定草稿，防止重复交卷或与超时自动提交并发
+            # （SQLite 不支持`SELECT … FOR UPDATE`，自动忽略）
+            locked = DraftResponse.objects.select_for_update().get(pk=draft_response.pk)
 
-        if not isinstance(choice_id, str) or not choice_id.startswith("choice-"):
-            return HttpResponseBadRequest(
-                f"Invalid choice ID “{choice_id}” for “{question_id}”."
-            )
+            # 同步表单到数据库（一次批量写入）
+            locked.apply_choices(request.POST)
 
-        answer: DraftAnswer = get_object_or_404(
-            draft_response.answer_set,
-            question_id=int(question_id.removeprefix("question-")),
-        )
+            # 1. Convert from draft
+            response, answers = locked.finalize(submit_at=timezone.now())
 
-        answer.choice = get_object_or_404(
-            Choice.objects,
-            pk=int(choice_id.removeprefix("choice-")),
-            question=answer.question,
-        )
-
-        answer.save()
-
-    # 1. Convert from draft
-    response, answers = student.draft_response.finalize(submit_at=timezone.now())
-
-    # 2. Save
-    response.save()
-    response.answer_set.bulk_create(answers)
-    student.draft_response.delete()
+            # 2. Save
+            response.save()
+            response.answer_set.bulk_create(answers)
+            locked.delete()
+    except ValueError as e:
+        return HttpResponseBadRequest(str(e))
+    except DraftResponse.DoesNotExist:
+        # 已被超时自动提交等并发定稿，无需重复
+        pass
 
     cache.delete(f"{draft_response.id}_json")
     cache.delete(f"{draft_response.id}_ddl")
