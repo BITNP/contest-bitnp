@@ -142,6 +142,15 @@ DATABASES = {
     }
 }
 
+
+# 连接池是「每进程」的，常驻连接约`工作进程数 × min_size`，需计入 PostgreSQL 的`max_connections`。
+# 注意：池会随进程数量重复，且 ASGI 下每个请求有独立的敏感线程，故`max_size`应按每进程的目标并发设。
+DB_POOL_MIN_SIZE: int = int(getenv("DATABASE_POOL_MIN_SIZE") or 2)
+DB_POOL_MAX_SIZE: int = int(getenv("DATABASE_POOL_MAX_SIZE") or 10)
+DB_POOL_TIMEOUT: int = int(getenv("DATABASE_POOL_TIMEOUT") or 10)
+DB_POOL_MAX_LIFETIME: int = int(getenv("DATABASE_POOL_MAX_LIFETIME") or 1800)
+DB_POOL_MAX_IDLE: int = int(getenv("DATABASE_POOL_MAX_IDLE") or 300)
+
 if (getenv("DJANGO_PRODUCTION") or getenv("DJANGO_TESTING")) and getenv("DATABASE_PASSWORD"):
     DATABASES = {
         "default": {
@@ -151,7 +160,23 @@ if (getenv("DJANGO_PRODUCTION") or getenv("DJANGO_TESTING")) and getenv("DATABAS
             "PASSWORD": getenv("DATABASE_PASSWORD"),
             "HOST": getenv("DATABASE_HOST") or "127.0.0.1",
             "PORT": getenv("DATABASE_PORT") or "5432",
-            "CONN_MAX_AGE": 60,
+            # 连接池需要 psycopg 3（`psycopg[binary,pool]`），psycopg2 会直接报错。
+            # `OPTIONS["pool"]`的字典会原样传给`psycopg_pool.ConnectionPool`。
+            # 详见 <https://docs.djangoproject.com/en/5.2/ref/databases/#connection-pool>。
+            "OPTIONS": {
+                "pool": {
+                    "min_size": DB_POOL_MIN_SIZE,
+                    # 默认`max_size`等于`min_size`（池不会增长）；取不到连接时等待`timeout`秒后抛`PoolTimeout`。
+                    "max_size": max(DB_POOL_MIN_SIZE, DB_POOL_MAX_SIZE),
+                    "timeout": DB_POOL_TIMEOUT,
+                    "max_lifetime": DB_POOL_MAX_LIFETIME,
+                    "max_idle": DB_POOL_MAX_IDLE,
+                },
+            },
+            # 池与持久连接互斥：非 0 时 Django 会抛`ImproperlyConfigured`。
+            "CONN_MAX_AGE": 0,
+            # Django 会据此给池设置`check=ConnectionPool.check_connection`。
+            "CONN_HEALTH_CHECKS": True,
         }
     }
 
@@ -263,25 +288,100 @@ else:
     )
 
 # 添加redis缓存
+REDIS_HOST = getenv("REDIS_HOST") or "localhost"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://" + REDIS_HOST + ":6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
 
-if DEBUG:  # noqa: SIM108
-    CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-else:
-    CELERY_BROKER_URL = "redis://localhost:6379/0"  # Modify in Release
+CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":6379/0"
 
 CELERY_TIMEZONE = TIME_ZONE
 # DJANGO_CELERY_BEAT_TZ_AWARE = False
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CELERY_ENABLE_UTC = False
+
+# Logging
+
+# Django 默认把`django.request`（500 的 traceback 就记在这里）只接到`mail_admins`，
+# 且`propagate = False`。未配置`ADMINS`时`mail_admins()`会直接返回，
+# 于是`DEBUG = False`时后端报错完全不留痕，容器里`docker logs`/`podman logs`什么都看不到。
+# 这里显式配置为输出到标准流（即容器的日志）。
+
+LOG_LEVEL = getenv("DJANGO_LOG_LEVEL", "INFO").upper()
+"""日志等级，可用环境变量`DJANGO_LOG_LEVEL`覆盖，例如`DEBUG`。"""
+
+LOGGING = {
+    "version": 1,
+    # 保留 gunicorn/uvicorn/celery 自己配置的 logger
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+    "formatters": {
+        "console": {
+            "format": "[{asctime}] {levelname} {name}: {message}",
+            "style": "{",
+        },
+        # 与 Django 默认的`django.server`一致，保留`runserver`的访问日志格式
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+            "level": LOG_LEVEL,
+        },
+        "django.server": {
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+        },
+        # 只有配置了`ADMINS`和邮件后端才会真正发信，否则`mail_admins()`静默返回
+        "mail_admins": {
+            "class": "django.utils.log.AdminEmailHandler",
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        # 4xx 记作`WARNING`，5xx 记作`ERROR`；生产环境只关心 5xx
+        "django.request": {
+            "handlers": ["console", "mail_admins"],
+            "level": "INFO" if DEBUG else "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console", "mail_admins"],
+            "level": "INFO" if DEBUG else "ERROR",
+            "propagate": False,
+        },
+        # SQL 只在`DEBUG`下输出，避免拖慢生产环境
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "INFO" if DEBUG else "WARNING",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
 
 # 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件
 # 有MIME报错的时候可以解除注释然后强制刷新前端运行看看

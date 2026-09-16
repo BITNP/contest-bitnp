@@ -1,4 +1,4 @@
-FROM node:18-slim AS build
+FROM node:24-slim AS build
 RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN pnpm config set registry https://registry.npmmirror.com/
 COPY contest /usr/src/app
