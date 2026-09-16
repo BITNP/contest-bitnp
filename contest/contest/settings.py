@@ -283,6 +283,83 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CELERY_ENABLE_UTC = False
 
+# Logging
+
+# Django 默认把`django.request`（500 的 traceback 就记在这里）只接到`mail_admins`，
+# 且`propagate = False`。未配置`ADMINS`时`mail_admins()`会直接返回，
+# 于是`DEBUG = False`时后端报错完全不留痕，容器里`docker logs`/`podman logs`什么都看不到。
+# 这里显式配置为输出到标准流（即容器的日志）。
+
+LOG_LEVEL = getenv("DJANGO_LOG_LEVEL", "INFO").upper()
+"""日志等级，可用环境变量`DJANGO_LOG_LEVEL`覆盖，例如`DEBUG`。"""
+
+LOGGING = {
+    "version": 1,
+    # 保留 gunicorn/uvicorn/celery 自己配置的 logger
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+    "formatters": {
+        "console": {
+            "format": "[{asctime}] {levelname} {name}: {message}",
+            "style": "{",
+        },
+        # 与 Django 默认的`django.server`一致，保留`runserver`的访问日志格式
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+            "level": LOG_LEVEL,
+        },
+        "django.server": {
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+        },
+        # 只有配置了`ADMINS`和邮件后端才会真正发信，否则`mail_admins()`静默返回
+        "mail_admins": {
+            "class": "django.utils.log.AdminEmailHandler",
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        # 4xx 记作`WARNING`，5xx 记作`ERROR`；生产环境只关心 5xx
+        "django.request": {
+            "handlers": ["console", "mail_admins"],
+            "level": "INFO" if DEBUG else "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console", "mail_admins"],
+            "level": "INFO" if DEBUG else "ERROR",
+            "propagate": False,
+        },
+        # SQL 只在`DEBUG`下输出，避免拖慢生产环境
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "INFO" if DEBUG else "WARNING",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
 # 防止本地注册表出现损坏导致的MIME类型解析错误，导致后端无法处理JS文件
 # 有MIME报错的时候可以解除注释然后强制刷新前端运行看看
 # 这个用法已经被取消，建议不要使用，而是更改注册表.js的属性
