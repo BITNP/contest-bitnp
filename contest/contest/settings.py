@@ -142,6 +142,15 @@ DATABASES = {
     }
 }
 
+
+# 连接池是「每进程」的，常驻连接约`工作进程数 × min_size`，需计入 PostgreSQL 的`max_connections`。
+# 注意：池会随进程数量重复，且 ASGI 下每个请求有独立的敏感线程，故`max_size`应按每进程的目标并发设。
+DB_POOL_MIN_SIZE: int = int(getenv("DATABASE_POOL_MIN_SIZE") or 2)
+DB_POOL_MAX_SIZE: int = int(getenv("DATABASE_POOL_MAX_SIZE") or 10)
+DB_POOL_TIMEOUT: int = int(getenv("DATABASE_POOL_TIMEOUT") or 10)
+DB_POOL_MAX_LIFETIME: int = int(getenv("DATABASE_POOL_MAX_LIFETIME") or 1800)
+DB_POOL_MAX_IDLE: int = int(getenv("DATABASE_POOL_MAX_IDLE") or 300)
+
 if (getenv("DJANGO_PRODUCTION") or getenv("DJANGO_TESTING")) and getenv("DATABASE_PASSWORD"):
     DATABASES = {
         "default": {
@@ -151,7 +160,23 @@ if (getenv("DJANGO_PRODUCTION") or getenv("DJANGO_TESTING")) and getenv("DATABAS
             "PASSWORD": getenv("DATABASE_PASSWORD"),
             "HOST": getenv("DATABASE_HOST") or "127.0.0.1",
             "PORT": getenv("DATABASE_PORT") or "5432",
-            "CONN_MAX_AGE": 60,
+            # 连接池需要 psycopg 3（`psycopg[binary,pool]`），psycopg2 会直接报错。
+            # `OPTIONS["pool"]`的字典会原样传给`psycopg_pool.ConnectionPool`。
+            # 详见 <https://docs.djangoproject.com/en/5.2/ref/databases/#connection-pool>。
+            "OPTIONS": {
+                "pool": {
+                    "min_size": DB_POOL_MIN_SIZE,
+                    # 默认`max_size`等于`min_size`（池不会增长）；取不到连接时等待`timeout`秒后抛`PoolTimeout`。
+                    "max_size": max(DB_POOL_MIN_SIZE, DB_POOL_MAX_SIZE),
+                    "timeout": DB_POOL_TIMEOUT,
+                    "max_lifetime": DB_POOL_MAX_LIFETIME,
+                    "max_idle": DB_POOL_MAX_IDLE,
+                },
+            },
+            # 池与持久连接互斥：非 0 时 Django 会抛`ImproperlyConfigured`。
+            "CONN_MAX_AGE": 0,
+            # Django 会据此给池设置`check=ConnectionPool.check_connection`。
+            "CONN_HEALTH_CHECKS": True,
         }
     }
 

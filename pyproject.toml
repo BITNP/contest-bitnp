@@ -37,7 +37,8 @@ pyquery = "^2.0.1"
 [tool.poetry.group.deploy.dependencies]
 gunicorn = "^22.0.0"
 uvicorn = "^0.23.2"
-psycopg2-binary = "^2.9.9"
+# psycopg3 才支持 Django 内置连接池（OPTIONS["pool"]）。
+psycopg = { version = "^3.2", extras = ["binary", "pool"] }
 
 [tool.poetry.group.coverage]
 optional = true
