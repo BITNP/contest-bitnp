@@ -288,20 +288,18 @@ else:
     )
 
 # 添加redis缓存
+REDIS_HOST = getenv("REDIS_HOST") or "localhost"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://"+REDIS_HOST+":6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
 
-if DEBUG:  # noqa: SIM108
-    CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-else:
-    CELERY_BROKER_URL = "redis://localhost:6379/0"  # Modify in Release
+CELERY_BROKER_URL = "redis://"+REDIS_HOST+":6379/0"
 
 CELERY_TIMEZONE = TIME_ZONE
 # DJANGO_CELERY_BEAT_TZ_AWARE = False
