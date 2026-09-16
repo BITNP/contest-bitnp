@@ -4,13 +4,14 @@ from itertools import cycle
 from os import environ
 from unittest import skip
 
-from contest.tasks import auto_save_redis_to_database
 from django.core.cache import cache
 from django.http import Http404, HttpRequest
 from django.shortcuts import render
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+
+from contest.tasks import auto_save_redis_to_database
 
 from .constants import constants
 from .models import (
