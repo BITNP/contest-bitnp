@@ -353,7 +353,8 @@ class ContestViewTests(TestCase):
             self.assertEqual(response.status_code, HTTPStatus.OK)
 
             # 渲染时已选中
-            self.assertEqual(response.context["answer_set"][0].choice, choice)
+            answer = next(a for a in response.context["answer_set"] if a.question == question)
+            self.assertEqual(answer.choice, choice)
             self.assertIn(b"checked", response.content)
 
             # 但读取路径不写数据库
@@ -669,7 +670,8 @@ class RedisIntegrationTests(TestCase):
 
         response = self.client.get(reverse("quiz:contest"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(response.context["answer_set"][0].choice, choice)
+        answer = next(a for a in response.context["answer_set"] if a.question == question)
+        self.assertEqual(answer.choice, choice)
 
         # 读取路径不写数据库
         answer.refresh_from_db()

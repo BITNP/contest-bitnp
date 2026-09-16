@@ -10,15 +10,15 @@ readme = "README.md"
 packages = [{ include = "contest" }]
 
 [tool.poetry.dependencies]
-python = "^3.12"
-Django = "^4.2"
+python = "^3.14"
+Django = "^5.2.8"
 humanize = "^4.7.0"
 django-cas-ng = "^4.3.0"
 django-tailwind = "^3.6.0"
 pyyaml = "^6.0.1"
 django-redis = "^5.2.0"  # 添加 django-redis 依赖
 celery = "^5.4.0"
-eventlet = "^0.36.1"
+eventlet = "^0.40.4"
 django-celery-beat = "^2.6.0"
 python-dotenv = "^1.0.1"
 locust = "^2.39.0"  # 添加 locust 用于压力测试
@@ -27,7 +27,7 @@ pyquery = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.1"
-django-stubs = { extras = ["compatible-mypy"], version = "^4.2.3" }
+django-stubs = { extras = ["compatible-mypy"], version = "^5.2.8" }
 ipython = "^8.14.0"
 django-tailwind = { extras = ["reload"], version = "^3.6.0" }
 django-debug-toolbar = "^4.1.0"
