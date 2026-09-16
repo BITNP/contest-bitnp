@@ -17,8 +17,13 @@ from pathlib import Path
 from shutil import which
 from zoneinfo import ZoneInfo
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 从项目根目录的`.env`读取环境变量。已存在的环境变量优先。
+load_dotenv(BASE_DIR.parent / ".env")
 
 
 # Security Settings
@@ -140,8 +145,13 @@ DATABASES = {
 if getenv("DJANGO_PRODUCTION"):
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db" / "db.sqlite3",
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": getenv("POSTGRES_DB", "contest"),
+            "USER": getenv("POSTGRES_USER", "contest"),
+            "PASSWORD": getenv("POSTGRES_PASSWORD", ""),
+            "HOST": getenv("POSTGRES_HOST", "localhost"),
+            "PORT": getenv("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": 60,
         }
     }
 

@@ -20,6 +20,7 @@ django-redis = "^5.2.0"  # 添加 django-redis 依赖
 celery = "^5.4.0"
 eventlet = "^0.36.1"
 django-celery-beat = "^2.6.0"
+python-dotenv = "^1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -32,6 +33,7 @@ django-debug-toolbar = "^4.1.0"
 [tool.poetry.group.deploy.dependencies]
 gunicorn = "^22.0.0"
 uvicorn = "^0.23.2"
+psycopg2-binary = "^2.9.9"
 
 [tool.poetry.group.coverage]
 optional = true

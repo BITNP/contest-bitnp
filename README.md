@@ -236,28 +236,44 @@ $ docker build -t everything411/contest-bitnp .
 
 #### 从头开始使用容器进行部署
 
+复制[`.env.example`](./.env.example)为`.env`，并填写`SECRET_KEY`、`POSTGRES_PASSWORD`等。生产环境使用 PostgreSQL，数据库连接信息由`.env`提供。
+
 编写`docker-compose.yml`
 
-```dockerfile
-version: "3"
+```yaml
 services:
   web:
     image: everything411/contest-bitnp
     ports:
       - 8080:80
+    env_file: .env
     environment:
-      - SECRET_KEY=${SECRET_KEY}
       - DJANGO_PRODUCTION=1
+      - POSTGRES_HOST=db          # 容器内通过服务名访问数据库
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
-     - ./db:/usr/src/app/db              # 数据库持久化
-     - ./fixtures:/usr/src/app/fixtures  # 放fixtures，加载题目用
-     # - ./settings.py:/usr/src/app/contest/settings.py # 取消注释可临时调整设置
+      - ./fixtures:/usr/src/app/fixtures  # 放fixtures，加载题目用
+      # - ./settings.py:/usr/src/app/contest/settings.py # 取消注释可临时调整设置
+  db:
+    image: postgres:16
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # 数据库持久化
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
 ```
 
 然后
 
 ```shell
-$ mkdir db
 $ docker compose up -d
 ```
 
@@ -278,25 +294,24 @@ $ docker exec -it contest_web_1 bash
 > 可用`python -m venv`替代 poetry，手动执行替代 just。
 
 ```bash
-$ export DJANGO_PRODUCTION="任何非空字符串"
-$ export SECRET_KEY="The secret key must be a large random value and it must be kept secret"
+$ cp .env.example .env
+$ # 编辑`.env`，填写`SECRET_KEY`、`POSTGRES_PASSWORD`等，并启用`DJANGO_PRODUCTION`
 
-$ echo 'PYTHON = "./.venv/bin/python"' > .env
-$ just update  # 安装依赖、数据库等
+$ just update  # 安装依赖、迁移数据库等（需可访问 PostgreSQL）
 $ just check-deploy  # 检查
 ```
 
 > **Note**
 >
-> 若希望部署时永远开放答题，请`export DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL="任何非空字符串"`。
+> 若希望部署时永远开放答题，请在`.env`中设置`DJANGO_DISABLE_QUIZ_OPENING_TIME_INTERVAL`为非空值。
+
+`settings.py`会用[python-dotenv][]自动读取项目根目录的`.env`，因此无需手动`export`。
 
 在 poetry 中安装部署依赖组后，可以使用 [uvicorn][] 或者 [gunicorn][] 来运行本网站：
 
 使用 uvicorn 单线程运行：
 
 ```shell
-$ export DJANGO_PRODUCTION=1
-$ export SECRET_KEY="!!replace me replace me!!"
 $ cd contest-bitnp
 $ uvicorn contest.asgi::application
 ```
@@ -304,8 +319,6 @@ $ uvicorn contest.asgi::application
 或者使用 gunicorn 管理多个 uvicorn 工作进程：
 
 ```shell
-$ export DJANGO_PRODUCTION=1
-$ export SECRET_KEY="!!replace me replace me!!"
 $ cd contest-bitnp
 $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 ```
@@ -320,6 +333,7 @@ $ gunicorn -w 4 -k uvicorn.workers.UvicornWorker contest.asgi:application
 [pnpm]: https://pnpm.io/
 [poetry]: https://python-poetry.org
 [pre-commit]: https://pre-commit.com/
+[python-dotenv]: https://saurabh-kumar.com/python-dotenv/
 [scoop]: https://scoop.sh
 [uvicorn]: https://www.uvicorn.org/
 [gunicorn]: https://gunicorn.org/
