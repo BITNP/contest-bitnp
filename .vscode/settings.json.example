@@ -1,4 +1,6 @@
 {
     "python.analysis.typeCheckingMode": "basic",
     "mypy.dmypyExecutable": "${workspaceFolder}/.venv/Scripts/dmypy.exe",
+    // For Linux Users with venv:
+    // "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
 }

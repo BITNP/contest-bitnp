@@ -212,6 +212,8 @@ VS Code 默认的 [Pylance](https://marketplace.visualstudio.com/items?itemName=
 
 为减小镜像，用 pip 替代 [poetry][]，需将[`pyproject.toml`](https://python-poetry.org/docs/pyproject/)的`tool.poetry.dependencies`、`tool.poetry.group.deploy.dependencies`转换为[`requirements.txt`](https://pip.pypa.io/en/stable/reference/requirements-file-format/)。
 
+> poetry 最近更新之后, `export` 命令被移到了 `poetry-plugin-export` 插件, 需安装后才可使用.
+
 ```shell
 $ poetry export --output requirements.txt --without-hashes --without-urls --with deploy
 ```

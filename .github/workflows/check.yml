@@ -38,7 +38,7 @@ jobs:
         echo 'PYTHON = "./.venv/bin/python"' > .env
     - uses: actions/setup-python@v6
       with:
-        python-version: '3.12'
+        python-version: '3.14'
         cache: poetry
 
     # Setup other tools
@@ -148,7 +148,7 @@ jobs:
           .venv/
     - uses: actions/setup-python@v6
       with:
-        python-version: '3.12'
+        python-version: '3.14'
 
     # Setup other tools
     - name: Setup just

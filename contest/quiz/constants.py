@@ -63,10 +63,10 @@ class ConstantsNamespace:
     MAX_TRIES = 2
     """答题次数上限"""
 
-    MAX_TRAFFIC = 400
+    MAX_TRAFFIC = 800
     """最大系统承载人数"""
 
-    YEAR = 2024
+    YEAR = 2026
     MONTH = 8
 
     ROUTES = {
