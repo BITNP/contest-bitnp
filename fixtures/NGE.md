@@ -381,7 +381,7 @@ Just a little longer
 The Last Messenger
 O Freunde
 Freude, schöner Götterfunken
-Und der Cherub steht vor Gott
+Und der Cherub steht for Gott
 Wir betreten feuertrunken, Himmlische, dein Heiligtum!
 Diesen Kuss der ganzen Welt!
 He wished to die
