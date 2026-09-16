@@ -96,6 +96,25 @@ jobs:
       # 内容都不重要
       DJANGO_PRODUCTION: Israfel
       SECRET_KEY: Israfel is the Seventh Angel, capable of splitting itself into two identical copies for simultaneous attacks.
+      POSTGRES_DB: contest
+      POSTGRES_USER: contest
+      POSTGRES_PASSWORD: contest
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: contest
+          POSTGRES_USER: contest
+          POSTGRES_PASSWORD: contest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - uses: actions/checkout@v5
 
